@@ -3,18 +3,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Netko.TransferPage">
+             x:Class="Netko.UploadPage">
 	<UserControl.Styles>
 		<Style>
 			<Style.Resources>
-				<StreamGeometry x:Key="Download">M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z</StreamGeometry>
+				<StreamGeometry x:Key="Upload">M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z</StreamGeometry>
 			</Style.Resources>
 		</Style>
 	</UserControl.Styles>
 	<Grid ColumnDefinitions="*" RowDefinitions="Auto, 3, Auto">
 		<DockPanel  Grid.Row="0" Grid.Column="0">
-			<PathIcon Data="{StaticResource Download}" Height="30" Width="30" Margin="5"/>
-			<Label Margin="5" FontSize="25">下载管理</Label>
+			<PathIcon Data="{StaticResource Upload}" Height="30" Width="30" Margin="5"/>
+			<Label Margin="5" FontSize="25">上传管理</Label>
 		</DockPanel>
 		<Separator Grid.Row="1" Grid.Column="0" Margin="0" Padding="0"></Separator>
 	</Grid>

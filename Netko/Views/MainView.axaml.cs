@@ -3,7 +3,6 @@ using Avalonia.Interactivity;
 using System.Collections.Generic;
 using System.Reactive;
 using System.Windows.Input;
-
 namespace Netko.Views;
 
 public partial class MainView : UserControl
@@ -17,6 +16,7 @@ public partial class MainView : UserControl
     UserControl Page_Home = new HomePage();
     UserControl Page_Transfer = new TransferPage();
     UserControl Page_Setting = new SettingPage();
+    UserControl Page_Upload = new UploadPage();
 
     public void Change(object sender, RoutedEventArgs e)
     {
@@ -41,7 +41,9 @@ public partial class MainView : UserControl
             case "Setting":
                 ContentPanel.Children.Add(Page_Setting);
                 break;
-
+            case "Upload":
+                ContentPanel.Children.Add(Page_Upload);
+                break;
         }
         return;
     }
