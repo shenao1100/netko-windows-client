@@ -8,8 +8,22 @@
 
   
   <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
+	  <AvaloniaResource Include="Assets\**" />
+	  <AvaloniaResource Include="Assets\FileIcon\**" />
   </ItemGroup>
+
+  
+
+
+	<!--ItemGroup>
+    <None Remove="Assets\FileIcon\test.png" />
+    <None Remove="Assets\logo.png" />
+    <None Remove="Assets\logo256.ico" />
+    <None Remove="Assets\logo512.ico" />
+    <None Remove="Assets\test.png" />
+	  <None Remove="Assets\FileIcon\test.png" />
+	  <None Remove="Assets\test.png" />
+  </ItemGroup-->
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
@@ -18,5 +32,7 @@
     <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+
+    
   </ItemGroup>
 </Project>

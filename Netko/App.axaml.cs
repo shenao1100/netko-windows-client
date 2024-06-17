@@ -1,9 +1,10 @@
 ﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-
+using Avalonia.Media;
 using Netko.ViewModels;
 using Netko.Views;
+
 
 namespace Netko;
 
@@ -11,7 +12,10 @@ public partial class App : Application
 {
     public override void Initialize()
     {
+        AppThemeUtils.BeforeInitialize();
         AvaloniaXamlLoader.Load(this);
+        AppThemeUtils.AfterInitialize();
+ 
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -32,5 +36,6 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+        
     }
 }

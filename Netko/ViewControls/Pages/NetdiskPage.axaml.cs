@@ -9,5 +9,7 @@ public partial class NetdiskPage : UserControl
     public NetdiskPage()
     {
         InitializeComponent();
+        UserControl FilePanel = new NetdiskFilePage();
+        FileListPanel.Children.Add(FilePanel);
     }
 }

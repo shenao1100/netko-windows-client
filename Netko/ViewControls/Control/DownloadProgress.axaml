@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="Netko.DownloadProgress">
+	<Grid RowDefinitions="Auto, Auto">
+
+		<Grid Grid.Column="0" ColumnDefinitions="Auto, Auto, *">
+			<Image Grid.Column="0" Width="64" Height="64" Source="/Assets/FileIcon/test.png"></Image>
+			<StackPanel Grid.Column="1">
+				<Label>Download File Name</Label>
+				<Label>64.0MB/128.0MB 50% 3.2MB/s</Label>
+			</StackPanel>
+			<StackPanel HorizontalAlignment="Right" Grid.Column="2">
+				<DockPanel>
+					<Button Height="60" Width="60"></Button>
+					<Button Height="60" Width="60"></Button>
+				</DockPanel>
+			</StackPanel>
+		</Grid>
+	<DockPanel DockPanel.Dock="Left" >
+		
+		
+	</DockPanel>
+	<ProgressBar Grid.Row="1"></ProgressBar>
+	</Grid>
+</UserControl>

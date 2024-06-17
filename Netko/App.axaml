@@ -1,10 +1,28 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Netko.App"
+			 xmlns:vm="clr-namespace:Netko.ViewModels"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
-
-    <Application.Styles>
-        <FluentTheme />
-    </Application.Styles>
+	<Design.DataContext>
+		<!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+		<vm:MainViewModel />
+	</Design.DataContext>
+	<Application.Resources>
+		<ResourceDictionary>
+			<!-- Resources used only in the control catalog -->
+				<ResourceDictionary.MergedDictionaries>
+					<ResourceInclude Source="/GlobalResource.axaml"/>
+				</ResourceDictionary.MergedDictionaries>
+			<!-- Styles attached dynamically depending on current theme (simple or fluent) -->
+			<FluentTheme x:Key="FluentTheme">
+			</FluentTheme>
+			<SimpleTheme x:Key="SimpleTheme" />
+			<StyleInclude x:Key="DataGridFluent" Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+			<StyleInclude x:Key="DataGridSimple" Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml" />
+			<StyleInclude x:Key="ColorPickerFluent" Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
+			<StyleInclude x:Key="ColorPickerSimple" Source="avares://Avalonia.Controls.ColorPicker/Themes/Simple/Simple.xaml" />
+		</ResourceDictionary>
+	</Application.Resources>
 </Application>

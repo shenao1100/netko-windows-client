@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:lv="using:Netko.Views"
              x:Class="Netko.SettingPage">
 	<UserControl.Styles>
 		<Style>
@@ -11,7 +12,7 @@
 			</Style.Resources>
 		</Style>
 	</UserControl.Styles>
-	<Grid ColumnDefinitions="*" RowDefinitions="Auto, 3, Auto">
+	<Grid ColumnDefinitions="*" RowDefinitions="Auto, 3, Auto, Auto">
 		<DockPanel  Grid.Row="0" Grid.Column="0">
 			<PathIcon Data="{StaticResource Setting}" Height="30" Width="30" Margin="5"/>
 			<Label Margin="5" FontSize="25">设置</Label>
@@ -25,8 +26,32 @@
 			</Grid>
 			<Label>暗黑模式</Label>
 			<Button Click="ChangeDayNight">Change</Button>
+			<Label>下载线程</Label>
+			<TextBlock Text="" x:Name="thread_show"></TextBlock>
+			<Slider  x:Name="slider" Maximum="10" Margin="5 0"/>
 		</StackPanel>
-		
+		<StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="0">
+			<TextBlock Text="Themes" Padding="2" ></TextBlock>
+			<ComboBox x:Name="ThemeBox" Width="125" Padding="4" SelectedIndex="0">
+				<ComboBox.Items>
+					<lv:ThemeType>Fluent</lv:ThemeType>
+					<lv:ThemeType>Simple</lv:ThemeType>
+				</ComboBox.Items>
+			</ComboBox>
+			<TextBlock Text="Styles"  Padding="2"></TextBlock>
+			<ComboBox x:Name="ThemeVariantsBox"
+					  Width="125"
+					  Padding="4"
+					  DisplayMemberBinding="{Binding Key, x:DataType=ThemeVariant}"
+					  SelectionChanged="ComboBox_SelectionChanged"
+					  SelectedIndex="0">
+				<ComboBox.Items>
+					<ThemeVariant>Default</ThemeVariant>
+					<ThemeVariant>Light</ThemeVariant>
+					<ThemeVariant>Dark</ThemeVariant>
+				</ComboBox.Items>
+			</ComboBox>
+		</StackPanel>
 		
 	</Grid>
 </UserControl>

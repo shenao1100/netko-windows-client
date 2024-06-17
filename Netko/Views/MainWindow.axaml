@@ -6,9 +6,32 @@
         xmlns:views="clr-namespace:Netko.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Netko.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/logo256.ico"
         Title="Netko"
 		Background="Transparent"
-		TransparencyLevelHint="Mica">
-        <views:MainView />
+		TransparencyLevelHint="AcrylicBlur"
+		ExtendClientAreaToDecorationsHint="True"
+		DragDrop.AllowDrop="True">
+	<Design.DataContext>
+		<vm:MainViewModel></vm:MainViewModel>
+	</Design.DataContext>
+	<Panel>
+		<Border Background="{ReflectionBinding sdadad}" CornerRadius="0" Opacity="0.35">
+		</Border>
+		<DockPanel>
+
+			<Panel  Margin="0" DockPanel.Dock="Top" x:Name="DragBar" PointerPressed="DragBar_OnDrag" DoubleTapped="DragBar_MaxWin">
+				<!--Provide darker background-->
+				<Border Background="{ReflectionBinding sdadad}" CornerRadius="0 7" Padding="17" Margin="0" Opacity="0.5" x:Name="Backpanel">
+				</Border>
+				<StackPanel Margin="7" x:Name="ContentPanel">
+					<TextBlock FontSize="15" Text="hello" x:Name="TitleBlock"/>
+				</StackPanel>
+			</Panel>
+			<views:MainView DockPanel.Dock="Top"/>
+
+		</DockPanel>
+
+	</Panel>
+
 </Window>

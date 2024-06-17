@@ -11,7 +11,7 @@
 			</Style.Resources>
 		</Style>
 	</UserControl.Styles>
-	<Grid ColumnDefinitions="*" RowDefinitions="30, 5">
+	<Grid ColumnDefinitions="*" RowDefinitions="30, Auto, *">
 		<Grid Grid.Column="0" Grid.Row="0" ColumnDefinitions="*, 25" RowDefinitions="Auto, Auto">
 			
 			<Button Grid.Column="1" Grid.Row="0">
@@ -33,5 +33,6 @@
 			
 		</Grid>
 		<Separator Grid.Row="1" Margin="0" Padding="0"></Separator>
+		<StackPanel x:Name="FileListPanel" Grid.Row="2"></StackPanel>
 	</Grid>
 </UserControl>

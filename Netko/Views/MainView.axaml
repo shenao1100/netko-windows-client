@@ -30,6 +30,7 @@
 	<ScrollViewer VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="0">
 		<DockPanel Margin="0">
 			<!--Function selection-->
+			<Image Source="/Assets/logo.png" Height="120" Width="120" DockPanel.Dock="Top"/>
 			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="110" x:Name="Home">
 				<DockPanel>
 					<PathIcon Classes="audio-on" Data="{StaticResource Home}"/>
@@ -70,16 +71,23 @@
 		</DockPanel>
 		
 	</ScrollViewer>
-		<ScrollViewer Grid.Column="1" Grid.Row="0" >
+		<!--ScrollViewer Grid.Column="1" Grid.Row="0" >
 			<Panel  Margin="5">
-				<!--Provide darker background-->
-				<Border Background="Black" CornerRadius="7" Padding="0" Margin="0" Opacity="0.3">
+				<Border Background="{Binding sdadad}" CornerRadius="7" Padding="0" Margin="0" Opacity="0.3">
 					</Border>
 				<StackPanel Margin="7" x:Name="ContentPanel">
 					
 				</StackPanel>
 			</Panel>
 			
-		</ScrollViewer>
+		</ScrollViewer-->
+		<Panel  Margin="5"  Grid.Column="1" Grid.Row="0" >
+			<!--Provide darker background-->
+			<Border Background="{Binding sdadad}" CornerRadius="7" Padding="0" Margin="0" Opacity="0.3">
+			</Border>
+			<Panel Margin="7" x:Name="ContentPanel1">
+
+			</Panel>
+		</Panel>
 		</Grid>
 </UserControl>

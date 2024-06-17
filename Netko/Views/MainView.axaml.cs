@@ -1,5 +1,8 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Controls.Chrome;
 using Avalonia.Interactivity;
+using Avalonia.Media;
+using Netko.ViewModels;
 using System.Collections.Generic;
 using System.Reactive;
 using System.Windows.Input;
@@ -9,6 +12,7 @@ public partial class MainView : UserControl
 {
     public MainView()
     {
+        
         InitializeComponent();
     }
     //Init all pages
@@ -21,7 +25,7 @@ public partial class MainView : UserControl
     public void Change(object sender, RoutedEventArgs e)
     {
         //Change page
-        ContentPanel.Children.Clear();
+        ContentPanel1.Children.Clear();
         var clicked_button = sender as Button;
         if (clicked_button.Name == null)
         {
@@ -30,19 +34,19 @@ public partial class MainView : UserControl
         switch (clicked_button.Name.ToString())
         {
             case "Home":
-                ContentPanel.Children.Add(Page_Home);
+                ContentPanel1.Children.Add(Page_Home);
                 break;
             case "Manage":
-                ContentPanel.Children.Add(Page_Netdisk);
+                ContentPanel1.Children.Add(Page_Netdisk);
                 break;
             case "Transfer":
-                ContentPanel.Children.Add(Page_Transfer);
+                ContentPanel1.Children.Add(Page_Transfer);
                 break;
             case "Setting":
-                ContentPanel.Children.Add(Page_Setting);
+                ContentPanel1.Children.Add(Page_Setting);
                 break;
             case "Upload":
-                ContentPanel.Children.Add(Page_Upload);
+                ContentPanel1.Children.Add(Page_Upload);
                 break;
         }
         return;

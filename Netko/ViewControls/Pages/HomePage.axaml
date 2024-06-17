@@ -4,8 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Netko.HomePage">
-	<StackPanel>
-		<Label>你好</Label>
-		<Label>这是一条测试文本</Label>
+	<StackPanel HorizontalAlignment="Center">
+		<Image Margin="20" Height="200" Width="200"
+         Source="avares://Netko/Assets/logo.png"/>
+		<Label FontSize="30" HorizontalAlignment="Center">Netko盒</Label>
 	</StackPanel>
 </UserControl>
