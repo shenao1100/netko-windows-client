@@ -52,4 +52,9 @@ public partial class SettingPage : UserControl
     {
         
     }
+
+    private void Slider_ValueChanged(object? sender, Avalonia.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+    {
+        thread_show.Text = Math.Round(slider.Value).ToString(); 
+    }
 }

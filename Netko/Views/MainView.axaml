@@ -24,6 +24,13 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
     <vm:MainViewModel />
   </Design.DataContext>
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="/GlobalResource.axaml"></ResourceInclude>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
 	<Grid ColumnDefinitions="Auto, *">
 		
 	
@@ -83,7 +90,7 @@
 		</ScrollViewer-->
 		<Panel  Margin="5"  Grid.Column="1" Grid.Row="0" >
 			<!--Provide darker background-->
-			<Border Background="{Binding sdadad}" CornerRadius="7" Padding="0" Margin="0" Opacity="0.3">
+			<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="7" Padding="0" Margin="0" Opacity="0.3">
 			</Border>
 			<Panel Margin="7" x:Name="ContentPanel1">
 
