@@ -4,18 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="Netko.DownloadProgress">
-	<Grid RowDefinitions="Auto, Auto">
+	<Grid RowDefinitions="Auto, Auto" Margin="3">
 
 		<Grid Grid.Column="0" ColumnDefinitions="Auto, Auto, *">
-			<Image Grid.Column="0" Width="64" Height="64" Source="/Assets/FileIcon/test.png"></Image>
+			<Image Grid.Column="0" Width="60" Height="60" Source="/Assets/FileIcon/test.png"></Image>
 			<StackPanel Grid.Column="1">
-				<Label>Download File Name</Label>
-				<Label>64.0MB/128.0MB 50% 3.2MB/s</Label>
+				<Label Margin="3">Download File Name</Label>
+				<Label Margin="3 0" Opacity=".7">64.0MB/128.0MB 50% 3.2MB/s</Label>
 			</StackPanel>
 			<StackPanel HorizontalAlignment="Right" Grid.Column="2">
 				<DockPanel>
-					<Button Height="60" Width="60"></Button>
-					<Button Height="60" Width="60"></Button>
+					<Button Margin="3" Height="55" Width="55"></Button>
+					<Button Margin="3" Height="55" Width="55"></Button>
 				</DockPanel>
 			</StackPanel>
 		</Grid>
@@ -23,6 +23,6 @@
 		
 		
 	</DockPanel>
-	<ProgressBar Grid.Row="1"></ProgressBar>
+	<ProgressBar Value="50" Grid.Row="1"></ProgressBar>
 	</Grid>
 </UserControl>

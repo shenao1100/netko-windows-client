@@ -13,6 +13,13 @@
 			</Style.Resources>
 		</Style>
 	</UserControl.Styles>
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="/GlobalResource.axaml"></ResourceInclude>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
 	<Grid ColumnDefinitions="*" RowDefinitions="Auto, 3, *">
 		<DockPanel  Grid.Row="0" Grid.Column="0">
 			<PathIcon Data="{StaticResource Download}" Height="30" Width="30" Margin="5"/>
@@ -26,13 +33,23 @@
 				</StackPanel>
 			</ScrollViewer>
 			<Separator Grid.Column="1" ></Separator>
-			<Panel Margin="5"  Grid.Column="2">
+			<Panel Margin="0"  Grid.Column="2">
 				<!--Provide darker background-->
-				<Border Background="{Binding sdadad}" CornerRadius="7" Padding="0" Margin="0" Opacity="0.3">
+				<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="3" Padding="0" Margin="0" Opacity="0.2">
 				</Border>
-				<Panel Margin="7">
-					<Label>nihao</Label>
-				</Panel>
+				<ScrollViewer>
+					<StackPanel Margin="7">
+						<Label>nihao</Label>
+						<Label>nihao</Label>
+						<Label>nihao</Label>
+						<Label>nihao</Label>
+						<Label>nihao</Label>
+						<Label>nihao</Label>
+						<Label>nihao</Label>
+						<Label>nihao</Label>
+					</StackPanel>
+				</ScrollViewer>
+				
 			</Panel>
 		</Grid>
 

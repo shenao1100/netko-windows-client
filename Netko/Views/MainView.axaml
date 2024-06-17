@@ -63,8 +63,17 @@
 					<PathIcon Classes="audio-on" Data="{StaticResource Upload}" />
 					<Label>上传管理</Label>
 				</DockPanel>
+			</Button>
+
+			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="110" x:Name="History">
+				<DockPanel>
+					<PathIcon Classes="audio-on" Data="{StaticResource Upload}" />
+					<Label>历史记录</Label>
+				</DockPanel>
+
 
 			</Button>
+			
 			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="110" x:Name="Setting">
 				<DockPanel>
 					<PathIcon Classes="audio-on" Data="{StaticResource Setting}" />
