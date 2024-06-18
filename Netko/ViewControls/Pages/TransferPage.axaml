@@ -6,14 +6,12 @@
              x:Class="Netko.TransferPage">
 	<UserControl.Styles>
 		<Style>
-			<Style.Resources>
-				<StreamGeometry x:Key="Download">M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z</StreamGeometry>
-			</Style.Resources>
+			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
 		</Style>
 	</UserControl.Styles>
 	<Grid ColumnDefinitions="*" RowDefinitions="Auto, 3, *">
 		<DockPanel  Grid.Row="0" Grid.Column="0">
-			<PathIcon Data="{StaticResource Download}" Height="30" Width="30" Margin="5"/>
+			<PathIcon Data="{StaticResource download}" Height="30" Width="30" Margin="5"/>
 			<Label Margin="5" FontSize="25">下载管理</Label>
 		</DockPanel>
 		<Separator Grid.Row="1" Grid.Column="0" Margin="0" Padding="0"></Separator>

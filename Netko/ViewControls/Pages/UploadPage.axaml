@@ -6,14 +6,12 @@
              x:Class="Netko.UploadPage">
 	<UserControl.Styles>
 		<Style>
-			<Style.Resources>
-				<StreamGeometry x:Key="Upload">M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z</StreamGeometry>
-			</Style.Resources>
+			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
 		</Style>
 	</UserControl.Styles>
 	<Grid ColumnDefinitions="*" RowDefinitions="Auto, 3, Auto">
 		<DockPanel  Grid.Row="0" Grid.Column="0">
-			<PathIcon Data="{StaticResource Upload}" Height="30" Width="30" Margin="5"/>
+			<PathIcon Data="{StaticResource upload}" Height="30" Width="30" Margin="5"/>
 			<Label Margin="5" FontSize="25">上传管理</Label>
 		</DockPanel>
 		<Separator Grid.Row="1" Grid.Column="0" Margin="0" Padding="0"></Separator>

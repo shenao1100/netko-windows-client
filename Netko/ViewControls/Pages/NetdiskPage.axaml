@@ -6,25 +6,23 @@
              x:Class="Netko.NetdiskPage">
 	<UserControl.Styles>
 		<Style>
-			<Style.Resources>
-				<StreamGeometry x:Key="Add">M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z</StreamGeometry>
-			</Style.Resources>
+			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
 		</Style>
 	</UserControl.Styles>
 	<Grid ColumnDefinitions="*" RowDefinitions="30, Auto, *">
 		<Grid Grid.Column="0" Grid.Row="0" ColumnDefinitions="*, 25" RowDefinitions="Auto, Auto">
 			
 			<Button Grid.Column="1" Grid.Row="0">
-				<PathIcon Data="{StaticResource Add}" Height="10" Width="10"/>
+				<PathIcon Data="{StaticResource add}" Height="10" Width="10"/>
 			</Button>
 			<ScrollViewer HorizontalScrollBarVisibility="Auto" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
 				<!--Change User selection-->
 				<DockPanel Margin="3" x:Name="UserSection">
 					<Button>
-						<PathIcon Data="{StaticResource Add}" Height="10" Width="10"/>
+						<PathIcon Data="{StaticResource add}" Height="10" Width="10"/>
 					</Button>
 					<Button>
-						<PathIcon Data="{StaticResource Add}" Height="10" Width="10"/>
+						<PathIcon Data="{StaticResource add}" Height="10" Width="10"/>
 					</Button>
 
 				</DockPanel>
