@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="55"
+             x:Class="Netko.FileShowLine">
+	<Grid ColumnDefinitions="*" VerticalAlignment="Top" Margin="3">
+		<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="7" Padding="0" Margin="0" Opacity="0.3">
+		</Border>
+		<Grid ColumnDefinitions="55, *">
+			<Image Source="/Assets/test.png" Height="50" Grid.Column="0" Margin="3"></Image>
+			<Grid RowDefinitions="Auto, Auto" Grid.Column="1" VerticalAlignment="Center" Margin="5 0">
+				<Label Grid.Row="0" FontSize="15" Padding="0 3">测试文件.zip</Label>
+				<Label Opacity=".7" Grid.Row="1" FontSize="12" Margin="0" Padding="0">128.0MB 2077-7-7 13:45</Label>
+
+			</Grid>
+		</Grid>
+
+	</Grid>
+
+</UserControl>

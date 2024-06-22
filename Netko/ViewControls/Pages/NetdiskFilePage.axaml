@@ -9,7 +9,7 @@
 			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
 		</Style>
 	</UserControl.Styles>
-	<Grid ColumnDefinitions="*" RowDefinitions="Auto, Auto, Auto, *, Auto" VerticalAlignment="Top">
+	<Grid ColumnDefinitions="*" RowDefinitions="Auto, Auto, Auto, *" VerticalAlignment="Top">
 		<Grid ColumnDefinitions="Auto, Auto, Auto, *, Auto">
 			<Button Grid.Row="0" Grid.Column="0" Background="Transparent">
 				<PathIcon Data="{StaticResource home}" Height="15" Width="15"/>
@@ -27,7 +27,13 @@
 		</Grid>
 		<Separator Grid.Row="1" Margin="0" Padding="0"></Separator>
 		<ProgressBar Grid.Row="2" Margin="0" Padding="0"></ProgressBar>
-		<ScrollViewer Grid.Row="3" Margin="0" Padding="0"></ScrollViewer>
+		<ScrollViewer Grid.Row="3" Margin="0" Padding="0">
+			<StackPanel x:Name="FileListViewer">
+				<Button Click="Button_Click">Add Item</Button>
+				<Button Click="NetdiskParse">Netdisk test</Button>
+
+			</StackPanel>
+		</ScrollViewer>
 
 	</Grid>
 </UserControl>

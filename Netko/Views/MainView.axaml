@@ -30,45 +30,45 @@
 		<DockPanel Margin="0">
 			<!--Function selection-->
 			<Image Source="/Assets/logo.png" Height="120" Width="120" DockPanel.Dock="Top"/>
-			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="110" x:Name="Home">
+			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Home" Background="Transparent">
 				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource home}"/>
+					<PathIcon Classes="audio-on" Data="{StaticResource home}" Margin="10 0"/>
 					<Label>主页</Label>
 				</DockPanel>
 
 			</Button>
-			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="110" x:Name="Manage">
+			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Manage" Background="Transparent">
 				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource web_drive}" />
+					<PathIcon Classes="audio-on" Data="{StaticResource web_drive}" Margin="10 0"/>
 					<Label>网盘管理</Label>
 				</DockPanel>
 			</Button>
-			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="110" x:Name="Transfer">
+			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Transfer" Background="Transparent">
 				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource download}" />
+					<PathIcon Classes="audio-on" Data="{StaticResource download}" Margin="10 0"/>
 					<Label>下载管理</Label>
 				</DockPanel>
 
 			</Button>
-			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="110" x:Name="Upload">
+			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Upload" Background="Transparent">
 				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource upload}" />
+					<PathIcon Classes="audio-on" Data="{StaticResource upload}" Margin="10 0"/>
 					<Label>上传管理</Label>
 				</DockPanel>
 			</Button>
 
-			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="110" x:Name="History">
+			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="History" Background="Transparent">
 				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource history}" />
+					<PathIcon Classes="audio-on" Data="{StaticResource history}" Margin="10 0"/>
 					<Label>历史记录</Label>
 				</DockPanel>
 
 
 			</Button>
 			
-			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="110" x:Name="Setting">
+			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Setting" Background="Transparent">
 				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource setting}" />
+					<PathIcon Classes="audio-on" Data="{StaticResource setting}" Margin="10 0"/>
 					<Label>设置</Label>
 				</DockPanel>
 

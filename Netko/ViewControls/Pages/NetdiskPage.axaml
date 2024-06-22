@@ -15,9 +15,8 @@
 			<Button Grid.Column="1" Grid.Row="0">
 				<PathIcon Data="{StaticResource add}" Height="10" Width="10"/>
 			</Button>
-			<ScrollViewer HorizontalScrollBarVisibility="Auto" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
 				<!--Change User selection-->
-				<DockPanel Margin="3" x:Name="UserSection">
+				<DockPanel Margin="3" x:Name="UserSection" Grid.Row="0" Grid.Column="0">
 					<Button>
 						<PathIcon Data="{StaticResource add}" Height="10" Width="10"/>
 					</Button>
@@ -27,10 +26,8 @@
 
 				</DockPanel>
 
-			</ScrollViewer>
-			
 		</Grid>
 		<Separator Grid.Row="1" Margin="0" Padding="0"></Separator>
-		<StackPanel x:Name="FileListPanel" Grid.Row="2"></StackPanel>
+		<Grid x:Name="FileListGrid" Grid.Row="2"></Grid>
 	</Grid>
 </UserControl>

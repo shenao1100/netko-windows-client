@@ -4,6 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="Netko.DownloadProgress">
+	<UserControl.Styles>
+		<Style>
+			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
+		</Style>
+	</UserControl.Styles>
 	<Grid RowDefinitions="Auto, Auto" Margin="3">
 
 		<Grid Grid.Column="0" ColumnDefinitions="Auto, Auto, *">
@@ -14,8 +19,12 @@
 			</StackPanel>
 			<StackPanel HorizontalAlignment="Right" Grid.Column="2">
 				<DockPanel>
-					<Button Margin="3" Height="55" Width="55"></Button>
-					<Button Margin="3" Height="55" Width="55"></Button>
+					<Button Margin="3" Height="55" Width="55">
+						<PathIcon Data="{StaticResource pause}" />
+					</Button>
+					<Button Margin="3" Height="55" Width="55">
+						<PathIcon Data="{StaticResource delete}" />
+					</Button>
 				</DockPanel>
 			</StackPanel>
 		</Grid>
