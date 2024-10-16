@@ -27,7 +27,7 @@
 		
 	
 	<ScrollViewer VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="0">
-		<DockPanel Margin="0">
+		<DockPanel Margin="0" x:Name="SideButtonBar">
 			<!--Function selection-->
 			<Image Source="/Assets/logo.png" Height="120" Width="120" DockPanel.Dock="Top"/>
 			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Home" Background="Transparent">
@@ -42,6 +42,13 @@
 					<PathIcon Classes="audio-on" Data="{StaticResource web_drive}" Margin="10 0"/>
 					<Label>网盘管理</Label>
 				</DockPanel>
+			</Button>
+			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Transmit" Background="Transparent">
+				<DockPanel>
+					<PathIcon Classes="audio-on" Data="{StaticResource download}" Margin="10 0"/>
+					<Label>传输</Label>
+				</DockPanel>
+
 			</Button>
 			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Transfer" Background="Transparent">
 				<DockPanel>

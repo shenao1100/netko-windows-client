@@ -4,12 +4,10 @@ using Avalonia.Markup.Xaml;
 
 namespace Netko;
 
-public partial class FileShowBlock : UserControl
+public partial class LinkHistoryLine : UserControl
 {
-    public FileShowBlock()
+    public LinkHistoryLine()
     {
         InitializeComponent();
     }
-
-
 }

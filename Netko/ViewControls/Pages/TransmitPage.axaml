@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Netko.TransmitPage">
+	<UserControl.Styles>
+		<Style>
+		<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
+	</Style>
+	</UserControl.Styles>
+	<Grid ColumnDefinitions="*" RowDefinitions="Auto, 3, *">
+		<DockPanel  Grid.Row="0" Grid.Column="0">
+			<PathIcon Data="{StaticResource download}" Height="30" Width="30" Margin="5"/>
+			<Label Margin="5" FontSize="25">传输</Label>
+		</DockPanel>
+		<Separator Grid.Row="1" Grid.Column="0" Margin="0" Padding="0"></Separator>
+		<Grid ColumnDefinitions="Auto, *" Grid.Row="2" Grid.Column="0">
+			<StackPanel Width="75" Grid.Column="0">
+				<Button Width="70" Height="70" Click="download_page" Margin="3">Download</Button>
+				<Button Width="70" Height="70" Click="download_page" Margin="3">Upload</Button>
+				<Button Width="70" Height="70" Click="download_page" Margin="3">History</Button>
+			</StackPanel>
+			<ScrollViewer Grid.Row="2" Grid.Column="1">
+
+
+				<StackPanel x:Name="DownloadListContiner">
+					<Button Click="add_task_test">Add Task</Button>
+				</StackPanel>
+			</ScrollViewer>
+		</Grid>
+
+
+
+	</Grid>
+</UserControl>

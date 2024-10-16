@@ -35,7 +35,7 @@
 					<ComboBox x:Name="ThemeBox" Width="125" Padding="4" SelectedIndex="0">
 						<ComboBox.Items>
 							<lv:ThemeType>Fluent</lv:ThemeType>
-							<lv:ThemeType>Simple</lv:ThemeType>
+							<!--lv:ThemeType>Simple</lv:ThemeType-->
 						</ComboBox.Items>
 					</ComboBox>
 					<TextBlock Text="Styles"  Padding="2"></TextBlock>

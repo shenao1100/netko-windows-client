@@ -10,4 +10,8 @@ public partial class FileShowLine : UserControl
     {
         InitializeComponent();
     }
+    public void SetName(string name)
+    {
+        FileName.Content = name;
+    }
 }
