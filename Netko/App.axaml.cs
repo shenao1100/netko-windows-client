@@ -5,6 +5,7 @@ using Avalonia.Media;
 using Netko.ViewModels;
 using Netko.Views;
 
+
 namespace Netko;
 
 public partial class App : Application
