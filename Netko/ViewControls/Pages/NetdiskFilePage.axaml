@@ -9,6 +9,11 @@
 			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
 		</Style>
 	</UserControl.Styles>
+	<UserControl.Transitions>
+		<Transitions>
+			<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+		</Transitions>
+	</UserControl.Transitions>
 	<Grid ColumnDefinitions="*" RowDefinitions="Auto, Auto, Auto, *" VerticalAlignment="Top">
 		<Grid ColumnDefinitions="Auto, Auto, Auto, *, Auto">
 			<Button Grid.Row="0" Grid.Column="0" Background="Transparent">

@@ -23,6 +23,12 @@
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</UserControl.Resources>
+
+	<UserControl.Transitions>
+		<Transitions>
+			<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+		</Transitions>
+	</UserControl.Transitions>
 	<Grid ColumnDefinitions="Auto, *">
 		
 	
@@ -96,12 +102,11 @@
 			</Panel>
 			
 		</ScrollViewer-->
-		<Panel  Margin="5"  Grid.Column="1" Grid.Row="0" >
+		<Panel  Margin="0 7 0 0"  Grid.Column="1" Grid.Row="0" >
 			<!--Provide darker background-->
-			<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="7" Padding="0" Margin="0" Opacity="0.3">
+			<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="7 0 0 0" Padding="0" Margin="0" Opacity="1" BoxShadow="9 9 20 2 Black">
 			</Border>
 			<Panel Margin="7" x:Name="ContentPanel1">
-
 			</Panel>
 		</Panel>
 		</Grid>

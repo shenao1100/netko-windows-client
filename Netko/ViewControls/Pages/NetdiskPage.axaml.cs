@@ -10,6 +10,8 @@ public partial class NetdiskPage : UserControl
     {
         InitializeComponent();
         UserControl FilePanel = new NetdiskFilePage();
+        Button bt = new Button();
+        //UserSection.Children.Add()
         FileListGrid.Children.Add(FilePanel);
     }
 }

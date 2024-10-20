@@ -15,6 +15,7 @@
   
   <ItemGroup>
     <None Remove="Assets\FileIcon\icons8-document-188.png" />
+    <None Remove="Assets\FileIcon\icons8-folder-188.png" />
   </ItemGroup>
 
   

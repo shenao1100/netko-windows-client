@@ -153,6 +153,8 @@ namespace Netko.NetDisk.Baidu
             log_id = cookie["BAIDUID_BFESS"] ?? string.Empty;
             return log_id;
         }
+        //https://passport.baidu.com/v2/api/getqrcode?lp=pc&qrloginfrom=pc&gid=D37084C-AEB7-493A-992C-9ED15CD1CEEC&callback=tangram_guid_1729166374201&apiver=v3&tt=1729166374830&tpl=netdisk&logPage=traceId%3Apc_loginv5_1729166375%2ClogPage%3Aloginv5&_=1729166374832
+
         public async Task<bool> initial_info()
         {
             /*

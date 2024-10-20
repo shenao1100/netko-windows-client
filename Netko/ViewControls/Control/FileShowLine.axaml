@@ -5,7 +5,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="45"
              x:Class="Netko.FileShowLine">
 	<Grid ColumnDefinitions="*" VerticalAlignment="Top" Margin="3">
-		<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="7" Padding="0" Margin="0" Opacity="0.3">
+		<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="7" Padding="0" Margin="0" Opacity="1">
 		</Border>
 		<Grid ColumnDefinitions="45, *">
 			<Image Source="/Assets/FileIcon/icons8-document-188.png" Height="50" Grid.Column="0" Margin="3"></Image>

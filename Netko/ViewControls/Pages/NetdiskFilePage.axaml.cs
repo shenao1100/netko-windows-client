@@ -35,7 +35,14 @@ public partial class NetdiskFilePage : UserControl
             await test_user.init();
             BaiduFileList Filelist = new BaiduFileList(test_user);
             BDFileList list_ = await Filelist.GetFileList(1);
-            foreach (BDFile file_b in list_.File)
+        foreach (BDDir dir_b in list_.Dir)
+        {
+            DirShowLine DirBlock = new DirShowLine();
+            DirBlock.SetName(dir_b.Name);
+            FileListViewer.Children.Add(DirBlock);
+
+        }
+        foreach (BDFile file_b in list_.File)
             {
             FileShowLine FileBlock = new FileShowLine();
             FileBlock.SetName(file_b.Name);
@@ -43,6 +50,7 @@ public partial class NetdiskFilePage : UserControl
 
             Trace.WriteLine(file_b.ToString());
             }
+            
         /*}
         catch (Exception ex)
         {

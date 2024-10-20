@@ -23,13 +23,13 @@
 		</ResourceDictionary>
 	</Window.Resources>
 	<Panel>
-		<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="0" Opacity="0.35">
+		<Border Background="{DynamicResource CatalogBaseLowColor}" CornerRadius="0" Opacity="1">
 		</Border>
 		<DockPanel>
 
 			<Panel  Margin="0" DockPanel.Dock="Top" x:Name="DragBar" PointerPressed="DragBar_OnDrag" DoubleTapped="DragBar_MaxWin">
 				<!--Provide darker background-->
-				<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="0 7" Padding="17" Margin="0" Opacity="0.5" x:Name="Backpanel">
+				<Border Background="{DynamicResource CatalogBaseMediumColor}" CornerRadius="0 7" Padding="17" Margin="0" Opacity="0" x:Name="Backpanel">
 				</Border>
 				<StackPanel Margin="7" x:Name="ContentPanel">
 					<TextBlock FontSize="15" Text="hello" x:Name="TitleBlock"/>

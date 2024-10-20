@@ -4,6 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Netko.HomePage">
+	<UserControl.Transitions>
+		<Transitions>
+			<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+		</Transitions>
+	</UserControl.Transitions>
 	<StackPanel HorizontalAlignment="Center">
 		<Image Margin="20" Height="200" Width="200"
          Source="avares://Netko/Assets/logo.png"/>

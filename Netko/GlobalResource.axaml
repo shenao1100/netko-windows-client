@@ -3,22 +3,22 @@
     <!-- Add Resources Here -->
 	<ResourceDictionary.ThemeDictionaries>
 		<ResourceDictionary x:Key="Default">
-			<Color x:Key="CatalogBaseLowColor">#33000000</Color>
-			<Color x:Key="CatalogBaseMediumColor">#99000000</Color>
+			<Color x:Key="CatalogBaseLowColor">#33191919</Color>
+			<Color x:Key="CatalogBaseMediumColor">#992b2b2b</Color>
 			<Color x:Key="CatalogChromeMediumColor">#FFE6E6E6</Color>
-			<Color x:Key="CatalogBaseHighColor">#FF000000</Color>
+			<Color x:Key="CatalogBaseHighColor">#A0575757</Color>
 		</ResourceDictionary>
 		<ResourceDictionary x:Key="Dark">
-			<Color x:Key="CatalogBaseLowColor">#33000000</Color>
-			<Color x:Key="CatalogBaseMediumColor">#99000000</Color>
+			<Color x:Key="CatalogBaseLowColor">#A02e2e2e</Color>
+			<Color x:Key="CatalogBaseMediumColor">#992b2b2b</Color>
 			<Color x:Key="CatalogChromeMediumColor">#FFE6E6E6</Color>
-			<Color x:Key="CatalogBaseHighColor">#FF000000</Color>
+			<Color x:Key="CatalogBaseHighColor">#50575757</Color>
 		</ResourceDictionary>
 		<ResourceDictionary x:Key="Light">
-			<Color x:Key="CatalogBaseLowColor">#33FFFFFF</Color>
+			<Color x:Key="CatalogBaseLowColor">#80FFFFFF</Color>
 			<Color x:Key="CatalogBaseMediumColor">#99FFFFFF</Color>
 			<Color x:Key="CatalogChromeMediumColor">#FF1F1F1F</Color>
-			<Color x:Key="CatalogBaseHighColor">#FFFFFFFF</Color>
+			<Color x:Key="CatalogBaseHighColor">#80FFFFFF</Color>
 		</ResourceDictionary>
 	</ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>
