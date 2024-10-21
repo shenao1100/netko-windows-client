@@ -22,6 +22,32 @@ public partial class NetdiskFilePage : UserControl
         UserControl FileBlock = new FileShowLine();
         
         FileListViewer.Children.Add(FileBlock);
+
+    }
+    private async void ChangePage(BaiduFileList user, string go_path, int page)
+    {
+        Trace.WriteLine("CHANGE");
+        FileListViewer.Children.Clear();
+        BDFileList list_ = await user.GetFileList(1, path:go_path);
+        foreach (BDDir dir_b in list_.Dir)
+        {
+            DirShowLine DirBlock = new DirShowLine();
+            DirBlock.SetName(dir_b.Name);
+            Trace.WriteLine("Addfunc");
+            DirBlock.Func = () => ChangePage(user, dir_b.Path, 1);
+
+            FileListViewer.Children.Add(DirBlock);
+
+
+        }
+        foreach (BDFile file_b in list_.File)
+        {
+            FileShowLine FileBlock = new FileShowLine();
+            FileBlock.SetName(file_b.Name);
+            FileListViewer.Children.Add(FileBlock);
+
+            Trace.WriteLine(file_b.ToString());
+        }
     }
     private async void NetdiskParse(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
@@ -40,6 +66,7 @@ public partial class NetdiskFilePage : UserControl
             DirShowLine DirBlock = new DirShowLine();
             DirBlock.SetName(dir_b.Name);
             FileListViewer.Children.Add(DirBlock);
+            DirBlock.Func = () => ChangePage(Filelist, dir_b.Path, 1);
 
         }
         foreach (BDFile file_b in list_.File)

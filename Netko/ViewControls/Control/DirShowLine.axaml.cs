@@ -6,11 +6,15 @@ using Avalonia.Media;
 using Avalonia.Styling;
 using System.Diagnostics;
 using System;
+using System.Runtime.CompilerServices;
+using Netko.NetDisk.Baidu;
 
 namespace Netko;
 
 public partial class DirShowLine : UserControl
 {
+    public Action Func;
+    private StackPanel FileListViewer;
     public Color HoverBG;
     public Color LeaveBG;
     private DateTime lastClickedTime;
@@ -28,12 +32,13 @@ public partial class DirShowLine : UserControl
         {
             LeaveBG = Background;
         }
+        lastClickedTime = DateTime.Now;
+
     }
     public void SetName(string name)
     {
         FileName.Content = name;
     }
-
     private void MouseInput(object sender, PointerPressedEventArgs e)
     {
         var textBlock = sender as Button;
@@ -48,17 +53,17 @@ public partial class DirShowLine : UserControl
 
     private void LeftClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        Trace.WriteLine("Left mouse button clicked!");
         var currentTime = DateTime.Now;
         var timeDiff = currentTime - lastClickedTime;
         lastClickedTime = currentTime;
-        if (timeDiff.Milliseconds <= 250)
+        
+        Trace.WriteLine(timeDiff.TotalMilliseconds.ToString());
+        if (timeDiff.TotalMilliseconds <= 250)
         {
-            Trace.WriteLine("Double clicked");
+            Func();
         }
         else
-        {
-            Trace.WriteLine("Left clicked");
+        { 
         }
     }
 }
