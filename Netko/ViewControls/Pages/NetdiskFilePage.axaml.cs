@@ -11,6 +11,7 @@ namespace Netko;
 public partial class NetdiskFilePage : UserControl
 {
     public const string HomePath = "";
+    public Action<string>? UpdateUserSectionName;
 
     public NetdiskFilePage()
     {
@@ -48,6 +49,18 @@ public partial class NetdiskFilePage : UserControl
 
             Trace.WriteLine(file_b.ToString());
         }
+    }
+
+    public async void initUser(string cookie)
+    {
+        Baidu test_user = new Baidu(cookie);
+        await test_user.init();
+        if (UpdateUserSectionName != null) {
+            UpdateUserSectionName(test_user.name);
+        }
+
+        BaiduFileList Filelist = new BaiduFileList(test_user);
+        ChangePage(Filelist, "/", 1);
     }
     private async void NetdiskParse(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {

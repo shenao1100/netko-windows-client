@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="50"
              x:Class="Netko.UserSection"
 			 >
 	<UserControl.Styles>
@@ -15,13 +15,25 @@
 			<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
 		</Transitions>
 	</UserControl.Transitions>
-	<Button>
-		<DockPanel Margin="0">
-			<PathIcon DockPanel.Dock="Left" Data="{StaticResource add}" Height="10" Width="10"/>
-			<Label DockPanel.Dock="Left"  x:Name="WO" Height="10" Width="70" Margin="5 0" Padding="0" FontSize="10">LLLDDDdwad</Label>
-			<Button Margin="0" Padding="0" Height="10">x</Button>
-		</DockPanel>
-		
-		
-	</Button>
+	<Panel Margin="3 3 0 0">
+		<Border Background="{DynamicResource CatalogBaseHighColor}" Height="36" CornerRadius="7 7 0 0" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #50000000">
+		</Border>
+		<Grid ColumnDefinitions="*, 30" RowDefinitions="*">
+
+			<Button Grid.Column="0" Grid.Row="0" Background="Transparent" Height="36" HorizontalAlignment="Stretch" Click="PageChangeBtClick">
+				<DockPanel Margin="0">
+
+					<Image x:Name="UserHeadPhoto" Margin="0" Height="17" Width="17" Source="avares://Netko/Assets/logo.png"/>
+					<Label x:Name="UserName" VerticalAlignment="Center" FontSize="13" Margin="5 0" Padding="0" MinWidth="150">LL</Label>
+				</DockPanel>
+
+
+			</Button>
+
+			<Button Width="20" Background="Transparent" Grid.Column="1" Grid.Row="0" Click="RemoveBtClick">
+				<PathIcon x:Name="RemoveBt" Data="{StaticResource dismiss}" Height="10" Width="10"/>
+			</Button>
+
+		</Grid>
+	</Panel>
 </UserControl>

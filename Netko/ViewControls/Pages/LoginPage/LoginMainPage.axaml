@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Netko.LoginMainPage">
+	<UserControl.Transitions>
+		<Transitions>
+			<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+		</Transitions>
+	</UserControl.Transitions>
+	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+		
+		<Label FontSize="30" VerticalAlignment="Center" HorizontalAlignment="Center">Are you new here?</Label>
+		<Button Height="50" HorizontalAlignment="Center" Width="300" Click="Button_Click">
+			<DockPanel>
+			<Image DockPanel.Dock="Left" Margin="20" Height="40" Width="40" Source="/Assets/NetdiskIcon/BaiduCloud.png"/>
+			<Label DockPanel.Dock="Left" HorizontalAlignment="Center"  VerticalAlignment="Center">Login to baidu</Label>
+			</DockPanel>
+		</Button>
+	</StackPanel>
+</UserControl>

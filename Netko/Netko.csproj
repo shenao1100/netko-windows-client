@@ -14,8 +14,10 @@
 
   
   <ItemGroup>
+    <None Remove="Assets\add.png" />
     <None Remove="Assets\FileIcon\icons8-document-188.png" />
     <None Remove="Assets\FileIcon\icons8-folder-188.png" />
+    <None Remove="Assets\NetdiskIcon\BaiduCloud.png" />
   </ItemGroup>
 
   

@@ -14,23 +14,19 @@
 			<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
 		</Transitions>
 	</UserControl.Transitions>
-	<Grid ColumnDefinitions="*" RowDefinitions="30, Auto, *">
-		<Grid Grid.Column="0" Grid.Row="0" ColumnDefinitions="*, 25" RowDefinitions="Auto, Auto">
-			
-			<Button Grid.Column="1" Grid.Row="0">
-				<PathIcon Data="{StaticResource add}" Height="10" Width="10"/>
-			</Button>
+	<Grid ColumnDefinitions="*" RowDefinitions="40, Auto, *">
+		<Grid Grid.Column="0" Grid.Row="0" ColumnDefinitions="*, 0" RowDefinitions="Auto, Auto" VerticalAlignment="Center">
 				<!--Change User selection-->
-				<DockPanel Margin="3" x:Name="UserSection" Grid.Row="0" Grid.Column="0">
-					<Button>
-						<PathIcon Data="{StaticResource add}" Height="10" Width="10"/>
-					</Button>
-					<Button>
-						<PathIcon Data="{StaticResource add}" Height="10" Width="10"/>
-					</Button>
-
+			<DockPanel Grid.Row="0" Grid.Column="0">
+				<ScrollViewer HorizontalScrollBarVisibility="Auto">
+				<DockPanel Margin="3" x:Name="UserSectionDockPanel">
+				
 				</DockPanel>
-
+				</ScrollViewer>
+			<Button Click="AddLoginPage" VerticalAlignment="Center">
+				<PathIcon Data="{StaticResource add}"  Height="10" Width="10"/>
+			</Button>
+			</DockPanel>
 		</Grid>
 		<Separator Grid.Row="1" Margin="0" Padding="0"></Separator>
 		<Grid x:Name="FileListGrid" Grid.Row="2"></Grid>
