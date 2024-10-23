@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
 			 xmlns:lv="using:Netko.Views"
+			 xmlns:local="clr-namespace:MainViewModel"
              x:Class="Netko.SettingPage">
 	<UserControl.Styles>
 		<Style>
@@ -17,50 +18,126 @@
 	</UserControl.Transitions>
 	<Grid ColumnDefinitions="*" RowDefinitions="Auto, 3, *">
 		<DockPanel  Grid.Row="0" Grid.Column="0">
-			<PathIcon Data="{StaticResource setting}" Height="30" Width="30" Margin="5"/>
+			<!-->PathIcon Data="{StaticResource setting}" Height="30" Width="30" Margin="5"/>
 			<Label Margin="5" FontSize="25">设置</Label>
 		</DockPanel>
-		<Separator Grid.Row="1" Grid.Column="0" Margin="0" Padding="0"></Separator>
+		<Separator Grid.Row="1" Grid.Column="0" Margin="0" Padding="0"></Separator-->
+			<Label Margin="5" FontSize="20" Padding="10 20 3 3">设置</Label>
+
+		</DockPanel>
 		<ScrollViewer Grid.Row="2" Grid.Column="0">
+
 			<StackPanel>
-				<StackPanel>
-					<Label>下载路径</Label>
-					<Grid ColumnDefinitions="*, Auto" Margin="5">
-						<TextBox>Download path</TextBox>
-						<Button Grid.Column="1" Margin="3 0">Broswer</Button>
-					</Grid>
-					<Label>暗黑模式</Label>
-					<Button Click="ChangeDayNight">Change</Button>
-					<Label>下载线程</Label>
-					<TextBlock x:Name="thread_show"></TextBlock>
-					<Slider ValueChanged="Slider_ValueChanged" x:Name="slider" Minimum="1" Maximum="10" Margin="5 0"/>
-				</StackPanel>
-				<StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="0">
-					<TextBlock Text="Themes" Padding="2" ></TextBlock>
-					<ComboBox x:Name="ThemeBox" Width="125" Padding="4" SelectedIndex="0">
-						<ComboBox.Items>
-							<lv:ThemeType>Fluent</lv:ThemeType>
-							<!--lv:ThemeType>Simple</lv:ThemeType-->
-						</ComboBox.Items>
-					</ComboBox>
-					<TextBlock Text="Styles"  Padding="2"></TextBlock>
-					<ComboBox x:Name="ThemeVariantsBox"
-							  Width="125"
-							  Padding="4"
-							  DisplayMemberBinding="{Binding Key, x:DataType=ThemeVariant}"
-							  SelectionChanged="ComboBox_SelectionChanged"
-							  SelectedIndex="0">
-						<ComboBox.Items>
-							<ThemeVariant>Default</ThemeVariant>
-							<ThemeVariant>Light</ThemeVariant>
-							<ThemeVariant>Dark</ThemeVariant>
-						</ComboBox.Items>
-					</ComboBox>
-				</StackPanel>
+				<Label Margin="15 3">常规</Label>
+				<!--Example-->
+				<!--Grid Height="60" Margin="15 3">
+					<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="5" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+					</Border>
+					<DockPanel>
+						<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
+							<Label>nihao</Label>
+						</StackPanel>
+						<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5 0">
+							<Label FontSize="15">Main</Label>
+							<Label Foreground="Gray">content</Label>
+						</StackPanel>
+					</DockPanel>
+				</Grid-->
+
+				<!--Theme-->
+				<Grid MinHeight="60" Margin="15 3">
+					<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="5" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+					</Border>
+					<StackPanel>
+					<DockPanel>
+						<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
+							<PathIcon Data="{StaticResource brush}" Height="17" Width="17" Margin="15"/>
+						</StackPanel>
+						<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5 0">
+							<Label FontSize="15" Margin="0">主题色</Label>
+							<Label Foreground="Gray" Margin="0" FontSize="12">亮色/暗色主题</Label>
+						</StackPanel>
+					</DockPanel>
+						
+						<Separator DockPanel.Dock="Bottom" Margin="0" Padding="0"></Separator>
+						<StackPanel Margin="40 15">
+							<RadioButton x:Name="Default" GroupName="ThemeVar" Checked="ChangeTheme"
+									  Content="默认"/>
+							<RadioButton x:Name="Light" GroupName="ThemeVar" Checked="ChangeTheme"
+									  Content="亮色"/>
+							<RadioButton x:Name="Dark" Checked="ChangeTheme"
+									  GroupName="ThemeVar"
+									  Content="暗色"/>
+						</StackPanel>
+						
+					</StackPanel>
+
+
+				</Grid>
+				<!--Download Path-->
+				<Grid MinHeight="60" Margin="15 3">
+					<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="5" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+					</Border>
+					<StackPanel>
+						<DockPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
+								<PathIcon Data="{StaticResource folder}" Height="17" Width="17" Margin="15"/>
+							</StackPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5 0">
+								<Label FontSize="15" Margin="0">下载路径</Label>
+								<Label Foreground="Gray" Margin="0" FontSize="12">C:\User\%User%\Download</Label>
+							</StackPanel>
+							<StackPanel DockPanel.Dock="Right" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+								<Button HorizontalAlignment="Right" VerticalAlignment="Center" Margin="20 0" Width="100">
+									<Label HorizontalAlignment="Center" VerticalAlignment="Center">浏览</Label>
+								</Button>
+							</StackPanel>
+						</DockPanel>
+					</StackPanel>
+
+
+				</Grid>
+				<Label Margin="15 3">关于</Label>
+				<!--About-->
+				<Grid MinHeight="60" Margin="15 3">
+					<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="5" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+					</Border>
+					<StackPanel>
+						<DockPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
+								<Image Source="/Assets/logo_new.png" Height="23" Width="23" Margin="13"/>
+							</StackPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5 0">
+								<Label FontSize="15" Margin="0">Netko</Label>
+								<TextBlock Foreground="Gray" Margin="4 0" FontSize="12" x:Name="VersionText"/>
+							</StackPanel>
+						</DockPanel>
+					</StackPanel>
+
+
+				</Grid>
+				<!--Avalonia-->
+				<Grid MinHeight="60" Margin="15 3">
+					<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="5" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+					</Border>
+					<StackPanel>
+						<DockPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
+								<Image Source="/Assets/avalonia.png" Height="23" Width="23" Margin="13"/>
+							</StackPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5 0">
+								<Label FontSize="15" Margin="0">Avalonia</Label>
+								<TextBlock Foreground="Gray" Margin="4 0" FontSize="12" x:Name="AvaloniaVersionText"/>
+							</StackPanel>
+						</DockPanel>
+					</StackPanel>
+
+
+				</Grid>
 			</StackPanel>
-			
+
 		</ScrollViewer>
-		
-		
+
+
 	</Grid>
 </UserControl>

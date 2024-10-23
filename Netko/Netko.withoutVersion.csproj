@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-	  <Version>0.0.1-c674f5d</Version>
+	  <Version>0.0.1-COMMIT_HASH</Version>
   </PropertyGroup>
 
   
@@ -17,7 +17,6 @@
   
   <ItemGroup>
     <None Remove="Assets\add.png" />
-    <None Remove="Assets\avalonia.png" />
     <None Remove="Assets\FileIcon\icons8-document-188.png" />
     <None Remove="Assets\FileIcon\icons8-folder-188.png" />
     <None Remove="Assets\logo_new.png" />

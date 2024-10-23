@@ -57,11 +57,11 @@ namespace Netko.NetDisk.Baidu
             {
                 if (cookie[key] != null)
                 {
-                    cookie_val += key + "=" + cookie[key] + ";";
+                    cookie_val += key + "=" + cookie[key] + "; ";
                 }
                 else
                 {
-                    cookie_val += key + ";";
+                    cookie_val += key + "; ";
 
                 }
             }
@@ -80,8 +80,8 @@ namespace Netko.NetDisk.Baidu
                 string? key, value;
                 if (sub_cookie_.Contains("="))
                 {
-                    key = sub_cookie_.Split("=")[0];
-                    value = sub_cookie_.Split("=")[1];
+                    key = sub_cookie_.Split("=")[0].Trim();
+                    value = sub_cookie_.Split("=")[1].Trim();
                 }
                 else
                 {

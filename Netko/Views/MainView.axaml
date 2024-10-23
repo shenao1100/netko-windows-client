@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Netko.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
              x:Class="Netko.Views.MainView"
              x:DataType="vm:MainViewModel">
 	<UserControl.Styles>
@@ -30,9 +30,9 @@
 		</Transitions>
 	</UserControl.Transitions>
 	<Grid ColumnDefinitions="Auto, *">
-		
-	
-	<ScrollViewer VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="0">
+
+	<DockPanel Grid.Column="0" Grid.Row="0">
+	<ScrollViewer VerticalAlignment="Top" HorizontalAlignment="Left" DockPanel.Dock="Top">
 		<DockPanel Margin="0" x:Name="SideButtonBar">
 			<!--Function selection-->
 			<Image Source="/Assets/logo.png" Height="120" Width="120" DockPanel.Dock="Top"/>
@@ -78,8 +78,8 @@
 
 
 			</Button>
-			
-			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Setting" Background="Transparent">
+
+			<Button DockPanel.Dock="Bottom" Margin="5" Click="Change" Width="130" x:Name="Setting" Background="Transparent" VerticalAlignment="Bottom">
 				<DockPanel>
 					<PathIcon Classes="audio-on" Data="{StaticResource setting}" Margin="10 0"/>
 					<Label>设置</Label>
@@ -92,6 +92,8 @@
 		</DockPanel>
 		
 	</ScrollViewer>
+		
+		</DockPanel>
 		<!--ScrollViewer Grid.Column="1" Grid.Row="0" >
 			<Panel  Margin="5">
 				<Border Background="{Binding sdadad}" CornerRadius="7" Padding="0" Margin="0" Opacity="0.3">

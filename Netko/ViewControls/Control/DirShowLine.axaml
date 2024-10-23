@@ -15,7 +15,22 @@
 		<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
 		</Border>
 		<Button x:Name="Action" HorizontalAlignment="Stretch" Margin="0" Padding="0" PointerPressed="MouseInput" Click="LeftClick" Background="Transparent">
-			
+			<Button.ContextMenu>
+				<ContextMenu>
+					<StackPanel>
+						<Button>
+							hello
+						</Button>
+						<Button>
+							hello
+						</Button>
+						<Button>
+							hello
+						</Button>
+					</StackPanel>
+				</ContextMenu>
+				
+			</Button.ContextMenu>
 			<Grid  ColumnDefinitions="45, *" >
 			<Image Source="/Assets/FileIcon/icons8-folder-188.png" Height="50" Grid.Column="0" Margin="3"></Image>
 			<Grid RowDefinitions="Auto, Auto" Grid.Column="1" VerticalAlignment="Center" Margin="5 0">

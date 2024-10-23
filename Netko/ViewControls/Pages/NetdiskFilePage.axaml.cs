@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Netko.NetDisk.Baidu;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,10 @@ public partial class NetdiskFilePage : UserControl
 {
     public const string HomePath = "";
     public Action<string>? UpdateUserSectionName;
+    private List<string> backHistory = new List<string>();
+    private List<string> forwardHistory = new List<string>();
+    private string currentPath;
+    private BaiduFileList baiduFileList;
 
     public NetdiskFilePage()
     {
@@ -25,18 +30,110 @@ public partial class NetdiskFilePage : UserControl
         FileListViewer.Children.Add(FileBlock);
 
     }
-    private async void ChangePage(BaiduFileList user, string go_path, int page)
+    private string GetForwardPath()
     {
-        Trace.WriteLine("CHANGE");
+        if (forwardHistory.Count > 0)
+        {
+            string result = forwardHistory[forwardHistory.Count - 1];
+            forwardHistory.RemoveAt(forwardHistory.Count - 1);
+            return result;
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+    private string GetBackPath()
+    {
+        forwardHistory.Add(currentPath);
+
+        if (backHistory[backHistory.Count - 1] == currentPath)
+        {
+
+            backHistory.RemoveAt(backHistory.Count - 1);
+        }
+
+        if (backHistory.Count != 0)
+        {
+            string result = backHistory[backHistory.Count - 1];
+            backHistory.RemoveAt(backHistory.Count - 1);
+            
+            return result;
+        }
+        else
+        {
+            return "/";
+        }
+    }
+    private async void GotoDir(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        ChangePage(baiduFileList, PathTextBox.Text, 1, insert_back_history: false);
+
+    }
+
+
+    private async void Back(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        ChangePage(baiduFileList, GetBackPath(), 1, reserve_forward_history:true);
+    }
+    private async void Forward(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        ChangePage(baiduFileList, GetForwardPath(), 1, insert_back_history: true, reserve_forward_history:true);
+
+    }
+
+    private async void Home(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        ChangePage(baiduFileList, "/", 1, insert_back_history: false);
+    }
+    private async void Refresh(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        ChangePage(baiduFileList, currentPath, 1, insert_back_history:false);
+    }
+    /// <summary>
+    /// To get and show file list in UI, items count 1000 at max
+    /// </summary>
+    /// <param name="user">This function will use BaiduFileList to parse file list</param>
+    /// <param name="go_path">Path need to parse, for ep. "/"</param>
+    /// <param name="page">1: 1-1000 items, 2: 1001-2000 items...</param>
+    private async void ChangePage(BaiduFileList user, string go_path, int page, bool insert_back_history=true, bool reserve_forward_history=false)
+    {
+        if (!reserve_forward_history)
+        {
+            forwardHistory.Clear();
+        }
+        if (insert_back_history)
+        {
+            backHistory.Add(go_path);
+        }
+        if (forwardHistory.Count == 0) 
+        {
+            ForwardButton.IsEnabled = false;
+        }
+        else
+        {
+            ForwardButton.IsEnabled = true;
+        }
+        Trace.WriteLine(backHistory.Count.ToString());
+        Trace.WriteLine(backHistory[0]);
+        if ((backHistory.Count == 1 && go_path == "/" && backHistory[0] == "/") || backHistory.Count == 0)
+        {
+            BackButton.IsEnabled = false;
+        }
+        else
+        {
+            BackButton.IsEnabled = true;
+        }
+        
+        PathTextBox.Text = go_path;
+        currentPath = go_path;
         FileListViewer.Children.Clear();
         BDFileList list_ = await user.GetFileList(1, path:go_path);
         foreach (BDDir dir_b in list_.Dir)
         {
             DirShowLine DirBlock = new DirShowLine();
-            DirBlock.SetName(dir_b.Name);
-            Trace.WriteLine("Addfunc");
             DirBlock.Func = () => ChangePage(user, dir_b.Path, 1);
-
+            DirBlock.SetName(dir_b.Name);
             FileListViewer.Children.Add(DirBlock);
 
 
@@ -50,7 +147,10 @@ public partial class NetdiskFilePage : UserControl
             Trace.WriteLine(file_b.ToString());
         }
     }
-
+    /// <summary>
+    /// To init user info, create and change to new page, update user name
+    /// </summary>
+    /// <param name="cookie">user cookie</param>
     public async void initUser(string cookie)
     {
         Baidu test_user = new Baidu(cookie);
@@ -60,8 +160,15 @@ public partial class NetdiskFilePage : UserControl
         }
 
         BaiduFileList Filelist = new BaiduFileList(test_user);
+        baiduFileList = Filelist;
         ChangePage(Filelist, "/", 1);
     }
+    /// <summary>
+    /// 
+    /// Test function
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void NetdiskParse(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         /*var button = sender as Button;

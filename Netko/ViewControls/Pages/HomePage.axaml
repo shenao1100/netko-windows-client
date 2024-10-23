@@ -12,6 +12,6 @@
 	<StackPanel HorizontalAlignment="Center">
 		<Image Margin="20" Height="200" Width="200"
          Source="avares://Netko/Assets/logo.png"/>
-		<Label FontSize="30" HorizontalAlignment="Center">Netko盒</Label>
+		<Label FontSize="30" HorizontalAlignment="Center">Netko</Label>
 	</StackPanel>
 </UserControl>

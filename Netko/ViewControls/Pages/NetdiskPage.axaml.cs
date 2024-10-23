@@ -24,7 +24,10 @@ public partial class NetdiskPage : UserControl
         // call this func when receive cookie
         cookieReciver.CallBack = (cookie) => AddAccount(cookie);
     }
-
+    /// <summary>
+    /// Create a new file page and user section
+    /// </summary>
+    /// <param name="cookie">user cookie</param>
     private void AddAccount(string cookie)
     {
         UserSection UserSectionObj = new UserSection();
@@ -37,6 +40,11 @@ public partial class NetdiskPage : UserControl
         FilePage.initUser(cookie);
 
     }
+    /// <summary>
+    /// Remove user section and file page
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="user_section"></param>
     public void RemovePage(UserControl page, UserControl user_section)
     {
         UserSectionDockPanel.Children.Remove(user_section);
@@ -46,13 +54,21 @@ public partial class NetdiskPage : UserControl
             FileListGrid.Children.Remove(page);
         }
     }
+    /// <summary>
+    /// change current page into Page
+    /// </summary>
+    /// <param name="Page"></param>
     public void ChangePage(UserControl Page)
     {
         FileListGrid.Children.Clear();
         FileListGrid.Children.Add(Page);
         NowShowPage = Page;
     }
-
+    /// <summary>
+    /// Create Login page and usersection
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void AddLoginPage(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         UserSection UserSectionObj = new UserSection();
