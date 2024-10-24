@@ -4,14 +4,52 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Netko.HomePage">
+	<UserControl.Styles>
+		<Style>
+			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
+		</Style>
+	</UserControl.Styles>
 	<UserControl.Transitions>
 		<Transitions>
 			<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
 		</Transitions>
 	</UserControl.Transitions>
-	<StackPanel HorizontalAlignment="Center">
-		<Image Margin="20" Height="200" Width="200"
-         Source="avares://Netko/Assets/logo.png"/>
-		<Label FontSize="30" HorizontalAlignment="Center">Netko</Label>
-	</StackPanel>
+	<Grid ColumnDefinitions="Auto" RowDefinitions="Auto, Auto" HorizontalAlignment="Center" VerticalAlignment="Center">
+		<Grid>
+			<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+			</Border>
+			<DockPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+
+				<Image Margin="20" Height="100" Width="100"
+				 Source="avares://Netko/Assets/logo_new.png"/>
+				<StackPanel>
+					<Label FontSize="20" HorizontalAlignment="Left" Margin="10">Netko</Label>
+					<Label FontSize="15" HorizontalAlignment="Left" Margin="10 0">A third party Baidu Netdisk Client</Label>
+					<Label FontSize="15" HorizontalAlignment="Left" Margin="10 0">Open source project</Label>
+				</StackPanel>
+			</DockPanel>
+		</Grid>
+		<Grid Grid.Row="1" ColumnDefinitions="*, 0" Margin="0 10">
+			<Grid Grid.Column="0" Margin="5">
+				<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+				</Border>
+				<DockPanel>
+					<PathIcon Data="{StaticResource github}" Height="50" Width="50" Margin="5"/>
+					<StackPanel>
+						<Label Margin="10 10 5 5">Github repo:</Label>
+						<Label Margin="10 0 5 8" Foreground="Gray">https://github.com/shenao1100/netko-windows-client</Label>
+					</StackPanel>
+
+				</DockPanel>
+			</Grid>
+			<Grid Grid.Column="1" Margin="5">
+				<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+				</Border>
+				<Label VerticalAlignment="Center" HorizontalAlignment="Center">Click "+" to add a account</Label>
+			</Grid>
+			
+		</Grid>
+	</Grid>
+
+
 </UserControl>

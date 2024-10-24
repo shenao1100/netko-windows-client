@@ -14,10 +14,15 @@ public partial class NetdiskPage : UserControl
     public NetdiskPage()
     {
         InitializeComponent();
-        UserControl FilePanel = new NetdiskFilePage();
-        Button bt = new Button();
-        //UserSection.Children.Add()
-        FileListGrid.Children.Add(FilePanel);
+        UserSection UserSectionObj = new UserSection();
+        LoginMainPage loginPage = new LoginMainPage();
+        UserSectionObj.SetAvatar("avares://Netko/Assets/add.png", false);
+        UserSectionObj.SetName("µÇÈë");
+        UserSectionObj.ChangeAction = () => ChangePage(loginPage);
+        UserSectionObj.DeleteAction = () => RemovePage(loginPage, UserSectionObj);
+        // UserSectionPageDict.Add(UserSectionObj, loginPage);
+        ChangePage(loginPage);
+        UserSectionDockPanel.Children.Add(UserSectionObj);
         // login server to receive cookie
         CookieReciver cookieReciver = new CookieReciver();
         cookieReciver.Listen();

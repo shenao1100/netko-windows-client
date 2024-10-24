@@ -20,7 +20,7 @@ public partial class MainView : UserControl
     {
         
         InitializeComponent();
-
+        
   
 
     }
@@ -32,7 +32,37 @@ public partial class MainView : UserControl
     UserControl Page_Upload = new UploadPage();
     UserControl Page_History = new HistoryPage();
     UserControl Page_Transmit = new TransmitPage();
-
+    public void unFold()
+    {
+        foreach (var button in SideButtonBar.Children)
+        {
+            if (button is Button)
+            {
+                button.Width =  130;
+            }
+        }
+    }
+    public void Shrink()
+    {
+        foreach (var button in SideButtonBar.Children)
+        {
+            if (button is Button)
+            {
+                button.Width = 50;
+            }
+        }
+    }
+    public void switchShrink()
+    {
+        if (Home.Width == 50)
+        {
+            unFold();
+        }
+        else
+        {
+            Shrink();
+        }
+    }
     public void Change(object sender, RoutedEventArgs e)
     {
         //Change page

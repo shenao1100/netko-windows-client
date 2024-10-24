@@ -17,7 +17,7 @@
 		<Button x:Name="Action" HorizontalAlignment="Stretch" Margin="0" Padding="0" PointerPressed="MouseInput" Click="LeftClick" Background="Transparent">
 			<Button.ContextMenu>
 				<ContextMenu>
-					<StackPanel>
+
 						<Button>
 							hello
 						</Button>
@@ -27,7 +27,7 @@
 						<Button>
 							hello
 						</Button>
-					</StackPanel>
+
 				</ContextMenu>
 				
 			</Button.ContextMenu>

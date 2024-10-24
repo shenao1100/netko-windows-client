@@ -61,7 +61,11 @@ namespace Netko.NetDisk.Baidu
                 }
                 else
                 {
-                    cookie_val += key + "; ";
+                    if (key != "" && key != string.Empty) 
+                    {
+                        cookie_val += key + "; ";
+
+                    }
 
                 }
             }
@@ -275,10 +279,13 @@ namespace Netko.NetDisk.Baidu
                 throw new Exception("Refresh logid failed.");
             }
             ProcessSubCookie(init_cookie_string);
+            Trace.WriteLine("COOKIE: ------" + GetCookie());
             if (!await GetUkStoken())
             {
                 throw new Exception("Get UK, Stoken failed.");
             }
+            Trace.WriteLine("COOKIE: ------" + GetCookie());
+
             if (!await initial_info())
             {
                 throw new Exception("Get basic info failed.");

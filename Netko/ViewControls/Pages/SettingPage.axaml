@@ -81,7 +81,7 @@
 					<StackPanel>
 						<DockPanel>
 							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
-								<PathIcon Data="{StaticResource folder}" Height="17" Width="17" Margin="15"/>
+								<PathIcon Data="{StaticResource folder_outline}" Height="17" Width="17" Margin="15"/>
 							</StackPanel>
 							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5 0">
 								<Label FontSize="15" Margin="0">下载路径</Label>

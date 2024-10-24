@@ -5,6 +5,7 @@
              xmlns:vm="clr-namespace:Netko.ViewModels"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
              x:Class="Netko.Views.MainView"
+			 x:Name="MainViewPanel"
              x:DataType="vm:MainViewModel">
 	<UserControl.Styles>
 		<Style>
@@ -33,46 +34,76 @@
 
 	<DockPanel Grid.Column="0" Grid.Row="0">
 	<ScrollViewer VerticalAlignment="Top" HorizontalAlignment="Left" DockPanel.Dock="Top">
-		<DockPanel Margin="0" x:Name="SideButtonBar">
+		<DockPanel Margin="0 5 0 0" x:Name="SideButtonBar">
 			<!--Function selection-->
-			<Image Source="/Assets/logo.png" Height="120" Width="120" DockPanel.Dock="Top"/>
+			<!--Image Source="/Assets/logo_new.png" Height="120" Width="120" DockPanel.Dock="Top"/-->
 			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Home" Background="Transparent">
+				<Button.Transitions>
+					<Transitions>
+						<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ElasticEaseOut"/>
+					</Transitions>
+				</Button.Transitions>
 				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource home}" Margin="10 0"/>
+					<PathIcon Classes="audio-on" Data="{StaticResource home}" Margin="5 0 10 0"/>
 					<Label>主页</Label>
 				</DockPanel>
 
 			</Button>
 			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Manage" Background="Transparent">
+				<Button.Transitions>
+					<Transitions>
+						<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ElasticEaseOut"/>
+					</Transitions>
+				</Button.Transitions>
 				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource web_drive}" Margin="10 0"/>
+					<PathIcon Classes="audio-on" Data="{StaticResource web_drive}" Margin="5 0 10 0"/>
 					<Label>网盘管理</Label>
 				</DockPanel>
 			</Button>
-			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Transmit" Background="Transparent">
+			<!--Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Transmit" Background="Transparent">
+				<Button.Transitions>
+					<Transitions>
+						<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ElasticEaseOut"/>
+					</Transitions>
+				</Button.Transitions>
 				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource download}" Margin="10 0"/>
+					<PathIcon Classes="audio-on" Data="{StaticResource download}" Margin="5 0 10 0"/>
 					<Label>传输</Label>
 				</DockPanel>
 
-			</Button>
+			</Button-->
 			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Transfer" Background="Transparent">
+				<Button.Transitions>
+					<Transitions>
+						<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ElasticEaseOut"/>
+					</Transitions>
+				</Button.Transitions>
 				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource download}" Margin="10 0"/>
+					<PathIcon Classes="audio-on" Data="{StaticResource download}" Margin="5 0 10 0"/>
 					<Label>下载管理</Label>
 				</DockPanel>
 
 			</Button>
 			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Upload" Background="Transparent">
+				<Button.Transitions>
+					<Transitions>
+						<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ElasticEaseOut"/>
+					</Transitions>
+				</Button.Transitions>
 				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource upload}" Margin="10 0"/>
+					<PathIcon Classes="audio-on" Data="{StaticResource upload}" Margin="5 0 10 0" />
 					<Label>上传管理</Label>
 				</DockPanel>
 			</Button>
 
 			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="History" Background="Transparent">
+				<Button.Transitions>
+					<Transitions>
+						<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ElasticEaseOut"/>
+					</Transitions>
+				</Button.Transitions>
 				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource history}" Margin="10 0"/>
+					<PathIcon Classes="audio-on" Data="{StaticResource history}" Margin="5 0 10 0"/>
 					<Label>历史记录</Label>
 				</DockPanel>
 
@@ -80,8 +111,13 @@
 			</Button>
 
 			<Button DockPanel.Dock="Bottom" Margin="5" Click="Change" Width="130" x:Name="Setting" Background="Transparent" VerticalAlignment="Bottom">
+				<Button.Transitions>
+					<Transitions>
+						<DoubleTransition Property="Width" Duration="0:0:0.2" Easing="ElasticEaseOut"/>
+					</Transitions>
+				</Button.Transitions>
 				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource setting}" Margin="10 0"/>
+					<PathIcon Classes="audio-on" Data="{StaticResource setting}" Margin="5 0 10 0"/>
 					<Label>设置</Label>
 				</DockPanel>
 
