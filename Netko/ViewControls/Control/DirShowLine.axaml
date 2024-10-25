@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" 
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
              x:Class="Netko.DirShowLine">
 	<UserControl.Styles>
 
@@ -17,16 +17,35 @@
 		<Button x:Name="Action" HorizontalAlignment="Stretch" Margin="0" Padding="0" PointerPressed="MouseInput" Click="LeftClick" Background="Transparent">
 			<Button.ContextMenu>
 				<ContextMenu>
+					<DockPanel>
+						<Label>打开</Label>
+					</DockPanel>
+					<DockPanel>
+						<Label>删除</Label>
+					</DockPanel>
 
-						<Button>
-							hello
-						</Button>
-						<Button>
-							hello
-						</Button>
-						<Button>
-							hello
-						</Button>
+					<DockPanel>
+						<Label>移动</Label>
+					</DockPanel>
+
+					<DockPanel>
+						<Label>复制</Label>
+					</DockPanel>
+
+
+					<DockPanel>
+						<Label>重命名</Label>
+					</DockPanel>
+
+					<DockPanel>
+						<Label>分享</Label>
+					</DockPanel>
+					<DockPanel>
+						<Label>在此新建文件夹</Label>
+					</DockPanel>
+					<DockPanel>
+						<Label>属性</Label>
+					</DockPanel>
 
 				</ContextMenu>
 				

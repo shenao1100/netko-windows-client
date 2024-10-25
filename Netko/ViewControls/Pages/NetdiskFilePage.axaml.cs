@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Netko.NetDisk.Baidu;
 using System;
 using System.Collections.Generic;
@@ -13,14 +14,144 @@ public partial class NetdiskFilePage : UserControl
 {
     public const string HomePath = "";
     public Action<string>? UpdateUserSectionName;
+
+    // for history use
     private List<string> backHistory = new List<string>();
     private List<string> forwardHistory = new List<string>();
     private string currentPath;
     private BaiduFileList baiduFileList;
 
+    // for file action use
+    private List<BDDir> selectDirList = new List<BDDir>();
+    private List<BDFile> selectFileList = new List<BDFile>();
+    // for color changing use
+    private Color selectedColor;
+    private Color unselectedColor;
+
+
     public NetdiskFilePage()
     {
         InitializeComponent();
+        GetColor();
+
+    }
+
+    /// <summary>
+    /// Get Geometry svg from resource xaml
+    /// </summary>
+    /// <param name="resource_name">key for StreamGeometry you want</param>
+    /// <returns></returns>
+    private Geometry? TryGetGeometry(string resource_name)
+    {
+        var is_res_exist = Application.Current.Resources.TryGetResource(resource_name, null, out var res);
+        if (is_res_exist && res is Geometry geom)
+        {
+            return geom;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private DockPanel GenerateMenuItem(string item_func)
+    {
+        DockPanel dockPanel = new DockPanel();
+        Geometry? svg = null;
+        Label label = new Label();
+        switch (item_func) {
+            case "OPEN":
+                svg = TryGetGeometry("open");
+                label.Content = "打开";
+                break;
+            case "DELETE":
+                svg = TryGetGeometry("delete_outline");
+                label.Content = "删除";
+
+                break;
+            case "MOVE":
+                svg = TryGetGeometry("move");
+                label.Content = "移动";
+                break;
+            case "DUPLICATE":
+                svg = TryGetGeometry("duplicate");
+                label.Content = "复制";
+                break;
+            case "RENAME":
+                svg = TryGetGeometry("rename");
+                label.Content = "重命名";
+                break;
+            case "SHARE":
+                svg = TryGetGeometry("share");
+                label.Content = "分享";
+                break;
+            case "NEW_FOLDER":
+                svg = TryGetGeometry("folder_add");
+                label.Content = "新建文件夹";
+                break;
+            case "PROPERTIE":
+                svg = TryGetGeometry("detail");
+                label.Content = "属性";
+                break;
+        }
+
+        if (svg != null)
+        {
+            PathIcon icon = new PathIcon();
+            icon.Data = svg;
+            dockPanel.Margin = new Thickness(10);
+            dockPanel.Children.Add(icon);
+            dockPanel.Children.Add(label);
+            DockPanel.SetDock(icon, Dock.Left);
+            DockPanel.SetDock(label, Dock.Left);
+        }
+        return dockPanel;
+    }
+
+    public void GetColor()
+    {
+        var CBH_backgound = Application.Current.Resources.TryGetResource("CatalogBaseHighColor", null, out var Hresource);
+        if (CBH_backgound && Hresource is Color Backgound)
+        {
+            selectedColor = Backgound;
+        }
+        var CBL_background = Application.Current.Resources.TryGetResource("CatalogBaseHighColor", null, out var Lresource);
+        if (CBL_background && Lresource is Color Background)
+        {
+            unselectedColor = Background;
+        }
+    }
+    private void UpdateMenu()
+    {
+        if (selectFileList.Count + selectDirList.Count == 0) {
+            ActionMenu.
+    public void ToggleSelectedFile(BDFile file, UserControl userControl)
+    {
+        if (selectFileList.Contains(file))
+        {
+            userControl.Background = new SolidColorBrush(unselectedColor);
+            selectFileList.Remove(file);
+        }
+        else
+        {
+            userControl.Background = new SolidColorBrush(selectedColor);
+            selectFileList.Add(file);
+        }
+
+    }
+
+    public void ToogleSelectedFolder(BDDir dir, UserControl userControl)
+    {
+        if (selectDirList.Contains(dir))
+        {
+            userControl.Background = new SolidColorBrush(unselectedColor);
+            selectDirList.Remove(dir);
+        }
+        else
+        {
+            userControl.Background = new SolidColorBrush(selectedColor);
+            selectDirList.Add(dir);
+        }
     }
 
     private void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

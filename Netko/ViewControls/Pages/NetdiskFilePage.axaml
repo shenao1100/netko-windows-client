@@ -37,10 +37,46 @@
 		<ProgressBar Grid.Row="2" Margin="0" Padding="0"></ProgressBar>
 		<ScrollViewer Grid.Row="3" Margin="0" Padding="0">
 			<StackPanel x:Name="FileListViewer">
+				<StackPanel.ContextMenu>
+					<ContextMenu x:Name="ActionMenu">
+						<DockPanel>
+							<Label>打开</Label>
+						</DockPanel>
+						<DockPanel>
+							<Label>删除</Label>
+						</DockPanel>
+
+						<DockPanel>
+							<Label>移动</Label>
+						</DockPanel>
+
+						<DockPanel>
+							<Label>复制</Label>
+						</DockPanel>
+
+
+						<DockPanel>
+							<Label>重命名</Label>
+						</DockPanel>
+
+						<DockPanel>
+							<Label>分享</Label>
+						</DockPanel>
+						<DockPanel>
+							<Label>在此新建文件夹</Label>
+						</DockPanel>
+						<DockPanel>
+							<Label>属性</Label>
+						</DockPanel>
+
+					</ContextMenu>
+
+				</StackPanel.ContextMenu>
 				<Button Click="Button_Click">Add Item</Button>
 				<Button Click="NetdiskParse">Netdisk test</Button>
 
 			</StackPanel>
+			
 		</ScrollViewer>
 
 	</Grid>
