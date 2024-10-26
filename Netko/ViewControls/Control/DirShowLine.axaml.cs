@@ -18,6 +18,7 @@ public partial class DirShowLine : UserControl
     public Color HoverBG;
     public Color LeaveBG;
     private DateTime lastClickedTime;
+    
     public DirShowLine()
     {
         InitializeComponent();
@@ -66,5 +67,10 @@ public partial class DirShowLine : UserControl
         { 
 
         }
+    }
+
+    private void DockPanel_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+    {
+        Trace.WriteLine("dir rgclicked");
     }
 }

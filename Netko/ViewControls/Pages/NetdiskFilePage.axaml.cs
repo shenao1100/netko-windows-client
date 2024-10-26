@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Netko.NetDisk.Baidu;
@@ -33,8 +34,21 @@ public partial class NetdiskFilePage : UserControl
     {
         InitializeComponent();
         GetColor();
-
+        // FileListViewer.PointerPressed += FileListViewerOnClick;
     }
+
+    /*private void FileListViewerOnClick(object sender, PointerPressedEventArgs e)
+    {
+        Trace.WriteLine("btn pres");
+        if (e.GetCurrentPoint(FileListViewer).Properties.IsRightButtonPressed && !ActionMenuPopup.IsOpen)
+        {
+            ActionMenuPopup.IsOpen = true;
+        }
+        else
+        {
+            ActionMenuPopup.IsOpen = false;
+        }
+    }*/
 
     /// <summary>
     /// Get Geometry svg from resource xaml
@@ -123,8 +137,11 @@ public partial class NetdiskFilePage : UserControl
     }
     private void UpdateMenu()
     {
-        if (selectFileList.Count + selectDirList.Count == 0) {
-            ActionMenu.
+        if (selectFileList.Count + selectDirList.Count == 0)
+        {
+            //ActionMenu
+        }
+    }
     public void ToggleSelectedFile(BDFile file, UserControl userControl)
     {
         if (selectFileList.Contains(file))

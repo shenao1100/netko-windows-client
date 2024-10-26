@@ -65,6 +65,7 @@ namespace Netko.NetDisk.Baidu
         public long WpFile;
     }
 
+    
     public struct BDFileList
     {
         public string Path;
@@ -76,7 +77,11 @@ namespace Netko.NetDisk.Baidu
     {
         public Baidu BaiduAccount = Account;
         public Dictionary<string, BDFileList> FileListTemp = new Dictionary<string, BDFileList>();
-            
+
+        private List<BDDir> selectDirList = new List<BDDir>();
+        private List<BDFile> selectFileList = new List<BDFile>();
+
+
         private BDDir ParseDir(JObject item)
         {
             BDDir dir = new BDDir();
@@ -157,8 +162,53 @@ namespace Netko.NetDisk.Baidu
             return fileList;
 
         }
-        public async Task<BDFileList> GetFileList(int page, int num=1000, string path="/")
+        public BDFileList? GetSelectedItem()
         {
+            if(selectDirList.Count == 0 && selectFileList.Count == 0)
+            {
+                return null;
+            }
+            BDFileList fileList = new BDFileList();
+            fileList.File = selectFileList.ToArray();
+            fileList.Dir = selectDirList.ToArray();
+            return fileList;
+        }
+
+        public bool ToggleSelectDir(BDDir Dir)
+        {
+            if (selectDirList.Contains(Dir))
+            {
+                selectDirList.Remove(Dir);
+                return false;
+            }
+            else
+            {
+                selectDirList.Add(Dir);
+                return true;
+            }
+        }
+
+        public bool ToggleSelectFile(BDFile file)
+        {
+            if (selectFileList.Contains(file))
+            {
+                selectFileList.Remove(file);
+                return false;
+            }
+            else
+            {
+                selectFileList.Add(file);
+                return true;
+
+            }
+        }
+        public async Task<BDFileList> GetFileList(int page, int num=1000, string path="/", bool clear_select_list=true)
+        {
+            if (clear_select_list)
+            {
+                selectDirList.Clear();
+                selectFileList.Clear();
+            }
             path = WebUtility.UrlEncode(path);
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
             string url = $"https://pan.baidu.com/api/list?dir={path}&page={page}&num={num}&clienttype=8&channel=00000000000000000000000040000001&version=7.45.0.109&devuid=BDIMXV2%2dO%5f9432D545AA3849D19EFD762333A53888%2dC%5f0%2dD%5fE823%5f8FA6%5fBF53%5f0001%5f001B%5f448B%5f4A73%5f734B%2e%2dM%5f088FC3E23825%2dV%5f3EBDE1E0&rand=17a15c3f37fc5bd28a6fea151d1c7c6f67fb1c22&time=1728903683&rand2=b4e5cb179b298309a26dd85e95596c2ac1cd2300&vip=2&logid={log_id}&desc=1&order=time";

@@ -17,33 +17,33 @@
 		<Button x:Name="Action" HorizontalAlignment="Stretch" Margin="0" Padding="0" PointerPressed="MouseInput" Click="LeftClick" Background="Transparent">
 			<Button.ContextMenu>
 				<ContextMenu>
-					<DockPanel>
+					<DockPanel PointerPressed="DockPanel_PointerPressed" x:Name="DockpanelOpen">
 						<Label>打开</Label>
 					</DockPanel>
-					<DockPanel>
+					<DockPanel x:Name="DockpanelDelete">
 						<Label>删除</Label>
 					</DockPanel>
 
-					<DockPanel>
+					<DockPanel x:Name="DockpanelMove">
 						<Label>移动</Label>
 					</DockPanel>
 
-					<DockPanel>
+					<DockPanel x:Name="DockpanelDuplicate">
 						<Label>复制</Label>
 					</DockPanel>
 
 
-					<DockPanel>
+					<DockPanel x:Name="DockpanelRename">
 						<Label>重命名</Label>
 					</DockPanel>
 
-					<DockPanel>
+					<DockPanel x:Name="DockpanelShare">
 						<Label>分享</Label>
 					</DockPanel>
-					<DockPanel>
+					<DockPanel x:Name="DockpanelNewFolder">
 						<Label>在此新建文件夹</Label>
 					</DockPanel>
-					<DockPanel>
+					<DockPanel x:Name="DockpanelProp">
 						<Label>属性</Label>
 					</DockPanel>
 

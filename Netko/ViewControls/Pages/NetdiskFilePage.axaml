@@ -39,8 +39,13 @@
 			<StackPanel x:Name="FileListViewer">
 				<StackPanel.ContextMenu>
 					<ContextMenu x:Name="ActionMenu">
-						<DockPanel>
-							<Label>打开</Label>
+						<DockPanel Margin="0">
+							<Button Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+								<Label>打开</Label>
+							</Button>
+							<Button Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+								<Label>打开</Label>
+							</Button>
 						</DockPanel>
 						<DockPanel>
 							<Label>删除</Label>
