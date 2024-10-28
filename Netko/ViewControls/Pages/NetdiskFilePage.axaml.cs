@@ -283,7 +283,8 @@ public partial class NetdiskFilePage : UserControl
             DirBlock.Func = () => ChangePage(user, dir_b.Path, 1);
             DirBlock.SetName(dir_b.Name);
             FileListViewer.Children.Add(DirBlock);
-
+            DirBlock.SelfDir = dir_b;
+            DirBlock.baiduFileList = user;
 
         }
         foreach (BDFile file_b in list_.File)

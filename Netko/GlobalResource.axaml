@@ -14,9 +14,9 @@
 			<Color x:Key="CatalogBaseHighColor">#A0575757</Color>
 		</ResourceDictionary>
 		<ResourceDictionary x:Key="Dark">
-			<Color x:Key="CatalogBaseLowColor">#D0000000</Color>
+			<Color x:Key="CatalogBaseLowColor">#C0000000</Color>
 			<Color x:Key="CatalogBaseMediumColor">#A9141414</Color>
-			<Color x:Key="CatalogChromeMediumColor">#FFE6E6E6</Color>
+			<Color x:Key="CatalogChromeMediumColor">#A0E6E6E6</Color>
 			<Color x:Key="CatalogBaseHighColor">#50575757</Color>
 		</ResourceDictionary>
 		<ResourceDictionary x:Key="Light">

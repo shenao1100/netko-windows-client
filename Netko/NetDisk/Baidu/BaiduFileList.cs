@@ -188,6 +188,16 @@ namespace Netko.NetDisk.Baidu
             }
         }
 
+        public bool DirIsSelected(BDDir Dir)
+        {
+            if (selectDirList.Contains(Dir)) { return true; } else { return false; }
+        }
+
+        public bool FileIsSelected(BDFile File)
+        {
+            if (!selectFileList.Contains(File)) { return true; } else { return false; }
+        }
+
         public bool ToggleSelectFile(BDFile file)
         {
             if (selectFileList.Contains(file))

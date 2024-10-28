@@ -37,7 +37,7 @@
 		<ProgressBar Grid.Row="2" Margin="0" Padding="0"></ProgressBar>
 		<ScrollViewer Grid.Row="3" Margin="0" Padding="0">
 			<StackPanel x:Name="FileListViewer">
-				<StackPanel.ContextMenu>
+				<!--StackPanel.ContextMenu>
 					<ContextMenu x:Name="ActionMenu">
 						<DockPanel Margin="0">
 							<Button Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -76,7 +76,7 @@
 
 					</ContextMenu>
 
-				</StackPanel.ContextMenu>
+				</StackPanel.ContextMenu-->
 				<Button Click="Button_Click">Add Item</Button>
 				<Button Click="NetdiskParse">Netdisk test</Button>
 
