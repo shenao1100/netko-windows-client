@@ -14,75 +14,42 @@
 			<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
 		</Transitions>
 	</UserControl.Transitions>
-	<Grid ColumnDefinitions="*" RowDefinitions="Auto, Auto, Auto, *" VerticalAlignment="Top">
-		<Grid ColumnDefinitions="Auto, Auto, Auto, *, Auto, Auto">
-			<Button Grid.Row="0" Grid.Column="0" Background="Transparent" Click="Home">
-				<PathIcon Data="{StaticResource home}" Height="15" Width="15"/>
-			</Button>
-			<Button Grid.Row="0" Grid.Column="1" Background="Transparent" x:Name="BackButton" Click="Back">
-				<PathIcon Data="{StaticResource backward}" Height="15" Width="15"/>
-			</Button>
-			<Button Grid.Row="0" Grid.Column="2" Background="Transparent" x:Name="ForwardButton" Click="Forward">
-				<PathIcon Data="{StaticResource forward}" Height="15" Width="15"/>
-			</Button>
-			<TextBox Grid.Row="0" Grid.Column="3" BorderBrush="Transparent" Background="" x:Name="PathTextBox"></TextBox>
-			<Button Grid.Row="0" Grid.Column="4" Background="Transparent" Click="GotoDir">
-				<PathIcon Data="{StaticResource enter}" Height="15" Width="15"/>
-			</Button>
-			<Button Grid.Row="0" Grid.Column="5" Background="Transparent" Click="Refresh">
-				<PathIcon Data="{StaticResource refresh}" Height="15" Width="15"/>
-			</Button>
+	<Panel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+		<Grid ColumnDefinitions="*" RowDefinitions="Auto, Auto, Auto, *" VerticalAlignment="Stretch">
+			<Grid ColumnDefinitions="Auto, Auto, Auto, *, Auto, Auto">
+				<Button Grid.Row="0" Grid.Column="0" Background="Transparent" Click="Home">
+					<PathIcon Data="{StaticResource home}" Height="15" Width="15"/>
+				</Button>
+				<Button Grid.Row="0" Grid.Column="1" Background="Transparent" x:Name="BackButton" Click="Back">
+					<PathIcon Data="{StaticResource backward}" Height="15" Width="15"/>
+				</Button>
+				<Button Grid.Row="0" Grid.Column="2" Background="Transparent" x:Name="ForwardButton" Click="Forward">
+					<PathIcon Data="{StaticResource forward}" Height="15" Width="15"/>
+				</Button>
+				<TextBox Grid.Row="0" Grid.Column="3" BorderBrush="Transparent" Background="" x:Name="PathTextBox"></TextBox>
+				<Button Grid.Row="0" Grid.Column="4" Background="Transparent" Click="GotoDir">
+					<PathIcon Data="{StaticResource enter}" Height="15" Width="15"/>
+				</Button>
+				<Button Grid.Row="0" Grid.Column="5" Background="Transparent" Click="Refresh">
+					<PathIcon Data="{StaticResource refresh}" Height="15" Width="15"/>
+				</Button>
+			</Grid>
+			<Separator Grid.Row="1" Margin="0" Padding="0"></Separator>
+			<ProgressBar Grid.Row="2" Margin="0" Padding="0"></ProgressBar>
+			<ScrollViewer Grid.Row="3" Margin="0" Padding="0" VerticalAlignment="Stretch">
+				<Panel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+					<StackPanel x:Name="FileListViewer" VerticalAlignment="Stretch">
+						<Button Click="Button_Click">Add Item</Button>
+						<Button Click="NetdiskParse">Netdisk test</Button>
+
+					</StackPanel>
+				</Panel>
+			</ScrollViewer>
+
 		</Grid>
-		<Separator Grid.Row="1" Margin="0" Padding="0"></Separator>
-		<ProgressBar Grid.Row="2" Margin="0" Padding="0"></ProgressBar>
-		<ScrollViewer Grid.Row="3" Margin="0" Padding="0">
-			<StackPanel x:Name="FileListViewer">
-				<!--StackPanel.ContextMenu>
-					<ContextMenu x:Name="ActionMenu">
-						<DockPanel Margin="0">
-							<Button Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-								<Label>打开</Label>
-							</Button>
-							<Button Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-								<Label>打开</Label>
-							</Button>
-						</DockPanel>
-						<DockPanel>
-							<Label>删除</Label>
-						</DockPanel>
+		<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="OverlayReserved"/>
 
-						<DockPanel>
-							<Label>移动</Label>
-						</DockPanel>
+	</Panel>
 
-						<DockPanel>
-							<Label>复制</Label>
-						</DockPanel>
-
-
-						<DockPanel>
-							<Label>重命名</Label>
-						</DockPanel>
-
-						<DockPanel>
-							<Label>分享</Label>
-						</DockPanel>
-						<DockPanel>
-							<Label>在此新建文件夹</Label>
-						</DockPanel>
-						<DockPanel>
-							<Label>属性</Label>
-						</DockPanel>
-
-					</ContextMenu>
-
-				</StackPanel.ContextMenu-->
-				<Button Click="Button_Click">Add Item</Button>
-				<Button Click="NetdiskParse">Netdisk test</Button>
-
-			</StackPanel>
-			
-		</ScrollViewer>
-
-	</Grid>
 </UserControl>

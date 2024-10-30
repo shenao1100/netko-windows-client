@@ -9,19 +9,23 @@ using System;
 using System.Runtime.CompilerServices;
 using Netko.NetDisk.Baidu;
 using Avalonia.Markup.Xaml.MarkupExtensions;
+using Microsoft.CodeAnalysis.Scripting.Hosting;
 
 namespace Netko;
 
 public partial class DirShowLine : UserControl
 {
-    public Action Func;
+    public Action Func {  get; set; }
+    public Action Refresh {  get; set; }
+    public string ParentPath { get; set; }
     private StackPanel FileListViewer;
-    public Color HoverBG;
-    public Color LeaveBG;
+    //public Color HoverBG;
+    //public Color LeaveBG;
     private DateTime lastClickedTime;
     public BaiduFileList? baiduFileList;
     public BDDir SelfDir;
     private bool is_selected = false;
+    public Grid OverlayReservedGrid { get; set; }
 
     public DirShowLine()
     {
@@ -47,13 +51,11 @@ public partial class DirShowLine : UserControl
         }*/
         if (is_selected)
         {
-            Trace.WriteLine(HoverBG.ToString());
             //BorderBackground.Background = new SolidColorBrush(HoverBG);
             BorderBackground[!Border.BackgroundProperty] = new DynamicResourceExtension("CatalogBaseMediumColor");
         }
         else
         {
-            Trace.WriteLine(LeaveBG.ToString());
             BorderBackground[!Border.BackgroundProperty] = new DynamicResourceExtension("CatalogBaseHighColor");
             //BorderBackground.Background = new SolidColorBrush(LeaveBG);
         }
@@ -116,6 +118,49 @@ public partial class DirShowLine : UserControl
         }
     }
 
+    private void OepnOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        Func();
+    }
+
+    private async void NewFolderOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        DialogOverlay inputName = new DialogOverlay();
+        OverlayReservedGrid.Children.Add(inputName);
+        string? filename = await inputName.ShowDialog("请输入新建文件夹的名称", "创建");
+        if (await baiduFileList.CreateDir(ParentPath + "/" + filename))
+        {
+            Refresh();
+            return;
+        }
+        else
+        {
+            MessageOverlay message = new MessageOverlay();
+            OverlayReservedGrid.Children.Add(message);
+            message.SetMessage("创建失败", $"创建{ParentPath + "/" + filename}时遇到错误");
+            return;
+        }
+    }
+    private async void DeleteOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        BDDir[] dirlist = new BDDir[1];
+        dirlist[0] = SelfDir;
+        string delete_filelist = baiduFileList.IntegrateFilelist(null, dirlist);
+        Trace.WriteLine(delete_filelist);
+        if (await baiduFileList.DeleteFile(delete_filelist)){
+            Refresh();
+            return;
+        }
+        else
+        {
+            MessageOverlay message = new MessageOverlay();
+            OverlayReservedGrid.Children.Add(message);
+            message.SetMessage("删除失败", $"删除 {SelfDir.Name} 时遇到错误");
+
+            return;
+        }
+
+    }
     private void DockPanel_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
         Trace.WriteLine("dir rgclicked");

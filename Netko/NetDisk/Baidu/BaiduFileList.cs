@@ -1,4 +1,6 @@
-﻿using Avalonia.Controls.Documents;
+﻿using Avalonia.Controls;
+using Avalonia.Controls.Documents;
+using Avalonia.Media;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -7,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.Serialization;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
@@ -81,7 +84,12 @@ namespace Netko.NetDisk.Baidu
         private List<BDDir> selectDirList = new List<BDDir>();
         private List<BDFile> selectFileList = new List<BDFile>();
 
-
+        const string channel = "00000000000000000000000040000001";
+        const string version = "7.46.5.113";
+        const string devuid = "BDIMXV2%2dO%5f9432D545AA3849D19EFD762333A53888%2dC%5f0%2dD%5fE823%5f8FA6%5fBF53%5f0001%5f001B%5f448B%5f4A73%5f734B%2e%2dM%5f088FC3E23825%2dV%5f3EBDE1E0";
+        const string rand = "27f884dc5f353636874770bc396e1ce6eca29bfc";
+        const string time = "1730132298";
+        const string rand2 = "14a3c956f6a8daea6e650c72ce7888a6ee0f503d";
         private BDDir ParseDir(JObject item)
         {
             BDDir dir = new BDDir();
@@ -212,6 +220,120 @@ namespace Netko.NetDisk.Baidu
 
             }
         }
+        /// <summary>
+        /// Convert File and Dir list into list string that server can identify.
+        /// </summary>
+        /// <param name="files"></param>
+        /// <param name="dirs"></param>
+        /// <returns>like: "[\"/新建文件夹\"]"</returns>
+        public string IntegrateFilelist(BDFile[]? files, BDDir[]? dirs)
+        {
+            string result = "[";
+            int count = 0;
+            if (files != null) {
+                foreach (BDFile file in files)
+                {
+                    count++;
+                    if (count == files.Length)
+                    {
+                        result += $"\"{file.Path}\"";
+                    }
+                    else
+                    {
+                        result += $"\"{file.Path}\",";
+                    }
+                }
+            }
+            count = 0;
+            if (dirs != null)
+            {
+                foreach (BDDir dir in dirs)
+                {
+                    count++;
+                    if (count == dirs.Length)
+                    {
+                        result += $"\"{dir.Path}\"";
+                    }
+                    else
+                    {
+                        result += $"\"{dir.Path}\",";
+                    }
+                }
+            }
+            result += "]";
+            return result;
+        }
+
+        public async Task<bool> CreateDir(string path)
+        {
+            
+            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
+            string url = $"https://pan.baidu.com/api/create?clienttype={Baidu.clienttype}&channel={channel}&version={version}&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}";
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", Baidu.netdisk_user_agent);
+            client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
+            client.DefaultRequestHeaders.Add("Accept", "*/*");
+            client.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
+            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+            client.DefaultRequestHeaders.Add("Host", "pan.baidu.com");
+            //path=//新建文件夹&size=0&isdir=1
+            var formData = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("path", path),
+                new KeyValuePair<string, string>("size", "0"),
+                new KeyValuePair<string, string>("isdir", "1")
+            });
+            HttpResponseMessage content = await client.PostAsync(url, formData);
+            BaiduAccount.UpdateCookie(content.Headers);
+            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
+            task_content.Wait();
+            Dictionary<string, object>? body
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+            if (body != null && Convert.ToInt32(body["errno"]) == 0)
+            {
+                return true;
+            }
+            else { return false; }
+
+        }
+    
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="file_list">like "[\"/新建文件夹\"]"</param>
+        /// <returns></returns>
+        public async Task<bool> DeleteFile(string file_list)
+        {
+            long timestampSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            string time_stamp = timestampSeconds.ToString();
+            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
+
+            string url = $"https://pan.baidu.com/api/filemanager?opera=delete&async=1&onnest=fail&channel=chunlei&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
+            client.DefaultRequestHeaders.Add("Accept", "*/*");
+            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            //client.DefaultRequestHeaders.Add("Host", "pan.baidu.com");
+            var formData = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("filelist", file_list)
+            });
+            
+            HttpResponseMessage content = await client.PostAsync(url, formData);
+            BaiduAccount.UpdateCookie(content.Headers);
+            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
+            task_content.Wait();
+            Trace.WriteLine(task_content.Result);
+            Dictionary<string, object>? body
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+            if (body != null && Convert.ToInt32(body["errno"]) == 0)
+            {
+                return true;
+            }
+            else { return false; }
+
+        }
         public async Task<BDFileList> GetFileList(int page, int num=1000, string path="/", bool clear_select_list=true)
         {
             if (clear_select_list)
@@ -222,7 +344,6 @@ namespace Netko.NetDisk.Baidu
             path = WebUtility.UrlEncode(path);
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
             string url = $"https://pan.baidu.com/api/list?dir={path}&page={page}&num={num}&clienttype=8&channel=00000000000000000000000040000001&version=7.45.0.109&devuid=BDIMXV2%2dO%5f9432D545AA3849D19EFD762333A53888%2dC%5f0%2dD%5fE823%5f8FA6%5fBF53%5f0001%5f001B%5f448B%5f4A73%5f734B%2e%2dM%5f088FC3E23825%2dV%5f3EBDE1E0&rand=17a15c3f37fc5bd28a6fea151d1c7c6f67fb1c22&time=1728903683&rand2=b4e5cb179b298309a26dd85e95596c2ac1cd2300&vip=2&logid={log_id}&desc=1&order=time";
-            Trace.WriteLine(url);
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", Baidu.netdisk_user_agent);
             client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
@@ -235,7 +356,6 @@ namespace Netko.NetDisk.Baidu
             BaiduAccount.UpdateCookie(content.Headers);
             var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
             task_content.Wait();
-            Console.WriteLine(task_content.Result);
 
             Dictionary<string, object>? body
                 = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);

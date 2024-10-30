@@ -46,7 +46,29 @@ namespace Netko.NetDisk.Baidu
         public const string netdisk_user_agent = "netdisk";
         public const string broswer_user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.52";
 
-        
+        public string GetParticalCookie(string[] partical_keys)
+        {
+            string cookie_val = "";
+            foreach (string key in partical_keys)
+            {
+                if (cookie.ContainsKey(key))
+                {
+                    if (cookie[key] != null)
+                    {
+                        cookie_val = key + "=" + cookie[key] + "; ";
+                    }
+                    else
+                    {
+                        cookie_val += key + "; ";
+                    }
+                }
+                else
+                {
+                    Trace.WriteLine(key + "doesnt exist");
+                }
+            }
+            return cookie_val;
+        }
         public string GetCookie()
         {
             /*

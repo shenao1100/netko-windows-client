@@ -28,12 +28,13 @@ public partial class NetdiskFilePage : UserControl
     // for color changing use
     private Color selectedColor;
     private Color unselectedColor;
-
+    public Grid OverlayReservedGrid { get; set; }
 
     public NetdiskFilePage()
     {
         InitializeComponent();
         GetColor();
+        OverlayReservedGrid = OverlayReserved;
         // FileListViewer.PointerPressed += FileListViewerOnClick;
     }
 
@@ -280,11 +281,17 @@ public partial class NetdiskFilePage : UserControl
         foreach (BDDir dir_b in list_.Dir)
         {
             DirShowLine DirBlock = new DirShowLine();
+            // set enter, refresh command
             DirBlock.Func = () => ChangePage(user, dir_b.Path, 1);
+            DirBlock.Refresh = () => ChangePage(baiduFileList, currentPath, 1, insert_back_history: false);
+            // set name, BDDir, user, OverelayGrid
             DirBlock.SetName(dir_b.Name);
-            FileListViewer.Children.Add(DirBlock);
             DirBlock.SelfDir = dir_b;
             DirBlock.baiduFileList = user;
+            DirBlock.OverlayReservedGrid = OverlayReservedGrid;
+            DirBlock.ParentPath = currentPath;
+            // append to viewer
+            FileListViewer.Children.Add(DirBlock);
 
         }
         foreach (BDFile file_b in list_.File)

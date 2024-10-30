@@ -21,56 +21,49 @@
 			<Button.ContextMenu>
 				<ContextMenu>
 					
-					<MenuItem Header="1" Click="">
+					<MenuItem Header="打开" Click="OepnOnMenu" x:Name="DockpanelOpen" Margin="3">
 						<MenuItem.Icon>
-							<PathIcon Data="{StaticResource github}" Height="50" Width="50" Margin="5"/>
+							<PathIcon Data="{StaticResource open}" />
 						</MenuItem.Icon>
 					</MenuItem>
-					<MenuItem Header="2" Click=""></MenuItem>
+					<MenuItem Header="删除" Click="DeleteOnMenu" x:Name="DockpanelDelete" Margin="3">
+						<MenuItem.Icon>
+							<PathIcon Data="{StaticResource delete_outline}"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="移动" Click="" x:Name="DockpanelMove" Margin="3">
+						<MenuItem.Icon>
+							<PathIcon Data="{StaticResource move}"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="复制" Click="" x:Name="DockpanelDuplicate" Margin="3">
+						<MenuItem.Icon>
+							<PathIcon Data="{StaticResource duplicate}"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="重命名" Click="" x:Name="DockpanelRename" Margin="3">
+						<MenuItem.Icon>
+							<PathIcon Data="{StaticResource rename}"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="分享" Click="" x:Name="DockpanelShare" Margin="3">
+						<MenuItem.Icon>
+							<PathIcon Data="{StaticResource share}"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="在此新建文件夹" Click="NewFolderOnMenu" x:Name="DockpanelNewFolder" Margin="3">
+						<MenuItem.Icon>
+							<PathIcon Data="{StaticResource folder_add}"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="属性" Click="" x:Name="DockpanelProp" Margin="3">
+						<MenuItem.Icon>
+							<PathIcon Data="{StaticResource detail}"/>
+						</MenuItem.Icon>
+					</MenuItem>
 				</ContextMenu>
 			</Button.ContextMenu>
 			<Grid  ColumnDefinitions="45, *" >
-				<Popup x:Name="PopupMenu" IsOpen="False" PlacementMode="Pointer">
-					<Panel>
-						
-						<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="7" Padding="0" Margin="0" Opacity="1"/>
-
-							<StackPanel>
-						<DockPanel PointerPressed="DockPanel_PointerPressed" x:Name="DockpanelOpen">
-							<Button HorizontalAlignment="Stretch">
-							<Label>打开</Label>
-							</Button>
-						</DockPanel>
-						<DockPanel x:Name="DockpanelDelete">
-							<Label>删除</Label>
-						</DockPanel>
-
-						<DockPanel x:Name="DockpanelMove">
-							<Label>移动</Label>
-						</DockPanel>
-
-						<DockPanel x:Name="DockpanelDuplicate">
-							<Label>复制</Label>
-						</DockPanel>
-
-
-						<DockPanel x:Name="DockpanelRename">
-							<Label>重命名</Label>
-						</DockPanel>
-
-						<DockPanel x:Name="DockpanelShare">
-							<Label>分享</Label>
-						</DockPanel>
-						<DockPanel x:Name="DockpanelNewFolder">
-							<Label>在此新建文件夹</Label>
-						</DockPanel>
-						<DockPanel x:Name="DockpanelProp">
-							<Label>属性</Label>
-						</DockPanel>
-
-					</StackPanel>
-					</Panel>
-				</Popup>
 			<Image Source="/Assets/FileIcon/icons8-folder-188.png" Height="50" Grid.Column="0" Margin="3"></Image>
 			<Grid RowDefinitions="Auto, Auto" Grid.Column="1" VerticalAlignment="Center" Margin="5 0">
 				<Label Grid.Row="0" FontSize="15" Padding="0 3" x:Name="FileName">测试文件.zip</Label>

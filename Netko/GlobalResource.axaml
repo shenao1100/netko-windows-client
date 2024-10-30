@@ -8,21 +8,21 @@
 	</Design.PreviewWith>
 	<ResourceDictionary.ThemeDictionaries>
 		<ResourceDictionary x:Key="Default">
-			<Color x:Key="CatalogBaseLowColor">#33191919</Color>
+			<Color x:Key="CatalogBaseLowColor">#C0000000</Color>
 			<Color x:Key="CatalogBaseMediumColor">#992b2b2b</Color>
-			<Color x:Key="CatalogChromeMediumColor">#FFE6E6E6</Color>
+			<Color x:Key="CatalogChromeMediumColor">#FF303030</Color>
 			<Color x:Key="CatalogBaseHighColor">#A0575757</Color>
 		</ResourceDictionary>
 		<ResourceDictionary x:Key="Dark">
 			<Color x:Key="CatalogBaseLowColor">#C0000000</Color>
 			<Color x:Key="CatalogBaseMediumColor">#A9141414</Color>
-			<Color x:Key="CatalogChromeMediumColor">#A0E6E6E6</Color>
+			<Color x:Key="CatalogChromeMediumColor">#FE303030</Color>
 			<Color x:Key="CatalogBaseHighColor">#50575757</Color>
 		</ResourceDictionary>
 		<ResourceDictionary x:Key="Light">
 			<Color x:Key="CatalogBaseLowColor">#80FFFFFF</Color>
 			<Color x:Key="CatalogBaseMediumColor">#99FFFFFF</Color>
-			<Color x:Key="CatalogChromeMediumColor">#FF1F1F1F</Color>
+			<Color x:Key="CatalogChromeMediumColor">#FFc5c5c5</Color>
 			<Color x:Key="CatalogBaseHighColor">#80FFFFFF</Color>
 		</ResourceDictionary>
 	</ResourceDictionary.ThemeDictionaries>
