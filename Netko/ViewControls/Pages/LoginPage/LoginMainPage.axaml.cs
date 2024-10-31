@@ -9,6 +9,7 @@ public partial class LoginMainPage : UserControl
     public LoginMainPage()
     {
         InitializeComponent();
+        
     }
 
     private void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

@@ -41,12 +41,12 @@
 							<PathIcon Data="{StaticResource duplicate}"/>
 						</MenuItem.Icon>
 					</MenuItem>
-					<MenuItem Header="重命名" Click="" x:Name="DockpanelRename" Margin="3">
+					<MenuItem Header="重命名" Click="RenameOnMenu" x:Name="DockpanelRename" Margin="3">
 						<MenuItem.Icon>
 							<PathIcon Data="{StaticResource rename}"/>
 						</MenuItem.Icon>
 					</MenuItem>
-					<MenuItem Header="分享" Click="" x:Name="DockpanelShare" Margin="3">
+					<MenuItem Header="分享" Click="ShareOnMenu" x:Name="DockpanelShare" Margin="3">
 						<MenuItem.Icon>
 							<PathIcon Data="{StaticResource share}"/>
 						</MenuItem.Icon>

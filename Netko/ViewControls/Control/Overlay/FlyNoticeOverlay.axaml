@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Netko.FlyNoticeOverlay">
+	<UserControl.RenderTransform>
+		<!-- 使用TranslateTransform移动位置 -->
+		<TranslateTransform X="300" Y="300" />
+	</UserControl.RenderTransform>
+
+	<UserControl.Transitions>
+		<!-- 位置平移动画 -->
+		<TransformOperationsTransition Property="RenderTransform">
+			<TransformOperationsTransition.Easing>
+				<SineEaseInOut />
+			</TransformOperationsTransition.Easing>
+			<TransformOperationsTransition.Duration>
+				0:0:0.5
+			</TransformOperationsTransition.Duration>
+		</TransformOperationsTransition>
+	</UserControl.Transitions>
+	<Grid Background="Green" HorizontalAlignment="Center" VerticalAlignment="Center">
+		<Label>nih</Label>
+	</Grid>
+</UserControl>

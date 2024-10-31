@@ -3,26 +3,21 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Netko.MessageOverlay">
+             x:Class="Netko.PropertiesOverlay">
 	<UserControl.Transitions>
 		<Transitions>
 			<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
 		</Transitions>
 	</UserControl.Transitions>
 	<Grid Background="{DynamicResource CatalogBaseLowColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-		
-		
+
+
 		<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
 			<Border Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
 			<StackPanel>
-				<Label Margin="5" FontSize="20" Padding="10 20 3 3" x:Name="title">Notice</Label>
-				<Label Margin="20 10" x:Name="content">Login expired, please relogin</Label>
-				<Separator Margin="0 5" Padding="0"></Separator>
-
-				<Button HorizontalAlignment="Right" Margin="5" Click="Close">Understand</Button>
 			</StackPanel>
 
 		</Grid>
-		
+
 	</Grid>
 </UserControl>

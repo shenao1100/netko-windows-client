@@ -9,6 +9,8 @@ public class MainViewModel : ViewModelBase
     public IBrush sdadad => Brushes.Black;
     public int MainViewMenuButtonWidth => 130;
     public string AppVersion { get; }
+
+
     //public IBrush sdadada => Brushes.;
     public MainViewModel()
     {

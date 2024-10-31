@@ -1,0 +1,166 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+             x:Class="Netko.ShareLinkOverlay">
+	<UserControl.Styles>
+		<Style>
+			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
+		</Style>
+		</UserControl.Styles>
+	<UserControl.Transitions>
+		<Transitions>
+			<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+		</Transitions>
+	</UserControl.Transitions>
+	<Grid Background="{DynamicResource CatalogBaseLowColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="OutShellGrid">
+
+		
+		<Grid HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="OutShell" MinHeight="250">
+			<Grid.Transitions>
+				<Transitions>
+					<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+					<DoubleTransition Property="Width" Duration="0:0:0.2"/>
+					<DoubleTransition Property="Height" Duration="0:0:0.2"/>
+				</Transitions>
+			</Grid.Transitions>
+			<Border Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
+			<StackPanel>
+				<Label Margin="5" FontSize="20" Padding="10 20 3 3">分享链接</Label>
+				<StackPanel x:Name="SettingSection">
+					<StackPanel.Transitions>
+						<Transitions>
+							<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+							<DoubleTransition Property="Height" Duration="0:0:0.2"/>
+						</Transitions>
+					</StackPanel.Transitions>
+				<Grid MinHeight="60" Margin="15 3">
+					<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="5" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+					</Border>
+					<StackPanel>
+						<DockPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
+								<PathIcon Data="{StaticResource calendar}" Height="17" Width="17" Margin="15"/>
+							</StackPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5 0">
+								<Label FontSize="15" Margin="0">有效期</Label>
+								<Label Foreground="Gray" Margin="0" FontSize="12">分享链接有效期，注意隐私安全</Label>
+							</StackPanel>
+							<StackPanel DockPanel.Dock="Right" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+								<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Margin="20 0" Width="100" HorizontalAlignment="Right" x:Name="LastPeriodComboBox">
+									<ComboBoxItem>1天</ComboBoxItem>
+									<ComboBoxItem>7天</ComboBoxItem>
+									<ComboBoxItem>30天</ComboBoxItem>
+									<ComboBoxItem>365天</ComboBoxItem>
+									<ComboBoxItem>永久有效</ComboBoxItem>
+								</ComboBox>
+							</StackPanel>
+						</DockPanel>
+					</StackPanel>
+
+
+				</Grid>
+				<!--Share url-->
+				<Grid MinHeight="60" Margin="15 3">
+					<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="5" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+					</Border>
+					<StackPanel>
+						<DockPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
+								<PathIcon Data="{StaticResource key}" Height="17" Width="17" Margin="15"/>
+							</StackPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5 0">
+								<Label FontSize="15" Margin="0">密码</Label>
+								<Label Foreground="Gray" Margin="0" FontSize="12" x:Name="InfromMsg">4位数字或字母的组合</Label>
+							</StackPanel>
+							<StackPanel DockPanel.Dock="Right" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+								<MaskedTextBox Mask="AAAA" Margin="20 0" Width="100" HorizontalAlignment="Right" x:Name="InputPasswordTextBox"></MaskedTextBox>
+							</StackPanel>
+						</DockPanel>
+					</StackPanel>
+				</Grid>
+				<!--Get surl button-->
+				<DockPanel HorizontalAlignment="Right">
+					<Button DockPanel.Dock="Right" VerticalAlignment="Center" Width="100" Margin="0 5 15 5" Click="GetShareLink">
+						<Label HorizontalAlignment="Center">获取</Label>
+					</Button>
+					<Button DockPanel.Dock="Right" VerticalAlignment="Center" Width="100" Margin="5 5" Click="Close">
+						<Label HorizontalAlignment="Center">取消</Label>
+					</Button>
+				</DockPanel>
+				</StackPanel>
+
+				<!--Show surl-->
+				<StackPanel x:Name="ShowSection" IsVisible="False">
+					<StackPanel.Transitions>
+						<Transitions>
+							<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+							<DoubleTransition Property="Height" Duration="0:0:0.2"/>
+						</Transitions>
+					</StackPanel.Transitions>
+				<Grid MinHeight="60" Margin="15 3">
+					<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="5" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+					</Border>
+					<StackPanel>
+						<DockPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
+								<PathIcon Data="{StaticResource link}" Height="17" Width="17" Margin="15"/>
+							</StackPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5 0">
+								<Label FontSize="15" Margin="0">分享链接</Label>
+								<Label Foreground="Gray" Margin="0" FontSize="12" x:Name="ShareLinkLabel">SURL LINK</Label>
+							</StackPanel>
+							<StackPanel DockPanel.Dock="Right" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+								<Button Margin="20 0" Width="100" HorizontalAlignment="Right" Click="CopyShareLink">
+									<Label HorizontalAlignment="Center">复制</Label>
+								</Button>
+							</StackPanel>
+						</DockPanel>
+
+						<Separator DockPanel.Dock="Bottom" Margin="0" Padding="0"></Separator>
+							<StackPanel Margin="10">
+								<DockPanel HorizontalAlignment="Stretch">
+									<StackPanel VerticalAlignment="Center" Margin="0">
+										<Label FontSize="15" Margin="0">带有密码的分享链接</Label>
+										<Label Foreground="Gray" Margin="0" FontSize="12">他人使用此链接可无需输入密码</Label>
+									</StackPanel>
+									<Button Margin="10 0" Width="100" DockPanel.Dock="Right" HorizontalAlignment="Right" Click="CopyShareLinkWithPwd">
+										<Label HorizontalAlignment="Center">复制</Label>
+									</Button>
+								</DockPanel>
+
+							</StackPanel>
+						</StackPanel>
+					</Grid>
+					<!--Show Password-->
+				<Grid MinHeight="60" Margin="15 3">
+					<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="5" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+					</Border>
+					<StackPanel>
+						<DockPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
+								<PathIcon Data="{StaticResource key}" Height="17" Width="17" Margin="15"/>
+							</StackPanel>
+							<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5 0">
+								<Label FontSize="15" Margin="0">提取码</Label>
+								<Label Foreground="Gray" Margin="0" FontSize="12" x:Name="ShowPasswordLabel">PSWD</Label>
+							</StackPanel>
+							<StackPanel DockPanel.Dock="Right" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+								<Button Margin="20 0" Width="100" HorizontalAlignment="Right" Click="CopyPwd">
+									<Label HorizontalAlignment="Center">复制</Label>
+								</Button>
+							</StackPanel>
+						</DockPanel>
+						</StackPanel>
+					</Grid>
+				<Button HorizontalAlignment="Right" VerticalAlignment="Center" Width="100" Margin="15 5" Click="Close">
+					<Label HorizontalAlignment="Center">关闭</Label>
+				</Button>
+				</StackPanel>
+			</StackPanel>
+
+		</Grid>
+
+	</Grid>
+</UserControl>

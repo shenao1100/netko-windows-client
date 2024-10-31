@@ -141,6 +141,24 @@ public partial class DirShowLine : UserControl
             return;
         }
     }
+    private async void RenameOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        DialogOverlay inputName = new DialogOverlay();
+        OverlayReservedGrid.Children.Add(inputName);
+        string? filename = await inputName.ShowDialog("请输入文件的新名称", "重命名", place_holder:SelfDir.Name);
+        if (await baiduFileList.Rename([SelfDir.Path], [filename]))
+        {
+            Refresh();
+            return;
+        }
+        else
+        {
+            MessageOverlay message = new MessageOverlay();
+            OverlayReservedGrid.Children.Add(message);
+            message.SetMessage("创建失败", $"创建{ParentPath + "/" + filename}时遇到错误");
+            return;
+        }
+    }
     private async void DeleteOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         BDDir[] dirlist = new BDDir[1];
@@ -164,5 +182,17 @@ public partial class DirShowLine : UserControl
     private void DockPanel_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
         Trace.WriteLine("dir rgclicked");
+    }
+    private async void ShareOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        ShareLinkOverlay shareLinkOverlay = new ShareLinkOverlay();
+        shareLinkOverlay.baiduFileList = baiduFileList;
+        shareLinkOverlay.FileList = null;
+
+        shareLinkOverlay.DirList = new BDDir[] { SelfDir };
+        shareLinkOverlay.Opacity = 0;
+
+        OverlayReservedGrid.Children.Add(shareLinkOverlay);
+        shareLinkOverlay.Opacity = 1;
     }
 }

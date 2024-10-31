@@ -11,14 +11,14 @@ public partial class DialogOverlay : UserControl
     public DialogOverlay()
     {
         InitializeComponent();
-        this.Opacity = 0;
-
     }
-    public Task<string> ShowDialog(string message, string button_message)
+    public Task<string> ShowDialog(string message, string button_message, string place_holder="")
     {
+        this.Opacity = 0;
         this.Opacity = 1;
         Message.Content = message;
         SendButton.Content = button_message;
+        Input.Text = place_holder;
         _taskCompletionSource = new TaskCompletionSource<string>();
         this.IsVisible = true;
         return _taskCompletionSource.Task;
@@ -29,5 +29,11 @@ public partial class DialogOverlay : UserControl
         _taskCompletionSource?.SetResult(Input.Text);
         this.IsVisible = false;
     }
+    private async void Close(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        this.Opacity = 0;
+        await Task.Delay(200);
+        this.IsVisible = false;
 
+    }
 }

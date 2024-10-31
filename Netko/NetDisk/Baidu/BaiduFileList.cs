@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Runtime.Serialization;
 using System.Security.Principal;
 using System.Text;
@@ -74,6 +75,15 @@ namespace Netko.NetDisk.Baidu
         public string Path;
         public BDFile[] File;
         public BDDir[] Dir;
+    }
+    
+    /// <summary>
+    /// For use in serialize json obj in Rename data
+    /// </summary>
+    public class RenameItem
+    {
+        public string path { get; set; }
+        public string newname { get; set; }
     }
 
     public class BaiduFileList(Baidu Account)
@@ -221,7 +231,7 @@ namespace Netko.NetDisk.Baidu
             }
         }
         /// <summary>
-        /// Convert File and Dir list into list string that server can identify.
+        /// Convert File and Dir NAME list into list string that server can identify.
         /// </summary>
         /// <param name="files"></param>
         /// <param name="dirs"></param>
@@ -264,6 +274,51 @@ namespace Netko.NetDisk.Baidu
             return result;
         }
 
+        /// <summary>
+        /// Convert File and Dir ID list into list string that server can identify.
+        /// </summary>
+        /// <param name="files"></param>
+        /// <param name="dirs"></param>
+        /// <returns>like: "[123, 456...]"</returns>
+        public string IntegrateIDlist(BDFile[]? files, BDDir[]? dirs)
+        {
+            string result = "[";
+            int count = 0;
+            if (files != null)
+            {
+                foreach (BDFile file in files)
+                {
+                    count++;
+                    if (count == files.Length)
+                    {
+                        result += $"{file.ID}";
+                    }
+                    else
+                    {
+                        result += $"{file.ID},";
+                    }
+                }
+            }
+            count = 0;
+            if (dirs != null)
+            {
+                foreach (BDDir dir in dirs)
+                {
+                    count++;
+                    if (count == dirs.Length)
+                    {
+                        result += $"{dir.ID}";
+                    }
+                    else
+                    {
+                        result += $"{dir.ID},";
+                    }
+                }
+            }
+            result += "]";
+            return result;
+        }
+
         public async Task<bool> CreateDir(string path)
         {
             
@@ -297,7 +352,88 @@ namespace Netko.NetDisk.Baidu
             else { return false; }
 
         }
-    
+        public async Task<bool> Rename(string[] file_list, string[] name_list)
+        {
+            // pack json data
+            var data = new List<RenameItem>();
+            if (file_list.Length == name_list.Length)
+            {
+                for (int i = 0; i < name_list.Length; i++)
+                {
+                    data.Add(new RenameItem { newname = name_list[i], path = file_list[i] });
+                }
+            }
+            else
+            {
+                return false;
+            }
+            // serialize json data
+            string jsonString = JsonConvert.SerializeObject(data, Formatting.Indented);
+            // pack to key-value data
+            var formData = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("filelist", jsonString)
+            });
+            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
+            string url = $"https://pan.baidu.com/api/filemanager?opera=rename&async=1&onnest=fail&channel=chunlei&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
+            client.DefaultRequestHeaders.Add("Accept", "*/*");
+            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            HttpResponseMessage content = await client.PostAsync(url, formData);
+            BaiduAccount.UpdateCookie(content.Headers);
+            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
+            task_content.Wait();
+            Trace.WriteLine(task_content.Result);
+            Dictionary<string, object>? body
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+            if (body != null && Convert.ToInt32(body["errno"]) == 0)
+            {
+                return true;
+            }
+            else { return false; }
+        }
+        /// <summary>
+        /// Generate share url
+        /// </summary>
+        /// <param name="file_id_list">[123, 456...]</param>
+        /// <param name="password">4 digs combation of munber and char</param>
+        /// <param name="period">0: forever, 1: one day, 365: 365days...</param>
+        /// <returns></returns>
+        public async Task<string?> ShareFile(string file_id_list, string password, int period)
+        {
+            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
+
+            string url = $"https://pan.baidu.com/share/set?channel=chunlei&clienttype=0&web=1&channel=chunlei&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
+            client.DefaultRequestHeaders.Add("Accept", "*/*");
+            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            var formData = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("fid_list", file_id_list),
+                new KeyValuePair<string, string>("channel_list", "[]"),
+                new KeyValuePair<string, string>("period", period.ToString()),
+                new KeyValuePair<string, string>("pwd", password),
+                new KeyValuePair<string, string>("schannel", "4"),
+
+            });
+
+            HttpResponseMessage content = await client.PostAsync(url, formData);
+            BaiduAccount.UpdateCookie(content.Headers);
+            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
+            task_content.Wait();
+            Trace.WriteLine(task_content.Result);
+            Dictionary<string, object>? body
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+            if (body != null && Convert.ToInt32(body["errno"]) == 0)
+            {
+                return Convert.ToString(body["link"]);
+            }
+            else { return null; }
+
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -305,8 +441,8 @@ namespace Netko.NetDisk.Baidu
         /// <returns></returns>
         public async Task<bool> DeleteFile(string file_list)
         {
-            long timestampSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            string time_stamp = timestampSeconds.ToString();
+            //long timestampSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            //string time_stamp = timestampSeconds.ToString();
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
 
             string url = $"https://pan.baidu.com/api/filemanager?opera=delete&async=1&onnest=fail&channel=chunlei&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";

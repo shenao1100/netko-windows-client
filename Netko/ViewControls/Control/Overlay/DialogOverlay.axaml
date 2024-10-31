@@ -13,11 +13,14 @@
 		<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
 			<Border Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
 			<StackPanel>
-				<Label Margin="7" x:Name="Message">Explain</Label>
-				<TextBox Margin="10 0" Width="200" BorderThickness="0" x:Name="Input"/>
+				<Label Margin="5" FontSize="20" Padding="10 20 3 3" x:Name="Message">Explain</Label>
+				<TextBox Margin="10 0" Width="300" BorderThickness="0" x:Name="Input"></TextBox>
 				<Separator Margin="0 5" Padding="0"></Separator>
+				<DockPanel>
+					<Button HorizontalAlignment="Right" Margin="5" Click="Send" x:Name="SendButton" DockPanel.Dock="Right">Proceed</Button>
+					<Button HorizontalAlignment="Right" Margin="5" Click="Close" DockPanel.Dock="Right">取消</Button>
 
-				<Button HorizontalAlignment="Right" Margin="5" Click="Send" x:Name="SendButton">Proceed</Button>
+				</DockPanel>
 			</StackPanel>
 
 		</Grid>
