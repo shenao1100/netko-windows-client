@@ -11,12 +11,24 @@
 		<Style>
 			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
 		</Style>
+		<Style Selector="Panel.fly">
+			<Style.Animations>
+				<Animation Duration="0:0:0.5">
+					<KeyFrame Cue="0%">
+						<Setter Property="Margin" Value="0 100 0 0"></Setter>
+					</KeyFrame>
+					<KeyFrame Cue="100%">
+						<Setter Property="Margin" Value="0 0 0 0"></Setter>
+					</KeyFrame>
+				</Animation>
+			</Style.Animations>
+		</Style>
 	</UserControl.Styles>
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
+	<Design.DataContext>
+		<!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
-  </Design.DataContext>
+		<vm:MainViewModel />
+	</Design.DataContext>
 	<UserControl.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
@@ -32,38 +44,38 @@
 	</UserControl.Transitions>
 	<Grid ColumnDefinitions="Auto, *">
 
-	<DockPanel Grid.Column="0" Grid.Row="0">
-	<ScrollViewer VerticalAlignment="Top" HorizontalAlignment="Left" DockPanel.Dock="Top">
-		<DockPanel Margin="0 5 0 0" x:Name="SideButtonBar">
-			<!--Function selection-->
-			<!--Image Source="/Assets/logo_new.png" Height="120" Width="120" DockPanel.Dock="Top"/-->
-			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Home" Background="Transparent">
-				<Button.Transitions>
-					<Transitions>
-						<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ElasticEaseOut"/>
-					</Transitions>
-				</Button.Transitions>
-				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource home}" Margin="5 0 10 0"/>
-					<Label>主页</Label>
-				</DockPanel>
+		<DockPanel Grid.Column="0" Grid.Row="0">
+			<ScrollViewer VerticalAlignment="Top" HorizontalAlignment="Left" DockPanel.Dock="Top">
+				<DockPanel Margin="0 5 0 0" x:Name="SideButtonBar">
+					<!--Function selection-->
+					<!--Image Source="/Assets/logo_new.png" Height="120" Width="120" DockPanel.Dock="Top"/-->
+					<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Home" Background="Transparent">
+						<Button.Transitions>
+							<Transitions>
+								<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ExponentialEaseOut"/>
+							</Transitions>
+						</Button.Transitions>
+						<DockPanel>
+							<PathIcon Classes="audio-on" Data="{StaticResource home}" Margin="5 0 10 0"/>
+							<Label>主页</Label>
+						</DockPanel>
 
-			</Button>
-			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Manage" Background="Transparent">
+					</Button>
+					<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Manage" Background="Transparent">
+						<Button.Transitions>
+							<Transitions>
+								<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ExponentialEaseOut"/>
+							</Transitions>
+						</Button.Transitions>
+						<DockPanel>
+							<PathIcon Classes="audio-on" Data="{StaticResource web_drive}" Margin="5 0 10 0"/>
+							<Label>网盘管理</Label>
+						</DockPanel>
+					</Button>
+					<!--Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Transmit" Background="Transparent">
 				<Button.Transitions>
 					<Transitions>
-						<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ElasticEaseOut"/>
-					</Transitions>
-				</Button.Transitions>
-				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource web_drive}" Margin="5 0 10 0"/>
-					<Label>网盘管理</Label>
-				</DockPanel>
-			</Button>
-			<!--Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Transmit" Background="Transparent">
-				<Button.Transitions>
-					<Transitions>
-						<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ElasticEaseOut"/>
+						<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ExponentialEaseOut"/>
 					</Transitions>
 				</Button.Transitions>
 				<DockPanel>
@@ -72,63 +84,63 @@
 				</DockPanel>
 
 			</Button-->
-			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Transfer" Background="Transparent">
-				<Button.Transitions>
-					<Transitions>
-						<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ElasticEaseOut"/>
-					</Transitions>
-				</Button.Transitions>
-				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource download}" Margin="5 0 10 0"/>
-					<Label>下载管理</Label>
+					<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Transfer" Background="Transparent">
+						<Button.Transitions>
+							<Transitions>
+								<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ExponentialEaseOut"/>
+							</Transitions>
+						</Button.Transitions>
+						<DockPanel>
+							<PathIcon Classes="audio-on" Data="{StaticResource download}" Margin="5 0 10 0"/>
+							<Label>下载管理</Label>
+						</DockPanel>
+
+					</Button>
+					<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Upload" Background="Transparent">
+						<Button.Transitions>
+							<Transitions>
+								<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ExponentialEaseOut"/>
+							</Transitions>
+						</Button.Transitions>
+						<DockPanel>
+							<PathIcon Classes="audio-on" Data="{StaticResource upload}" Margin="5 0 10 0" />
+							<Label>上传管理</Label>
+						</DockPanel>
+					</Button>
+
+					<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="History" Background="Transparent">
+						<Button.Transitions>
+							<Transitions>
+								<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ExponentialEaseOut"/>
+							</Transitions>
+						</Button.Transitions>
+						<DockPanel>
+							<PathIcon Classes="audio-on" Data="{StaticResource history}" Margin="5 0 10 0"/>
+							<Label>历史记录</Label>
+						</DockPanel>
+
+
+					</Button>
+
+					<Button DockPanel.Dock="Bottom" Margin="5" Click="Change" Width="130" x:Name="Setting" Background="Transparent" VerticalAlignment="Bottom">
+						<Button.Transitions>
+							<Transitions>
+								<DoubleTransition Property="Width" Duration="0:0:0.2" Easing="ExponentialEaseOut"/>
+							</Transitions>
+						</Button.Transitions>
+						<DockPanel>
+							<PathIcon Classes="audio-on" Data="{StaticResource setting}" Margin="5 0 10 0"/>
+							<Label>设置</Label>
+						</DockPanel>
+
+					</Button>
+
+					<!-- END Function selection-->
+
 				</DockPanel>
 
-			</Button>
-			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Upload" Background="Transparent">
-				<Button.Transitions>
-					<Transitions>
-						<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ElasticEaseOut"/>
-					</Transitions>
-				</Button.Transitions>
-				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource upload}" Margin="5 0 10 0" />
-					<Label>上传管理</Label>
-				</DockPanel>
-			</Button>
+			</ScrollViewer>
 
-			<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="History" Background="Transparent">
-				<Button.Transitions>
-					<Transitions>
-						<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ElasticEaseOut"/>
-					</Transitions>
-				</Button.Transitions>
-				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource history}" Margin="5 0 10 0"/>
-					<Label>历史记录</Label>
-				</DockPanel>
-
-
-			</Button>
-
-			<Button DockPanel.Dock="Bottom" Margin="5" Click="Change" Width="130" x:Name="Setting" Background="Transparent" VerticalAlignment="Bottom">
-				<Button.Transitions>
-					<Transitions>
-						<DoubleTransition Property="Width" Duration="0:0:0.2" Easing="ElasticEaseOut"/>
-					</Transitions>
-				</Button.Transitions>
-				<DockPanel>
-					<PathIcon Classes="audio-on" Data="{StaticResource setting}" Margin="5 0 10 0"/>
-					<Label>设置</Label>
-				</DockPanel>
-
-			</Button>
-
-			<!-- END Function selection-->
-
-		</DockPanel>
-		
-	</ScrollViewer>
-		
 		</DockPanel>
 		<!--ScrollViewer Grid.Column="1" Grid.Row="0" >
 			<Panel  Margin="5">
@@ -144,8 +156,10 @@
 			<!--Provide darker background-->
 			<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="7 0 0 0" Padding="0" Margin="0" Opacity="1" BoxShadow="9 9 20 2 Black">
 			</Border>
-			<Panel Margin="7" x:Name="ContentPanel1">
+
+			<Panel Margin="0" x:Name="ContentPanel1" Classes="fly">
+
 			</Panel>
 		</Panel>
-		</Grid>
+	</Grid>
 </UserControl>

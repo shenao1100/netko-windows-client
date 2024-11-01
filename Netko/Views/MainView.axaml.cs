@@ -1,4 +1,6 @@
-﻿using Avalonia.Animation;
+﻿using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Controls.Chrome;
 using Avalonia.Interactivity;
@@ -16,15 +18,6 @@ namespace Netko.Views;
 
 public partial class MainView : UserControl
 {
-    public MainView()
-    {
-        
-        InitializeComponent();
-        
-  
-
-    }
-    //Init all pages
     UserControl Page_Netdisk = new NetdiskPage();
     UserControl Page_Home = new HomePage();
     UserControl Page_Transfer = new TransferPage();
@@ -32,6 +25,20 @@ public partial class MainView : UserControl
     UserControl Page_Upload = new UploadPage();
     UserControl Page_History = new HistoryPage();
     UserControl Page_Transmit = new TransmitPage();
+    UserControl CurrentPage {  get; set; }
+
+    public MainView()
+    {
+        
+        InitializeComponent();
+        ContentPanel1.Children.Add(Page_Home);
+        Page_Home.Opacity = 1;
+        Home.Background = new SolidColorBrush(Color.Parse("#30FFFFFF"));
+        CurrentPage = Page_Home;
+
+    }
+    //Init all pages
+    
     public void unFold()
     {
         foreach (var button in SideButtonBar.Children)
@@ -63,10 +70,10 @@ public partial class MainView : UserControl
             Shrink();
         }
     }
-    public void Change(object sender, RoutedEventArgs e)
+    public async void Change(object sender, RoutedEventArgs e)
     {
+        UserControl FormerPage = CurrentPage;
         //Change page
-        ContentPanel1.Children.Clear();
         var clicked_button = sender as Button;
         if (clicked_button == null || clicked_button.Name == null)
         {
@@ -81,46 +88,71 @@ public partial class MainView : UserControl
             }
         }
         clicked_button.Background = new SolidColorBrush(Color.Parse("#30FFFFFF"));
-        Page_History.Opacity = 0;
-        Page_Home.Opacity = 0;
-        Page_Netdisk.Opacity = 0;
-        Page_Transfer.Opacity = 0;  
-        Page_Setting.Opacity = 0;
-        Page_Upload.Opacity = 0;
-        Page_Transmit.Opacity = 0;
+
 
         switch (clicked_button.Name.ToString())
         {
             case "Home":
-                ContentPanel1.Children.Add(Page_Home);
-                Page_Home.Opacity = 1;
+                CurrentPage = Page_Home;
                 break;
             case "Manage":
-                ContentPanel1.Children.Add(Page_Netdisk);
-                Page_Netdisk.Opacity = 1;
+                CurrentPage = Page_Netdisk;
                 break;
             case "Transfer":
-                ContentPanel1.Children.Add(Page_Transfer);
-                Page_Transfer.Opacity = 1;
+                CurrentPage = Page_Transfer;
                 break;
             case "Setting":
-                ContentPanel1.Children.Add(Page_Setting);
-                Page_Setting.Opacity = 1;
+                CurrentPage = Page_Setting;
                 break;
             case "Upload":
-                ContentPanel1.Children.Add(Page_Upload);
-                Page_Upload.Opacity = 1;
+                CurrentPage = Page_Upload;
                 break;
             case "History":
-                ContentPanel1.Children.Add(Page_History);
-                Page_History.Opacity = 1;
+                CurrentPage = Page_History;
                 break;
             case "Transmit":
-                ContentPanel1.Children.Add(Page_Transmit);
-                Page_Transmit.Opacity = 1;
+
+                CurrentPage = Page_Transmit;
                 break;
 
         }
+        if (FormerPage == CurrentPage)
+        {
+            return;
+        }
+        ContentPanel1.Children.Clear();
+
+        ContentPanel1.Children.Add(CurrentPage);
+        var DropAnimation = new Animation
+        {
+            Duration = TimeSpan.FromSeconds(0.25),
+            Easing = new ExponentialEaseOut(),
+            Children =
+            {
+                new KeyFrame
+                {
+                    Cue = new Cue(0),
+                    Setters =
+                    {
+                        new Setter(UserControl.MarginProperty, new Thickness(0,100,0,0)),
+                        new Setter(UserControl.OpacityProperty, 0.0)
+                    }
+
+                },
+                new KeyFrame
+                {
+                    Cue = new Cue(1),
+                    Setters =
+                    {
+                        new Setter(UserControl.MarginProperty, new Thickness(0)),
+                        new Setter(UserControl.OpacityProperty, 1.0)
+                    }
+                }
+            }
+        };
+        await DropAnimation.RunAsync(ContentPanel1);
+        CurrentPage.Margin = new Thickness(0);
+        ContentPanel1.Margin = new Thickness(0);
         return;
     }
 }
