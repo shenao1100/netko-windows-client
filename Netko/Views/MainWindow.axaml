@@ -32,22 +32,24 @@
 		<Border Background="{DynamicResource CatalogBaseLowColor}" CornerRadius="0" Opacity="1">
 		</Border>
 		<DockPanel>
-
+			<DockPanel Margin="0" DockPanel.Dock="Top">
+				
+			
+			<Button Background="Transparent" Height="35" Width="40" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10 10 0 0" DockPanel.Dock="Left" Click="switchShrink">
+				<PathIcon Classes="audio-on" Data="{StaticResource Navigation}" />
+			</Button>
 			<Panel Margin="0" DockPanel.Dock="Top" x:Name="DragBar" PointerPressed="DragBar_OnDrag" DoubleTapped="DragBar_MaxWin">
 				<!--Provide darker background-->
 				<Border Background="{DynamicResource CatalogBaseMediumColor}" CornerRadius="0 7" Padding="17" Margin="0" Opacity="0" x:Name="Backpanel">
 				</Border>
 				
 				<DockPanel Margin="0"  x:Name="ContentPanel" VerticalAlignment="Center"  Height="40">
-					
-					<Button Background="Transparent" Height="35" Width="40" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10 16 0 0" DockPanel.Dock="Left" Click="switchShrink">
-						<PathIcon Classes="audio-on" Data="{StaticResource Navigation}" />
-					</Button>
-					<Image Margin="10 16 0 0" Source="/Assets/logo_new.png" Height="20" Width="20" DockPanel.Dock="Left" HorizontalAlignment="Left" VerticalAlignment="Center"></Image>
-					<TextBlock Margin="10 16 0 0" FontSize="13" Text="Netko" x:Name="TitleBlock" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+					<Image Margin="10 10 0 0" Source="/Assets/logo_new.png" Height="20" Width="20" DockPanel.Dock="Left" HorizontalAlignment="Left" VerticalAlignment="Center"></Image>
+					<TextBlock Margin="10 10 0 0" FontSize="13" Text="Netko" x:Name="TitleBlock" DockPanel.Dock="Left" VerticalAlignment="Center"/>
 					
 				</DockPanel>
 			</Panel>
+			</DockPanel>
 			<views:MainView x:Name="MainviewPanel" DockPanel.Dock="Top"/>
 
 		</DockPanel>

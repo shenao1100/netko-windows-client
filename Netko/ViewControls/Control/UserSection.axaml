@@ -9,13 +9,25 @@
 		<Style>
 			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
 		</Style>
+		<Style Selector="Panel.Show">
+			<Style.Animations>
+				<Animation Duration="0:0:0.3">
+					<KeyFrame Cue="0%">
+						<Setter Property="Opacity" Value="0"></Setter>
+					</KeyFrame>
+					<KeyFrame Cue="100%">
+						<Setter Property="Opacity" Value="1"></Setter>
+					</KeyFrame>
+				</Animation>
+			</Style.Animations>
+		</Style>
 	</UserControl.Styles>
 	<UserControl.Transitions>
 		<Transitions>
 			<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
 		</Transitions>
 	</UserControl.Transitions>
-	<Panel Margin="3 3 0 0">
+	<Panel Margin="3 3 0 0" Classes="Show">
 		<Border Background="{DynamicResource CatalogBaseHighColor}" Height="36" CornerRadius="7 7 0 0" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #50000000">
 		</Border>
 		<Grid ColumnDefinitions="*, 30" RowDefinitions="*">

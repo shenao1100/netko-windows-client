@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:local="clr-namespace:Netko"
+             x:Class="Netko.NetdiskPathOverlay">
+	<UserControl.Styles>
+		<Style>
+			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
+		</Style>
+	</UserControl.Styles>
+	<UserControl.Transitions>
+		<Transitions>
+			<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+		</Transitions>
+	</UserControl.Transitions>
+	<Grid Background="{DynamicResource CatalogBaseLowColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="OutShellGrid">
+
+
+		<Grid HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="OutShell" MinHeight="250">
+			<Grid.Transitions>
+				<Transitions>
+					<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+					<DoubleTransition Property="Width" Duration="0:0:0.2"/>
+					<DoubleTransition Property="Height" Duration="0:0:0.2"/>
+				</Transitions>
+			</Grid.Transitions>
+			<Border Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
+			<Grid ColumnDefinitions="*" RowDefinitions="Auto, Auto, Auto, *" VerticalAlignment="Stretch">
+				<Grid ColumnDefinitions="Auto, Auto, Auto, *, Auto, Auto">
+					<Button Grid.Row="0" Grid.Column="0" Background="Transparent" Click="Home">
+						<PathIcon Data="{StaticResource home}" Height="15" Width="15"/>
+					</Button>
+					<Button Grid.Row="0" Grid.Column="1" Background="Transparent" x:Name="BackButton" Click="Back">
+						<PathIcon Data="{StaticResource backward}" Height="15" Width="15"/>
+					</Button>
+					<Button Grid.Row="0" Grid.Column="2" Background="Transparent" x:Name="ForwardButton" Click="Forward">
+						<PathIcon Data="{StaticResource forward}" Height="15" Width="15"/>
+					</Button>
+					<TextBox Grid.Row="0" Grid.Column="3" BorderBrush="Transparent" Background="" x:Name="PathTextBox"></TextBox>
+					<Button Grid.Row="0" Grid.Column="4" Background="Transparent" Click="GotoDir">
+						<PathIcon Data="{StaticResource enter}" Height="15" Width="15"/>
+					</Button>
+					<Button Grid.Row="0" Grid.Column="5" Background="Transparent" Click="Refresh">
+						<PathIcon Data="{StaticResource refresh}" Height="15" Width="15"/>
+					</Button>
+				</Grid>
+				<Separator Grid.Row="1" Margin="0" Padding="0"></Separator>
+				<ProgressBar Grid.Row="2" Margin="0" Padding="0"></ProgressBar>
+				<ScrollViewer Grid.Row="3" Margin="0" Padding="0" VerticalAlignment="Stretch">
+					<Panel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+						<StackPanel x:Name="FileListViewer" VerticalAlignment="Stretch">
+							<Button Click="Button_Click">Add Item</Button>
+							<Button Click="NetdiskParse">Netdisk test</Button>
+
+						</StackPanel>
+					</Panel>
+				</ScrollViewer>
+
+			</Grid>
+		</Grid>
+	</Grid>
+</UserControl>

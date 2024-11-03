@@ -35,8 +35,16 @@ public partial class MainWindow : Window
     {
         // None Blur AcrylicBlur Mica Transparent
         TransparencyLevelHint = new WindowTransparencyLevel[] { WindowTransparencyLevel.AcrylicBlur };
+        if (this.WindowState == WindowState.Normal)
+        {
 
-        this.WindowState = WindowState.Maximized;
+            this.WindowState = WindowState.Maximized;
+        }
+        else
+        {
+            this.WindowState = WindowState.Normal;
+
+        }
         TitleBlock.Text = "(^=•ω•=^)~";
     }
 }
