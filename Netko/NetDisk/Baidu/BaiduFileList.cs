@@ -85,6 +85,15 @@ namespace Netko.NetDisk.Baidu
         public string path { get; set; }
         public string newname { get; set; }
     }
+    /// <summary>
+    /// For use in serial json obj in move data
+    /// </summary>
+    public class MoveItem
+    {
+        public string path { set; get; }
+        public string dest { set; get; }
+        public string newname { get; set; }
+    }
 
     public class BaiduFileList(Baidu Account)
     {
@@ -393,6 +402,49 @@ namespace Netko.NetDisk.Baidu
             }
             else { return false; }
         }
+
+        public async Task<bool> Move(string[] file_list, string[] name_list, string[] target_path_list)
+        {
+            // pack json data
+            var data = new List<MoveItem>();
+            if (file_list.Length == name_list.Length && name_list.Length == target_path_list.Length)
+            {
+                for (int i = 0; i < name_list.Length; i++)
+                {
+                    data.Add(new MoveItem { newname = name_list[i], path = file_list[i], dest = target_path_list[i] });
+                }
+            }
+            else
+            {
+                return false;
+            }
+            // serialize json data
+            string jsonString = JsonConvert.SerializeObject(data, Formatting.Indented);
+            // pack to key-value data
+            var formData = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("filelist", jsonString)
+            });
+            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
+            string url = $"https://pan.baidu.com/api/filemanager?opera=move&async=1&onnest=fail&channel=chunlei&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
+            client.DefaultRequestHeaders.Add("Accept", "*/*");
+            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            HttpResponseMessage content = await client.PostAsync(url, formData);
+            BaiduAccount.UpdateCookie(content.Headers);
+            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
+            task_content.Wait();
+            Trace.WriteLine(task_content.Result);
+            Dictionary<string, object>? body
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+            if (body != null && Convert.ToInt32(body["errno"]) == 0)
+            {
+                return true;
+            }
+            else { return false; }
+        }
+
         /// <summary>
         /// Generate share url
         /// </summary>

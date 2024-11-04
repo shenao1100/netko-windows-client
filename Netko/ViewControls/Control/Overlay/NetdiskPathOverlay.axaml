@@ -27,37 +27,24 @@
 				</Transitions>
 			</Grid.Transitions>
 			<Border Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
-			<Grid ColumnDefinitions="*" RowDefinitions="Auto, Auto, Auto, *" VerticalAlignment="Stretch">
-				<Grid ColumnDefinitions="Auto, Auto, Auto, *, Auto, Auto">
-					<Button Grid.Row="0" Grid.Column="0" Background="Transparent" Click="Home">
-						<PathIcon Data="{StaticResource home}" Height="15" Width="15"/>
-					</Button>
-					<Button Grid.Row="0" Grid.Column="1" Background="Transparent" x:Name="BackButton" Click="Back">
-						<PathIcon Data="{StaticResource backward}" Height="15" Width="15"/>
-					</Button>
-					<Button Grid.Row="0" Grid.Column="2" Background="Transparent" x:Name="ForwardButton" Click="Forward">
-						<PathIcon Data="{StaticResource forward}" Height="15" Width="15"/>
-					</Button>
-					<TextBox Grid.Row="0" Grid.Column="3" BorderBrush="Transparent" Background="" x:Name="PathTextBox"></TextBox>
-					<Button Grid.Row="0" Grid.Column="4" Background="Transparent" Click="GotoDir">
-						<PathIcon Data="{StaticResource enter}" Height="15" Width="15"/>
-					</Button>
-					<Button Grid.Row="0" Grid.Column="5" Background="Transparent" Click="Refresh">
-						<PathIcon Data="{StaticResource refresh}" Height="15" Width="15"/>
-					</Button>
-				</Grid>
-				<Separator Grid.Row="1" Margin="0" Padding="0"></Separator>
-				<ProgressBar Grid.Row="2" Margin="0" Padding="0"></ProgressBar>
+			<Grid ColumnDefinitions="*" RowDefinitions="Auto, Auto, Auto, *, Auto, Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="500" Height="300">
+				<StackPanel Grid.Row="0">
+					<Label Margin="5" FontSize="20" Padding="10 20 3 3" x:Name="title">选择一个保存路径</Label>
+					<Separator Grid.Row="2" Margin="0" Padding="0"></Separator>
+
+				</StackPanel>
 				<ScrollViewer Grid.Row="3" Margin="0" Padding="0" VerticalAlignment="Stretch">
-					<Panel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-						<StackPanel x:Name="FileListViewer" VerticalAlignment="Stretch">
-							<Button Click="Button_Click">Add Item</Button>
-							<Button Click="NetdiskParse">Netdisk test</Button>
+					<StackPanel x:Name="FileListViewer" VerticalAlignment="Stretch">
 
-						</StackPanel>
-					</Panel>
+					</StackPanel>
 				</ScrollViewer>
+				<Separator Grid.Row="4" Margin="0" Padding="0"></Separator>
+				<DockPanel Grid.Row="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+					
 
+					<Button HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="5" Width="100" Click="Send" x:Name="SendButton">选择此处</Button>
+					<Button HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="5" Width="100" Click="Close">取消</Button>
+				</DockPanel>
 			</Grid>
 		</Grid>
 	</Grid>

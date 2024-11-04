@@ -31,7 +31,7 @@
 							<PathIcon Data="{StaticResource delete_outline}"/>
 						</MenuItem.Icon>
 					</MenuItem>
-					<MenuItem Header="移动" Click="" x:Name="DockpanelMove" Margin="3">
+					<MenuItem Header="移动" Click="MoveOnMenu" x:Name="DockpanelMove" Margin="3">
 						<MenuItem.Icon>
 							<PathIcon Data="{StaticResource move}"/>
 						</MenuItem.Icon>
