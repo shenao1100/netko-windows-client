@@ -5,7 +5,12 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Netko.NetdiskPathDir">
 	<StackPanel>
-		<Button x:Name="Expander" HorizontalAlignment="Stretch" Click="ToogleExpand" Background="Transparent">XXX文件夹</Button>
+		<Button x:Name="Expander" HorizontalAlignment="Stretch" Click="ToogleExpand" Background="Transparent">
+			<DockPanel>
+				<Image Source="/Assets/FileIcon/icons8-folder-188.png" Height="20" Width="20" Margin="3"></Image>
+				<Label VerticalAlignment="Center" x:Name="FolderName">XXX文件夹</Label>
+			</DockPanel>
+		</Button>
 		<StackPanel x:Name="ExpandPanel" Margin="20 0 0 0">
 		</StackPanel>
 	</StackPanel>

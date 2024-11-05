@@ -142,6 +142,26 @@ public partial class DirShowLine : UserControl
             return;
         }
     }
+    private async void CopyOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        NetdiskPathOverlay netdiskPathOverlay = new NetdiskPathOverlay();
+        netdiskPathOverlay.baiduFileList = baiduFileList;
+        netdiskPathOverlay.ShowInitDir();
+        OverlayReservedGrid.Children.Add(netdiskPathOverlay);
+        string? target_path = await netdiskPathOverlay.ShowDialog("请选择目标文件夹", "复制");
+        if (!string.IsNullOrEmpty(target_path) && await baiduFileList.Copy([SelfDir.Path], [SelfDir.Name], [target_path]))
+        {
+            Refresh();
+            return;
+        }
+        else
+        {
+            MessageOverlay message = new MessageOverlay();
+            OverlayReservedGrid.Children.Add(message);
+            message.SetMessage("创建失败", $"移动文件{SelfDir.Path}时遇到错误");
+            return;
+        }
+    }
     private async void MoveOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         NetdiskPathOverlay netdiskPathOverlay = new NetdiskPathOverlay();

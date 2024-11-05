@@ -36,7 +36,7 @@
 							<PathIcon Data="{StaticResource move}"/>
 						</MenuItem.Icon>
 					</MenuItem>
-					<MenuItem Header="复制" Click="" x:Name="DockpanelDuplicate" Margin="3">
+					<MenuItem Header="复制" Click="CopyOnMenu" x:Name="DockpanelDuplicate" Margin="3">
 						<MenuItem.Icon>
 							<PathIcon Data="{StaticResource duplicate}"/>
 						</MenuItem.Icon>

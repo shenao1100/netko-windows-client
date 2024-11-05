@@ -24,7 +24,7 @@ public partial class NetdiskPathDir : UserControl
     }
     public void Show()
     {
-        Expander.Content = selfDir.Name;
+        FolderName.Content = selfDir.Name;
     }
     private void ToogleExpand(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
