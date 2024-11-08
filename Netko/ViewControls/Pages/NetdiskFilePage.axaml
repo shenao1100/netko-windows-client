@@ -40,8 +40,12 @@
 			<ScrollViewer Grid.Row="3" Margin="0" Padding="0" VerticalAlignment="Stretch">
 				<Panel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
 					<StackPanel x:Name="FileListViewer" VerticalAlignment="Stretch">
-						<Button Click="Button_Click">Add Item</Button>
-						<Button Click="NetdiskParse">Netdisk test</Button>
+						<StackPanel.Transitions>
+							<Transitions>
+								<DoubleTransition Property="Opacity" Duration="0:0:0.1"/>
+							</Transitions>
+						</StackPanel.Transitions>
+
 
 					</StackPanel>
 				</Panel>

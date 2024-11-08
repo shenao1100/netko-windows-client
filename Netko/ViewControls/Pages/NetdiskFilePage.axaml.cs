@@ -1,8 +1,11 @@
 using Avalonia;
+using Avalonia.Animation.Easings;
+using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Styling;
 using Netko.NetDisk.Baidu;
 using System;
 using System.Collections.Generic;
@@ -51,7 +54,70 @@ public partial class NetdiskFilePage : UserControl
             ActionMenuPopup.IsOpen = false;
         }
     }*/
-    //private async void 
+    private async void FadeOut()
+    {
+        var DropAnimation = new Animation
+        {
+            Duration = TimeSpan.FromSeconds(0.15),
+            Easing = new ExponentialEaseOut(),
+            Children =
+    {
+        new KeyFrame
+        {
+            Cue = new Cue(0),
+            Setters =
+            {
+                new Setter(UserControl.OpacityProperty, 1.0)
+            }
+
+        },
+        new KeyFrame
+        {
+            Cue = new Cue(1),
+            Setters =
+            {
+                new Setter(UserControl.OpacityProperty, 0.0)
+            }
+        }
+    }
+        };
+        await DropAnimation.RunAsync(FileListViewer);
+        FileListViewer.Opacity = 0;
+
+        await Task.Delay(150);
+    }
+    private async void FadeIn()
+    {
+        var DropAnimation = new Animation
+        {
+            Duration = TimeSpan.FromSeconds(0.15),
+            Easing = new ExponentialEaseOut(),
+            Children =
+    {
+        new KeyFrame
+        {
+            Cue = new Cue(0),
+            Setters =
+            {
+                new Setter(UserControl.OpacityProperty, 0.0)
+            }
+
+        },
+        new KeyFrame
+        {
+            Cue = new Cue(1),
+            Setters =
+            {
+                new Setter(UserControl.OpacityProperty, 1.0)
+            }
+        }
+    }
+        };
+
+        await DropAnimation.RunAsync(FileListViewer);
+        FileListViewer.Opacity = 1;
+        await Task.Delay(150);
+    }
     public void GetColor()
     {
         var CBH_backgound = Application.Current.Resources.TryGetResource("CatalogBaseHighColor", null, out var Hresource);
@@ -192,8 +258,6 @@ public partial class NetdiskFilePage : UserControl
         {
             ForwardButton.IsEnabled = true;
         }
-        Trace.WriteLine(backHistory.Count.ToString());
-        Trace.WriteLine(backHistory[0]);
         if ((backHistory.Count == 1 && go_path == "/" && backHistory[0] == "/") || backHistory.Count == 0)
         {
             BackButton.IsEnabled = false;
@@ -205,16 +269,20 @@ public partial class NetdiskFilePage : UserControl
         
         PathTextBox.Text = go_path;
         currentPath = go_path;
-        FileListViewer.Children.Clear();
+        //FadeOut();
+        FileListViewer.Opacity = 0;
+
         BDFileList list_ = await user.GetFileList(1, path:go_path);
+        FileListViewer.Children.Clear();
+
         foreach (BDDir dir_b in list_.Dir)
         {
-            DirShowLine DirBlock = new DirShowLine();
+            ItemShowLine DirBlock = new ItemShowLine();
             // set enter, refresh command
             DirBlock.Func = () => ChangePage(user, dir_b.Path, 1);
             DirBlock.Refresh = () => ChangePage(baiduFileList, currentPath, 1, insert_back_history: false);
             // set name, BDDir, user, OverelayGrid
-            DirBlock.SetName(dir_b.Name);
+            DirBlock.Init(dir_b.Name, is_dir: true);
             DirBlock.SelfDir = dir_b;
             DirBlock.baiduFileList = user;
             DirBlock.OverlayReservedGrid = OverlayReservedGrid;
@@ -225,10 +293,23 @@ public partial class NetdiskFilePage : UserControl
         }
         foreach (BDFile file_b in list_.File)
         {
-            FileShowLine FileBlock = new FileShowLine();
-            FileBlock.SetName(file_b.Name);
+            ItemShowLine FileBlock = new ItemShowLine();
+            // set enter, refresh command
+            FileBlock.Func = () => ChangePage(user, file_b.Path, 1);
+            FileBlock.Refresh = () => ChangePage(baiduFileList, currentPath, 1, insert_back_history: false);
+            // set name, BDDir, user, OverelayGrid
+            FileBlock.Init(file_b.Name, is_dir: false);
+            FileBlock.SelfFile = file_b;
+            FileBlock.baiduFileList = user;
+            FileBlock.OverlayReservedGrid = OverlayReservedGrid;
+            FileBlock.ParentPath = currentPath;
+            // append to viewer
             FileListViewer.Children.Add(FileBlock);
         }
+        //FadeIn();
+        FileListViewer.Opacity = 1;
+
+
     }
     /// <summary>
     /// To init user info, create and change to new page, update user name
@@ -248,10 +329,11 @@ public partial class NetdiskFilePage : UserControl
     }
     /// <summary>
     /// 
-    /// Test function
+    /// Test function, has been abandoned
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
+
     private async void NetdiskParse(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         /*var button = sender as Button;
@@ -266,8 +348,8 @@ public partial class NetdiskFilePage : UserControl
             BDFileList list_ = await Filelist.GetFileList(1);
         foreach (BDDir dir_b in list_.Dir)
         {
-            DirShowLine DirBlock = new DirShowLine();
-            DirBlock.SetName(dir_b.Name);
+            ItemShowLine DirBlock = new ItemShowLine();
+            DirBlock.Init(dir_b.Name, is_dir:true);
             FileListViewer.Children.Add(DirBlock);
             DirBlock.Func = () => ChangePage(Filelist, dir_b.Path, 1);
 

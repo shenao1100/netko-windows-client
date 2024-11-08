@@ -33,7 +33,7 @@ public partial class NetdiskPathOverlay : UserControl
         SendButton.Content = button_message;
         _taskCompletionSource = new TaskCompletionSource<string>();
         this.IsVisible = true;
-
+        currentPath = "/";
         return _taskCompletionSource.Task;
     }
 

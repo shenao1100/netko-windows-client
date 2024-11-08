@@ -24,6 +24,8 @@
 			<Color x:Key="CatalogBaseMediumColor">#99FFFFFF</Color>
 			<Color x:Key="CatalogChromeMediumColor">#FFc5c5c5</Color>
 			<Color x:Key="CatalogBaseHighColor">#80FFFFFF</Color>
+			<Color x:Key="CatalogBaseHighColor11">#80FFFFFF</Color>
 		</ResourceDictionary>
+
 	</ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

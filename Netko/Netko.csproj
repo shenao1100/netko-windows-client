@@ -53,4 +53,10 @@
 
     
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ViewControls\Control\ItemShowLine.axaml.cs">
+      <DependentUpon>ItemShowLine.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>
