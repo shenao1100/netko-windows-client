@@ -15,6 +15,7 @@ public partial class App : Application
         AppThemeUtils.BeforeInitialize();
         AvaloniaXamlLoader.Load(this);
         AppThemeUtils.AfterInitialize();
+        MeowSetting.LoadConfig();
  
     }
 

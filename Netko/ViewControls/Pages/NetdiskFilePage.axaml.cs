@@ -315,7 +315,7 @@ public partial class NetdiskFilePage : UserControl
     /// To init user info, create and change to new page, update user name
     /// </summary>
     /// <param name="cookie">user cookie</param>
-    public async void initUser(string cookie)
+    public async Task<string> initUser(string cookie)
     {
         Baidu test_user = new Baidu(cookie);
         await test_user.init();
@@ -325,7 +325,9 @@ public partial class NetdiskFilePage : UserControl
 
         BaiduFileList Filelist = new BaiduFileList(test_user);
         baiduFileList = Filelist;
+        MeowSetting.InsertAccount(cookie, test_user.bdstoken);
         ChangePage(Filelist, "/", 1);
+        return test_user.bdstoken;
     }
     /// <summary>
     /// 

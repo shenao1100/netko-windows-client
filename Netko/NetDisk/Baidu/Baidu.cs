@@ -39,7 +39,6 @@ namespace Netko.NetDisk.Baidu
         public int storage_total = 0;
         public int storage_used = 0;
         public int storage_free = 0;
-
         public const string app_id = "250528";
         public const string channel = "chunlei";
         public const string clienttype = "0";

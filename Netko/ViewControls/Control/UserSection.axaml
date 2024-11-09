@@ -36,7 +36,7 @@
 				<DockPanel Margin="0">
 
 					<Image x:Name="UserHeadPhoto" Margin="0" Height="17" Width="17" Source="avares://Netko/Assets/logo.png"/>
-					<Label x:Name="UserName" VerticalAlignment="Center" FontSize="13" Margin="5 0" Padding="0" MinWidth="150">LL</Label>
+					<Label x:Name="UserName" VerticalAlignment="Center" FontSize="13" Margin="5 0" Padding="0" MinWidth="150">请稍后...</Label>
 				</DockPanel>
 
 

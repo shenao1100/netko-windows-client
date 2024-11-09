@@ -23,27 +23,42 @@ public partial class NetdiskPage : UserControl
         // UserSectionPageDict.Add(UserSectionObj, loginPage);
         ChangePage(loginPage);
         UserSectionDockPanel.Children.Add(UserSectionObj);
+        // init user from config file
+        foreach (AccountStruct account in MeowSetting.GetAllAccount())
+        {
+            if (account.cookie == null) continue;
+            AddAccount(account.cookie);
+        }
+
         // login server to receive cookie
         CookieReciver cookieReciver = new CookieReciver();
         cookieReciver.Listen();
         // call this func when receive cookie
         cookieReciver.CallBack = (cookie) => AddAccount(cookie);
+
+        
+    }
+    private void RemoveAccount(UserControl FilePage,  UserControl UserSectionObj, string token)
+    {
+        MeowSetting.RemoveAccount(token);
+        RemovePage(FilePage, UserSectionObj);
     }
     /// <summary>
     /// Create a new file page and user section
     /// </summary>
     /// <param name="cookie">user cookie</param>
-    private void AddAccount(string cookie)
+    private async void AddAccount(string cookie)
     {
         UserSection UserSectionObj = new UserSection();
         NetdiskFilePage FilePage = new NetdiskFilePage();
         UserSectionObj.ChangeAction = () => ChangePage(FilePage);
-        UserSectionObj.DeleteAction = () => RemovePage(FilePage, UserSectionObj);
+        
         FilePage.UpdateUserSectionName = (name) => UserSectionObj.SetName(name);
         ChangePage(FilePage);
         UserSectionDockPanel.Children.Add(UserSectionObj);
-        FilePage.initUser(cookie);
+        string token = await FilePage.initUser(cookie);
 
+        UserSectionObj.DeleteAction = () => RemoveAccount(FilePage, UserSectionObj, token);
     }
     /// <summary>
     /// Remove user section and file page

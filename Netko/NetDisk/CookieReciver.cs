@@ -12,7 +12,7 @@ namespace Netko.NetDisk
     internal class CookieReciver
     {
         public HttpListener? httpobj;
-        public Action<string>? CallBack;
+        public Action<string>? CallBack {  get; set; }
         public void Listen()
         {
             //提供一个简单的、可通过编程方式控制的 HTTP 协议侦听器。此类不能被继承。
