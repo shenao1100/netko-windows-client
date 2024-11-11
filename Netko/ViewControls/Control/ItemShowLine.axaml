@@ -17,7 +17,7 @@
 		<Border Background="{DynamicResource CatalogBaseHighColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
 			<!--BoxShadow="0 0 3 1 #20000000"-->
 		</Border>
-		<Button x:Name="Action" HorizontalAlignment="Stretch" Margin="0" Padding="0" PointerPressed="MouseInput" Click="LeftClick" Background="Transparent">
+		<Button x:Name="Action" HorizontalAlignment="Stretch" Margin="0" Padding="0" PointerPressed="RightClick" Click="LeftClick" Background="Transparent">
 			<Button.ContextMenu>
 				<ContextMenu>
 					

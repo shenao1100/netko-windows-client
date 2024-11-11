@@ -16,6 +16,8 @@ using Avalonia.Platform;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Netko;
 public static class ImageHelper
@@ -51,12 +53,13 @@ public partial class ItemShowLine : UserControl
     //public Color HoverBG;
     //public Color LeaveBG;
     private DateTime lastClickedTime;
-    public BaiduFileList? baiduFileList;
+    public BaiduFileList baiduFileList {  get; set; }
     public BDDir SelfDir;
     public BDFile SelfFile;
     public bool isFile;
     public bool isDir;
     private bool is_selected = false;
+    private bool single_menu_operation = true;
     public Grid OverlayReservedGrid { get; set; }
 
     public ItemShowLine()
@@ -93,7 +96,11 @@ public partial class ItemShowLine : UserControl
         }
 
     }
-
+    /// <summary>
+    /// Init item, set type and icon
+    /// </summary>
+    /// <param name="name">file name</param>
+    /// <param name="is_dir"></param>
     public void Init(string name, bool is_dir)
     {
         Uri uri;
@@ -113,60 +120,134 @@ public partial class ItemShowLine : UserControl
         }
         ItemIcon.Source = ImageHelper.LoadFromResource(uri);
         FileName.Content = name;
+
     }
 
-
-    private void MouseInput(object sender, PointerPressedEventArgs e)
+    private void SetMultiOperationCommand()
     {
-        return;
-        var textBlock = sender as Button;
-        var pointerPoint = e.GetCurrentPoint(this);
+        if (!single_menu_operation) { return; }
+        DockpanelOpen.Header = "OPENMULTI";
 
+        //DockpanelOpen.Click -= OepnOnMenu;
+        DockpanelDelete.Click -= DeleteOnMenu;
+        DockpanelMove.Click -= MoveOnMenu;
+        DockpanelDuplicate.Click -= CopyOnMenu;
+        DockpanelShare.Click -= ShareOnMenu;
+
+        DockpanelDelete.Click += MultiDeleteOnMenu;
+        DockpanelMove.Click += MultiMoveOnMenu;
+        DockpanelDuplicate.Click += MultiCopyOnMenu;
+        DockpanelShare.Click += MultiShareOnMenu;
+        single_menu_operation = false;
+    }
+    private void SetSingleOperationCommand() 
+    {
+        if (single_menu_operation) { return; }
+        DockpanelOpen.Header = "OPENS";
+        DockpanelDelete.Click -= MultiDeleteOnMenu;
+        DockpanelMove.Click -= MultiMoveOnMenu;
+        DockpanelDuplicate.Click -= MultiCopyOnMenu;
+        DockpanelShare.Click -= MultiShareOnMenu;
+
+        DockpanelDelete.Click += DeleteOnMenu;
+        DockpanelMove.Click += MoveOnMenu;
+        DockpanelDuplicate.Click += CopyOnMenu;
+        DockpanelShare.Click += ShareOnMenu;
+        single_menu_operation = true;
+    } 
+
+    /// <summary>
+    /// right click to open menu, has been abandoned
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void RightClick(object sender, PointerPressedEventArgs e)
+    {
+        var pointerPoint = e.GetCurrentPoint(this);
         // 检查哪个按键被按下
-        if (pointerPoint.Properties.IsRightButtonPressed)
+        if (!pointerPoint.Properties.IsRightButtonPressed)
         {
-            
-            if (baiduFileList != null && baiduFileList.GetSelectedItem() == null)
+            return;
+        }
+        if (isFile)
+        {
+            BDFileList filelist = baiduFileList.GetSelectedItem();
+            if (filelist.File == null && filelist.Dir == null || !filelist.File!.Contains(SelfFile))
             {
-                DockpanelOpen.IsVisible = true;
-                DockpanelDuplicate.IsVisible = true;
+                // single select
+                SetSingleOperationCommand();
+            }
+            else if (filelist.File!.Contains(SelfFile) && filelist.File!.Count() == 1 && filelist.Dir.Count() == 0)
+            {
+                //single select
+                SetSingleOperationCommand();
+            }
+            else
+            {
+                //multi file
+                SetMultiOperationCommand();
+            }
+        }
+        if (isDir)
+        {
+            BDFileList filelist = baiduFileList.GetSelectedItem();
+            if (filelist.File == null && filelist.Dir == null || !filelist.Dir!.Contains(SelfDir))
+            {
+                // single select
+                SetSingleOperationCommand();
+
+            }
+            else if (filelist.Dir!.Contains(SelfDir) && filelist.Dir!.Count() == 1 && filelist.File!.Count() == 0)
+            {
+                //single select
+                SetSingleOperationCommand();
 
             }
             else
             {
-                DockpanelOpen.IsVisible = false;
-                DockpanelDuplicate.IsVisible = false;
+                //multi file
+                SetMultiOperationCommand();
+
             }
         }
     }
 
-    private void LeftClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        /// <summary>
+        /// left click and double click, toggle select
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LeftClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         var currentTime = DateTime.Now;
         var timeDiff = currentTime - lastClickedTime;
         lastClickedTime = currentTime;
         
-        // Trace.WriteLine(timeDiff.TotalMilliseconds.ToString());
         if (timeDiff.TotalMilliseconds <= 250)
         {
             Func();
         }
         else
         {
-            if (!baiduFileList.DirIsSelected(SelfDir))
+            if (isDir)
             {
-                is_selected = true;
-            }
-            else
-            {
-                is_selected = false;
+                is_selected = (!baiduFileList.DirIsSelected(SelfDir)) ? true : false;
+                baiduFileList.ToggleSelectDir(SelfDir);
 
+            }
+            if (isFile)
+            {
+                is_selected = (!baiduFileList.FileIsSelected(SelfFile)) ? true : false;
+                baiduFileList.ToggleSelectFile(SelfFile);
             }
             UpdateColor();
-            baiduFileList.ToggleSelectDir(SelfDir);
         }
     }
-
+    /// <summary>
+    /// Menu funcion: open
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void OepnOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         Func();
@@ -190,6 +271,11 @@ public partial class ItemShowLine : UserControl
             return;
         }
     }
+    /// <summary>
+    /// Menu funcion: copy
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void CopyOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         NetdiskPathOverlay netdiskPathOverlay = new NetdiskPathOverlay();
@@ -221,6 +307,11 @@ public partial class ItemShowLine : UserControl
             return;
         }
     }
+    /// <summary>
+    /// Menu funcion: move
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void MoveOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         NetdiskPathOverlay netdiskPathOverlay = new NetdiskPathOverlay();
@@ -251,6 +342,11 @@ public partial class ItemShowLine : UserControl
             return;
         }
     }
+    /// <summary>
+    /// Menu funcion: rename
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void RenameOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         DialogOverlay inputName = new DialogOverlay();
@@ -278,6 +374,11 @@ public partial class ItemShowLine : UserControl
             return;
         }
     }
+    /// <summary>
+    /// Menu funcion: delete
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void DeleteOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         string delete_filelist, self_name;
@@ -315,6 +416,11 @@ public partial class ItemShowLine : UserControl
     {
         Trace.WriteLine("dir rgclicked");
     }
+    /// <summary>
+    /// Menu funcion: share
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void ShareOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         ShareLinkOverlay shareLinkOverlay = new ShareLinkOverlay();
@@ -332,5 +438,161 @@ public partial class ItemShowLine : UserControl
 
         OverlayReservedGrid.Children.Add(shareLinkOverlay);
         shareLinkOverlay.Opacity = 1;
+    }
+
+    /*
+     * ==========================
+     *      Multi file operation
+     * ==========================
+     */
+
+    /// <summary>
+    /// Menu funcion: share
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private async void MultiShareOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        ShareLinkOverlay shareLinkOverlay = new ShareLinkOverlay();
+        shareLinkOverlay.baiduFileList = baiduFileList;
+
+        shareLinkOverlay.DirList = baiduFileList.GetSelectedItem().Dir;
+        Trace.WriteLine("dirlist:" + shareLinkOverlay.DirList.Length.ToString());
+        shareLinkOverlay.FileList = baiduFileList.GetSelectedItem().File;
+        Trace.WriteLine("filelist:" + shareLinkOverlay.FileList.Length.ToString());
+        shareLinkOverlay.Opacity = 0;
+
+        OverlayReservedGrid.Children.Add(shareLinkOverlay);
+        shareLinkOverlay.Opacity = 1;
+    }
+    /// <summary>
+    /// Menu funcion: delete
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private async void MultiDeleteOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        string delete_filelist;
+
+        BDDir[] dirlist = baiduFileList.GetSelectedItem().Dir;
+        BDFile[] filelist = baiduFileList.GetSelectedItem().File;
+        delete_filelist = baiduFileList.IntegrateFilelist(filelist, dirlist);
+
+        if (await baiduFileList.DeleteFile(delete_filelist))
+        {
+            Refresh();
+            return;
+        }
+        else
+        {
+            MessageOverlay message = new MessageOverlay();
+            OverlayReservedGrid.Children.Add(message);
+            message.SetMessage("删除失败", $"删除多个项目时遇到错误");
+
+            return;
+        }
+
+    }
+    /// <summary>
+    /// Menu funcion: move
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private async void MultiMoveOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        NetdiskPathOverlay netdiskPathOverlay = new NetdiskPathOverlay();
+        netdiskPathOverlay.baiduFileList = baiduFileList;
+        netdiskPathOverlay.ShowInitDir();
+        OverlayReservedGrid.Children.Add(netdiskPathOverlay);
+        string? target_path = await netdiskPathOverlay.ShowDialog("请选择目标文件夹", "移动");
+
+        List<string> self_path = new List<string>();
+        List<string> self_name = new List<string>();
+        List<string> target_path_list = new List<string>();
+        if (baiduFileList.GetSelectedItem().File != null)
+        {
+            foreach (BDFile file in baiduFileList.GetSelectedItem().File)
+            {
+                self_name.Add(file.Name);
+                self_path.Add(file.Path);
+            }
+        }
+        else
+        {
+            Trace.WriteLine("file is null");
+        }
+        if (baiduFileList.GetSelectedItem().Dir != null)
+        {
+            foreach (BDDir dir in baiduFileList.GetSelectedItem().Dir)
+            {
+                self_path.Add(dir.Name);
+                self_name.Add(dir.Path);
+            }
+        }
+        for (int i = 0; i < self_path.Count; i++)
+        {
+            target_path_list.Add(target_path);
+        }
+        if (!string.IsNullOrEmpty(target_path) && await baiduFileList.Move(self_path.ToArray(), self_name.ToArray(), target_path_list.ToArray()))
+        {
+            Refresh();
+            return;
+        }
+        else
+        {
+            MessageOverlay message = new MessageOverlay();
+            OverlayReservedGrid.Children.Add(message);
+            message.SetMessage("创建失败", $"移动文件时遇到错误");
+            return;
+        }
+    }
+    /// <summary>
+    /// Menu funcion: copy
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private async void MultiCopyOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        NetdiskPathOverlay netdiskPathOverlay = new NetdiskPathOverlay();
+        netdiskPathOverlay.baiduFileList = baiduFileList;
+        netdiskPathOverlay.ShowInitDir();
+        OverlayReservedGrid.Children.Add(netdiskPathOverlay);
+        string? target_path = await netdiskPathOverlay.ShowDialog("请选择目标文件夹", "复制");
+        List<string> self_path = new List<string>();
+        List<string> self_name = new List<string>();
+        List<string> target_path_list = new List<string>();
+        if (baiduFileList.GetSelectedItem().File != null)
+        {
+            foreach (BDFile file in baiduFileList.GetSelectedItem().File)
+            {
+                self_name.Add(file.Name);
+                self_path.Add(file.Path);
+            }
+        }
+        if (baiduFileList.GetSelectedItem().Dir != null)
+        {
+            foreach (BDDir dir in baiduFileList.GetSelectedItem().Dir)
+            {
+                self_path.Add(dir.Name);
+                self_name.Add(dir.Path);
+            }
+        }
+            
+        for (int i = 0; i < self_path.Count; i++)
+        {
+            target_path_list.Add(target_path);
+        }
+        if (!string.IsNullOrEmpty(target_path) && await baiduFileList.Copy(self_path.ToArray(), self_name.ToArray(), target_path_list.ToArray()))
+        {
+            Refresh();
+            return;
+        }
+        else
+        {
+            MessageOverlay message = new MessageOverlay();
+            OverlayReservedGrid.Children.Add(message);
+            message.SetMessage("创建失败", $"移动文件{self_path}时遇到错误");
+            return;
+        }
     }
 }

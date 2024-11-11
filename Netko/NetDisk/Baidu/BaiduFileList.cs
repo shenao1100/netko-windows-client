@@ -189,11 +189,11 @@ namespace Netko.NetDisk.Baidu
             return fileList;
 
         }
-        public BDFileList? GetSelectedItem()
+        public BDFileList GetSelectedItem()
         {
             if(selectDirList.Count == 0 && selectFileList.Count == 0)
             {
-                return null;
+                return new BDFileList();
             }
             BDFileList fileList = new BDFileList();
             fileList.File = selectFileList.ToArray();
@@ -222,7 +222,7 @@ namespace Netko.NetDisk.Baidu
 
         public bool FileIsSelected(BDFile File)
         {
-            if (!selectFileList.Contains(File)) { return true; } else { return false; }
+            if (selectFileList.Contains(File)) { return true; } else { return false; }
         }
 
         public bool ToggleSelectFile(BDFile file)
@@ -236,7 +236,6 @@ namespace Netko.NetDisk.Baidu
             {
                 selectFileList.Add(file);
                 return true;
-
             }
         }
         /// <summary>
@@ -248,12 +247,20 @@ namespace Netko.NetDisk.Baidu
         public string IntegrateFilelist(BDFile[]? files, BDDir[]? dirs)
         {
             string result = "[";
-            int count = 0;
+            int count = 0, total_count = 0;
+            if (files != null)
+            {
+                total_count += files.Count();
+            }
+            if (dirs != null)
+            {
+                total_count += dirs.Count();
+            }
             if (files != null) {
                 foreach (BDFile file in files)
                 {
                     count++;
-                    if (count == files.Length)
+                    if (count == total_count)
                     {
                         result += $"\"{file.Path}\"";
                     }
@@ -263,13 +270,12 @@ namespace Netko.NetDisk.Baidu
                     }
                 }
             }
-            count = 0;
             if (dirs != null)
             {
                 foreach (BDDir dir in dirs)
                 {
                     count++;
-                    if (count == dirs.Length)
+                    if (count == total_count)
                     {
                         result += $"\"{dir.Path}\"";
                     }
@@ -292,13 +298,22 @@ namespace Netko.NetDisk.Baidu
         public string IntegrateIDlist(BDFile[]? files, BDDir[]? dirs)
         {
             string result = "[";
-            int count = 0;
+            int count = 0, total_count = 0;
+            if (files != null)
+            {
+                total_count += files.Count();
+            }
+            if (dirs != null)
+            {
+                total_count += dirs.Count();
+            }
+
             if (files != null)
             {
                 foreach (BDFile file in files)
                 {
                     count++;
-                    if (count == files.Length)
+                    if (count == total_count)
                     {
                         result += $"{file.ID}";
                     }
@@ -308,13 +323,12 @@ namespace Netko.NetDisk.Baidu
                     }
                 }
             }
-            count = 0;
             if (dirs != null)
             {
                 foreach (BDDir dir in dirs)
                 {
                     count++;
-                    if (count == dirs.Length)
+                    if (count == total_count)
                     {
                         result += $"{dir.ID}";
                     }
@@ -453,6 +467,9 @@ namespace Netko.NetDisk.Baidu
             {
                 for (int i = 0; i < name_list.Length; i++)
                 {
+                    Trace.WriteLine(file_list[i]);
+                    Trace.WriteLine(name_list[i]);
+
                     data.Add(new MoveItem { newname = name_list[i], path = file_list[i], dest = target_path_list[i] });
                 }
             }
@@ -503,6 +520,7 @@ namespace Netko.NetDisk.Baidu
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            Trace.WriteLine(file_id_list);
             var formData = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("fid_list", file_id_list),

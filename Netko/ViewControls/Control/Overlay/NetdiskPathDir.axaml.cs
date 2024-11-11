@@ -53,7 +53,7 @@ public partial class NetdiskPathDir : UserControl
     private async void GetChildContent(string go_path)
     {
         
-        BDFileList list_ = await baiduFileList.GetFileList(1, path: go_path);
+        BDFileList list_ = await baiduFileList.GetFileList(1, path: go_path, clear_select_list:false);
         foreach (BDDir dir_b in list_.Dir)
         {
             NetdiskPathDir netdiskPathDir = new NetdiskPathDir();

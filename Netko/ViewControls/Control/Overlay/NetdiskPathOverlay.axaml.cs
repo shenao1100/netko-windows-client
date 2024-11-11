@@ -74,7 +74,7 @@ public partial class NetdiskPathOverlay : UserControl
     public async void ShowInitDir()
     {
 
-        BDFileList list_ = await baiduFileList.GetFileList(1, path: "/");
+        BDFileList list_ = await baiduFileList.GetFileList(1, path: "/", clear_select_list:false);
         foreach (BDDir dir_b in list_.Dir)
         {
             NetdiskPathDir netdiskPathDir = new NetdiskPathDir();
