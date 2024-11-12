@@ -525,8 +525,8 @@ public partial class ItemShowLine : UserControl
         {
             foreach (BDDir dir in baiduFileList.GetSelectedItem().Dir)
             {
-                self_path.Add(dir.Name);
-                self_name.Add(dir.Path);
+                self_path.Add(dir.Path);
+                self_name.Add(dir.Name);
             }
         }
         for (int i = 0; i < self_path.Count; i++)
@@ -573,8 +573,8 @@ public partial class ItemShowLine : UserControl
         {
             foreach (BDDir dir in baiduFileList.GetSelectedItem().Dir)
             {
-                self_path.Add(dir.Name);
-                self_name.Add(dir.Path);
+                self_path.Add(dir.Path);
+                self_name.Add(dir.Name);
             }
         }
             
