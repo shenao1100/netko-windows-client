@@ -12,19 +12,23 @@
 			<Color x:Key="CatalogBaseMediumColor">#992b2b2b</Color>
 			<Color x:Key="CatalogChromeMediumColor">#FF303030</Color>
 			<Color x:Key="CatalogBaseHighColor">#A0575757</Color>
+			<Color x:Key="HoverColor">#FF616161</Color>
+
 		</ResourceDictionary>
 		<ResourceDictionary x:Key="Dark">
 			<Color x:Key="CatalogBaseLowColor">#C0000000</Color>
 			<Color x:Key="CatalogBaseMediumColor">#A9141414</Color>
 			<Color x:Key="CatalogChromeMediumColor">#FE303030</Color>
 			<Color x:Key="CatalogBaseHighColor">#50575757</Color>
+			<Color x:Key="HoverColor">#FF616161</Color>
 		</ResourceDictionary>
 		<ResourceDictionary x:Key="Light">
 			<Color x:Key="CatalogBaseLowColor">#80FFFFFF</Color>
 			<Color x:Key="CatalogBaseMediumColor">#99FFFFFF</Color>
 			<Color x:Key="CatalogChromeMediumColor">#FFc5c5c5</Color>
 			<Color x:Key="CatalogBaseHighColor">#80FFFFFF</Color>
-			<Color x:Key="CatalogBaseHighColor11">#80FFFFFF</Color>
+			<Color x:Key="HoverColor">#FFadadad</Color>
+
 		</ResourceDictionary>
 
 	</ResourceDictionary.ThemeDictionaries>

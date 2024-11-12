@@ -87,7 +87,7 @@ public partial class ItemShowLine : UserControl
         if (is_selected)
         {
             //BorderBackground.Background = new SolidColorBrush(HoverBG);
-            BorderBackground[!Border.BackgroundProperty] = new DynamicResourceExtension("CatalogBaseMediumColor");
+            BorderBackground[!Border.BackgroundProperty] = new DynamicResourceExtension("HoverColor");
         }
         else
         {
@@ -126,7 +126,6 @@ public partial class ItemShowLine : UserControl
     private void SetMultiOperationCommand()
     {
         if (!single_menu_operation) { return; }
-        DockpanelOpen.Header = "OPENMULTI";
 
         //DockpanelOpen.Click -= OepnOnMenu;
         DockpanelDelete.Click -= DeleteOnMenu;
@@ -143,7 +142,6 @@ public partial class ItemShowLine : UserControl
     private void SetSingleOperationCommand() 
     {
         if (single_menu_operation) { return; }
-        DockpanelOpen.Header = "OPENS";
         DockpanelDelete.Click -= MultiDeleteOnMenu;
         DockpanelMove.Click -= MultiMoveOnMenu;
         DockpanelDuplicate.Click -= MultiCopyOnMenu;

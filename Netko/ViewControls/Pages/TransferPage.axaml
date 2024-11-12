@@ -16,12 +16,15 @@
 	</UserControl.Transitions>
 	<Grid ColumnDefinitions="*" RowDefinitions="Auto, 3, *">
 		<DockPanel  Grid.Row="0" Grid.Column="0">
-			<PathIcon Data="{StaticResource download}" Height="30" Width="30" Margin="5"/>
-			<Label Margin="5" FontSize="25">下载管理</Label>
+			<!-->PathIcon Data="{StaticResource setting}" Height="30" Width="30" Margin="5"/>
+			<Label Margin="5" FontSize="25">设置</Label>
 		</DockPanel>
-		<Separator Grid.Row="1" Grid.Column="0" Margin="0" Padding="0"></Separator>
+		<Separator Grid.Row="1" Grid.Column="0" Margin="0" Padding="0"></Separator-->
+			<Label Margin="5" FontSize="20" Padding="10 20 3 3">下载</Label>
+
+		</DockPanel>
 		<ScrollViewer Grid.Row="2">
-			<StackPanel x:Name="DownloadListContiner">
+			<StackPanel x:Name="DownloadListContiner" Margin="5 0">
 				<Button Click="add_task_test">Add Task</Button>
 			</StackPanel>
 		</ScrollViewer>

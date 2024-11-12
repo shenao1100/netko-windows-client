@@ -9,29 +9,37 @@
 			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
 		</Style>
 	</UserControl.Styles>
-	<Grid RowDefinitions="Auto, Auto" Margin="3">
+	<Grid ColumnDefinitions="*" VerticalAlignment="Top" Margin="3" >
+		<Border Background="{DynamicResource CatalogBaseHighColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 6 1 #40000000">
+			<!--BoxShadow="0 0 3 1 #20000000"-->
+		</Border>
+		<Grid RowDefinitions="Auto, Auto" Margin="3">
 
-		<Grid Grid.Column="0" ColumnDefinitions="Auto, Auto, *">
-			<Image Grid.Column="0" Width="60" Height="60" Source="/Assets/FileIcon/test.png"></Image>
-			<StackPanel Grid.Column="1">
-				<Label Margin="3">Download File Name</Label>
-				<Label Margin="3 0" Opacity=".7">64.0MB/128.0MB 50% 3.2MB/s</Label>
-			</StackPanel>
-			<StackPanel HorizontalAlignment="Right" Grid.Column="2">
-				<DockPanel>
-					<Button Margin="3" Height="55" Width="55">
-						<PathIcon Data="{StaticResource pause}" />
-					</Button>
-					<Button Margin="3" Height="55" Width="55">
-						<PathIcon Data="{StaticResource delete}" />
-					</Button>
-				</DockPanel>
-			</StackPanel>
+			<Grid Grid.Column="0" ColumnDefinitions="Auto, Auto, *">
+				<Image Margin="3" Grid.Column="0" Width="40" Height="40" Source="/Assets/FileIcon/test.png"></Image>
+				<StackPanel Grid.Column="1" VerticalAlignment="Center">
+					<Label Margin="3 0">Download File Name</Label>
+					<Label Margin="3 0" Opacity=".7" FontSize="10">64.0MB/128.0MB 50% 3.2MB/s</Label>
+				</StackPanel>
+				<StackPanel HorizontalAlignment="Right" Grid.Column="2" VerticalAlignment="Center">
+					<DockPanel>
+						<Button Margin="3" Height="23" Width="23" Background="Transparent" VerticalAlignment="Center">
+							<PathIcon Data="{StaticResource open}" Height="15" Width="15"/>
+						</Button>
+						<Button Margin="3" Height="23" Width="23" Background="Transparent" VerticalAlignment="Center">
+							<PathIcon Data="{StaticResource pause}" Height="15" Width="15"/>
+						</Button>
+						<Button Margin="3" Height="23" Width="23" Background="Transparent" VerticalAlignment="Center">
+							<PathIcon Data="{StaticResource delete_outline}" Height="15" Width="15"/>
+						</Button>
+					</DockPanel>
+				</StackPanel>
+			</Grid>
+			<DockPanel DockPanel.Dock="Left" >
+
+
+			</DockPanel>
+			<ProgressBar Value="50" Grid.Row="1" Margin="0"></ProgressBar>
 		</Grid>
-	<DockPanel DockPanel.Dock="Left" >
-		
-		
-	</DockPanel>
-	<ProgressBar Value="50" Grid.Row="1"></ProgressBar>
 	</Grid>
 </UserControl>

@@ -9,12 +9,13 @@
 			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
 		</Style>
 			<Style Selector="Button:pressed">
-				
+				<Setter Property="Background" Value="{DynamicResource HoverColor}"/>
+
 				<Setter Property="RenderTransform" Value=""/>
 			</Style>
 	</UserControl.Styles>
 	<Grid ColumnDefinitions="*" VerticalAlignment="Top" Margin="3" >
-		<Border Background="{DynamicResource CatalogBaseHighColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+		<Border Background="{DynamicResource CatalogBaseHighColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 6 1 #20000000">
 			<!--BoxShadow="0 0 3 1 #20000000"-->
 		</Border>
 		<Button x:Name="Action" HorizontalAlignment="Stretch" Margin="0" Padding="0" PointerPressed="RightClick" Click="LeftClick" Background="Transparent">
