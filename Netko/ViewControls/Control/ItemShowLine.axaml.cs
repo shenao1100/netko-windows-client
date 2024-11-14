@@ -223,7 +223,15 @@ public partial class ItemShowLine : UserControl
         
         if (timeDiff.TotalMilliseconds <= 250)
         {
-            Func();
+            if (isDir)
+            {
+                Func();
+
+            }
+            if (isFile)
+            {
+                baiduFileList.GetFileDownloadLink(SelfFile.Path);
+            }
         }
         else
         {

@@ -14,25 +14,25 @@ using Newtonsoft.Json.Linq;
 
 namespace Netko.NetDisk.Baidu
 {
-    
+
     public class Baidu(string cookie)
     {
         public Dictionary<string, string?> cookie = new Dictionary<string, string?>();      // contain BDUSS & STOKEN & PANPSC
-        public string   init_cookie_string = cookie;
-        public bool     account_error = false;  // if login error: true
-        public bool     initialed = false;      // if logined: true
-        public int      vip = 0;                // vip = 1; svip = 2
-        public bool     is_vip = false;         // false
-        public bool     is_svip = false;        // false
-        public string   loginstate = "";        // 1
-        public int      vip_level = 0;          // 1
-        public bool     is_year_vip = false;    // false
-        public string   bdstoken = "";          // 966aa9b0xx74e3785980d108f0839xxx
-        public string   uk = "";                // 
-        public string   sign1 = "";             // b1b24c86a6c49dfxxxfd3725c337xxx6aca88252
-        public string   sign3 = "";             // d76e889b6aafdxxx3bd56f4d4053a
-        public int      timestamp = 0;          // 1718809129
-        public string   log_id = "";
+        public string init_cookie_string = cookie;
+        public bool account_error = false;  // if login error: true
+        public bool initialed = false;      // if logined: true
+        public int vip = 0;                // vip = 1; svip = 2
+        public bool is_vip = false;         // false
+        public bool is_svip = false;        // false
+        public string loginstate = "";        // 1
+        public int vip_level = 0;          // 1
+        public bool is_year_vip = false;    // false
+        public string bdstoken = "";          // 966aa9b0xx74e3785980d108f0839xxx
+        public string uk = "";                // 
+        public string sign1 = "";             // b1b24c86a6c49dfxxxfd3725c337xxx6aca88252
+        public string sign3 = "";             // d76e889b6aafdxxx3bd56f4d4053a
+        public int timestamp = 0;          // 1718809129
+        public string log_id = "";
 
         public string name = "";
         public string headphoto_url = "";
@@ -82,7 +82,7 @@ namespace Netko.NetDisk.Baidu
                 }
                 else
                 {
-                    if (key != "" && key != string.Empty) 
+                    if (key != "" && key != string.Empty)
                     {
                         cookie_val += key + "; ";
 
@@ -150,8 +150,8 @@ namespace Netko.NetDisk.Baidu
             Trace.WriteLine("log_id: " + log_id);
             Trace.WriteLine("account_error: " + account_error.ToString());
             Trace.WriteLine("initialed: " + initialed.ToString());
-            /*Trace.WriteLine("vip: " + vip.ToString());
-            Trace.WriteLine("is_vip: " + is_vip.ToString());
+            Trace.WriteLine("vip: " + vip.ToString());
+            /*Trace.WriteLine("is_vip: " + is_vip.ToString());
             Trace.WriteLine("is_svip: " + is_svip.ToString());
             Trace.WriteLine("loginstate: " + loginstate.ToString());*/
             Trace.WriteLine("bdstoken: " + bdstoken);
@@ -160,6 +160,7 @@ namespace Netko.NetDisk.Baidu
             Trace.WriteLine("sign3: " + sign3);
             Trace.WriteLine("name: " + name);
             Trace.WriteLine("Cookie: " + GetCookie());
+            Trace.WriteLine("time: " + timestamp.ToString());
         }
         public async Task<string> refresh_logid()
         {
@@ -223,11 +224,11 @@ namespace Netko.NetDisk.Baidu
                     is_vip = (int)(result["is_vip"] ?? 0) == 1 ? true : false;
                     loginstate = result["loginstate"]?.ToString() ?? "";
                     vip_level = (int)(result["vip_level"] ?? 0);
-                    is_year_vip = (int)(result["is_year_vip"] ?? 0) == 1 ? true: false;
+                    is_year_vip = (int)(result["is_year_vip"] ?? 0) == 1 ? true : false;
                     sign1 = result["sign1"]?.ToString() ?? "";
                     sign3 = result["sign3"]?.ToString() ?? "";
                     timestamp = (int)(result["timestamp"] ?? 0);
-                    
+
                 }
                 debug_info();
                 return true;
@@ -269,7 +270,7 @@ namespace Netko.NetDisk.Baidu
             var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
             task_content.Wait();
             Trace.WriteLine(task_content.Result);
-            
+
             Dictionary<string, object>? body
                 = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
@@ -291,6 +292,21 @@ namespace Netko.NetDisk.Baidu
             }
 
         }
+        private void GetVipNum()
+        {
+            if (is_svip)
+            {
+                vip = 2;
+            }
+            else if (is_vip)
+            {
+                vip = 1;
+            }
+            else
+            {
+                vip = 0;
+            }
+        } 
         public async Task init()
         {
             // Update info from server, this may take some time
@@ -311,6 +327,7 @@ namespace Netko.NetDisk.Baidu
             {
                 throw new Exception("Get basic info failed.");
             }
+            GetVipNum();
 
         }
     }

@@ -167,13 +167,6 @@ public partial class NetdiskFilePage : UserControl
         }
     }
 
-    private void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
-        UserControl FileBlock = new FileShowLine();
-        
-        FileListViewer.Children.Add(FileBlock);
-
-    }
     private string GetForwardPath()
     {
         if (forwardHistory.Count > 0)
@@ -358,9 +351,9 @@ public partial class NetdiskFilePage : UserControl
         }
         foreach (BDFile file_b in list_.File)
             {
-            FileShowLine FileBlock = new FileShowLine();
-            FileBlock.SetName(file_b.Name);
-            FileListViewer.Children.Add(FileBlock);
+            //FileShowLine FileBlock = new FileShowLine();
+            //FileBlock.SetName(file_b.Name);
+            //FileListViewer.Children.Add(FileBlock);
 
             Trace.WriteLine(file_b.ToString());
             }

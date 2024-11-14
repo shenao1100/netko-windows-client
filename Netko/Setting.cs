@@ -124,6 +124,10 @@ namespace Netko
 
         public static List<AccountStruct> GetAllAccount()
         {
+            if (Account == null)
+            {
+                return new List<AccountStruct>();
+            }
             return Account;
         }
         public static void InsertAccount(string cookie, string token)

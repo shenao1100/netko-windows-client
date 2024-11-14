@@ -14,7 +14,7 @@
 				<Setter Property="RenderTransform" Value=""/>
 			</Style>
 	</UserControl.Styles>
-	<Grid ColumnDefinitions="*" VerticalAlignment="Top" Margin="3" >
+	<Grid ColumnDefinitions="*" VerticalAlignment="Top" Margin="7 3" >
 		<Border Background="{DynamicResource CatalogBaseHighColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 6 1 #20000000">
 			<!--BoxShadow="0 0 3 1 #20000000"-->
 		</Border>
@@ -34,7 +34,7 @@
 					</MenuItem>
 					<MenuItem Header="移动" Click="MoveOnMenu" x:Name="DockpanelMove" Margin="3">
 						<MenuItem.Icon>
-							<PathIcon Data="{StaticResource move}"/>
+							<PathIcon Data="{StaticResource move_arrow}"/>
 						</MenuItem.Icon>
 					</MenuItem>
 					<MenuItem Header="复制" Click="CopyOnMenu" x:Name="DockpanelDuplicate" Margin="3">
@@ -65,10 +65,10 @@
 				</ContextMenu>
 			</Button.ContextMenu>
 			<Grid  ColumnDefinitions="45, *" >
-			<Image Source="/Assets/FileIcon/icons8-folder-188.png" Height="50" Grid.Column="0" Margin="3" x:Name="ItemIcon"></Image>
+			<Image Source="/Assets/FileIcon/icons8-folder-188.png" Height="45" Grid.Column="0" Margin="3" x:Name="ItemIcon"></Image>
 			<Grid RowDefinitions="Auto, Auto" Grid.Column="1" VerticalAlignment="Center" Margin="5 0">
-				<Label Grid.Row="0" FontSize="15" Padding="0 3" x:Name="FileName">测试文件.zip</Label>
-				<Label Opacity=".7" Grid.Row="1" FontSize="12" Margin="0" Padding="0">128.0MB 2077-7-7 13:45</Label>
+				<Label Grid.Row="0" FontSize="14" Padding="0 3" x:Name="FileName">测试文件.zip</Label>
+				<Label Opacity=".7" Grid.Row="1" FontSize="10" Margin="0" Padding="0">128.0MB 2077-7-7 13:45</Label>
 
 			</Grid>
 			</Grid>

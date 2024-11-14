@@ -14,6 +14,7 @@ using System.Runtime.Serialization;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace Netko.NetDisk.Baidu
 {
@@ -94,7 +95,7 @@ namespace Netko.NetDisk.Baidu
         public string dest { set; get; }
         public string newname { get; set; }
     }
-
+    
     public class BaiduFileList(Baidu Account)
     {
         public Baidu BaiduAccount = Account;
@@ -102,13 +103,34 @@ namespace Netko.NetDisk.Baidu
 
         private List<BDDir> selectDirList = new List<BDDir>();
         private List<BDFile> selectFileList = new List<BDFile>();
-
+        
         const string channel = "00000000000000000000000040000001";
+        const string channel_short = "chunlei";
         const string version = "7.46.5.113";
-        const string devuid = "BDIMXV2%2dO%5f9432D545AA3849D19EFD762333A53888%2dC%5f0%2dD%5fE823%5f8FA6%5fBF53%5f0001%5f001B%5f448B%5f4A73%5f734B%2e%2dM%5f088FC3E23825%2dV%5f3EBDE1E0";
-        const string rand = "27f884dc5f353636874770bc396e1ce6eca29bfc";
-        const string time = "1730132298";
-        const string rand2 = "14a3c956f6a8daea6e650c72ce7888a6ee0f503d";
+        string devuid = WebUtility.UrlEncode("BDIMXV2-O_" + GenerateSHA1Hash(DateTimeOffset.Now.ToUnixTimeSeconds().ToString()).ToUpper() + "-C_0-D_EF93_EFA6_BE93_0001_001B_448B_4A73_736B.-M_088FC3E93899-V_3FFFE1E0");
+        string rand = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + "meow_rand1";
+        string time = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+        string rand2 = GenerateSHA1Hash(DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + "meow");
+        static string GenerateSHA1Hash(string input)
+        {
+            using (SHA1 sha1 = SHA1.Create())  // 创建 SHA-1 实例
+            {
+                // 将输入文本转换为字节数组
+                byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+
+                // 计算哈希值
+                byte[] hashBytes = sha1.ComputeHash(inputBytes);
+
+                // 将哈希值转换为十六进制字符串
+                StringBuilder sb = new StringBuilder();
+                foreach (byte b in hashBytes)
+                {
+                    sb.Append(b.ToString("x2"));
+                }
+
+                return sb.ToString();
+            }
+        }
         private BDDir ParseDir(JObject item)
         {
             BDDir dir = new BDDir();
@@ -399,7 +421,7 @@ namespace Netko.NetDisk.Baidu
                 new KeyValuePair<string, string>("filelist", jsonString)
             });
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string url = $"https://pan.baidu.com/api/filemanager?opera=rename&async=1&onnest=fail&channel=chunlei&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            string url = $"https://pan.baidu.com/api/filemanager?opera=rename&async=1&onnest=fail&channel={channel_short}&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
@@ -440,7 +462,7 @@ namespace Netko.NetDisk.Baidu
                 new KeyValuePair<string, string>("filelist", jsonString)
             });
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string url = $"https://pan.baidu.com/api/filemanager?opera=copy&async=1&onnest=fail&channel=chunlei&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            string url = $"https://pan.baidu.com/api/filemanager?opera=copy&async=1&onnest=fail&channel={channel_short}&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
@@ -485,7 +507,7 @@ namespace Netko.NetDisk.Baidu
                 new KeyValuePair<string, string>("filelist", jsonString)
             });
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string url = $"https://pan.baidu.com/api/filemanager?opera=move&async=1&onnest=fail&channel=chunlei&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            string url = $"https://pan.baidu.com/api/filemanager?opera=move&async=1&onnest=fail&channel={channel_short}&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
@@ -515,7 +537,7 @@ namespace Netko.NetDisk.Baidu
         {
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
 
-            string url = $"https://pan.baidu.com/share/set?channel=chunlei&clienttype=0&web=1&channel=chunlei&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            string url = $"https://pan.baidu.com/share/set?channel={channel}&clienttype=0&web=1&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
@@ -557,7 +579,7 @@ namespace Netko.NetDisk.Baidu
             //string time_stamp = timestampSeconds.ToString();
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
 
-            string url = $"https://pan.baidu.com/api/filemanager?opera=delete&async=1&onnest=fail&channel=chunlei&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            string url = $"https://pan.baidu.com/api/filemanager?opera=delete&async=1&onnest=fail&channel={channel_short}&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
@@ -591,7 +613,7 @@ namespace Netko.NetDisk.Baidu
             }
             path = WebUtility.UrlEncode(path);
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string url = $"https://pan.baidu.com/api/list?dir={path}&page={page}&num={num}&clienttype=8&channel=00000000000000000000000040000001&version=7.45.0.109&devuid=BDIMXV2%2dO%5f9432D545AA3849D19EFD762333A53888%2dC%5f0%2dD%5fE823%5f8FA6%5fBF53%5f0001%5f001B%5f448B%5f4A73%5f734B%2e%2dM%5f088FC3E23825%2dV%5f3EBDE1E0&rand=17a15c3f37fc5bd28a6fea151d1c7c6f67fb1c22&time=1728903683&rand2=b4e5cb179b298309a26dd85e95596c2ac1cd2300&vip=2&logid={log_id}&desc=1&order=time";
+            string url = $"https://pan.baidu.com/api/list?dir={path}&page={page}&num={num}&clienttype=8&channel={channel}&version=7.45.0.109&devuid=BDIMXV2%2dO%5f9432D545AA3849D19EFD762333A53888%2dC%5f0%2dD%5fE823%5f8FA6%5fBF53%5f0001%5f001B%5f448B%5f4A73%5f734B%2e%2dM%5f088FC3E23825%2dV%5f3EBDE1E0&rand=17a15c3f37fc5bd28a6fea151d1c7c6f67fb1c22&time=1728903683&rand2=b4e5cb179b298309a26dd85e95596c2ac1cd2300&vip=2&logid={log_id}&desc=1&order=time";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", Baidu.netdisk_user_agent);
             client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
@@ -619,5 +641,106 @@ namespace Netko.NetDisk.Baidu
             return fileList;
             
         }
+        /// <summary>
+        /// Check if file is legal to download
+        /// </summary>
+        /// <param name="path"></param>
+        public async void downloadPreProcess(string path)
+        {
+            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
+            string new_logid = WebUtility.UrlEncode($"=MTczMTQxMjU5NSw4Nw==&path{path}");
+
+            path = WebUtility.UrlEncode(path);
+            string url = $"https://pan.baidu.com/api/checkapl/download?clienttype=8&channel={channel}&version=7.46.5.113&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}&vip=0&logid={new_logid}";
+            using var nclient = new HttpClient();
+            nclient.DefaultRequestHeaders.Add("User-Agent", Baidu.netdisk_user_agent);
+            nclient.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
+            nclient.DefaultRequestHeaders.Add("Accept", "*/*");
+            nclient.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
+            nclient.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            nclient.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+            nclient.DefaultRequestHeaders.Add("Host", "pan.baidu.com");
+            var ndata = new StringContent(" ", Encoding.UTF8, "application/x-www-form-urlencoded");
+
+            HttpResponseMessage ncontent = await nclient.PostAsync(url, ndata);
+            BaiduAccount.UpdateCookie(ncontent.Headers);
+            var ntask_content = Task.Run(() => ncontent.Content.ReadAsStringAsync());
+            ntask_content.Wait();
+            Trace.WriteLine(ntask_content.Result);
+        }
+        /// <summary>
+        /// CMS check for p2s record, has been disabled
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public async Task<string> CMS(string path)
+        {
+            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
+            string new_logid = WebUtility.UrlEncode($"=MTczMTQxMjU5NSw4Nw==&path{path}");
+
+            path = WebUtility.UrlEncode(path);
+            string url = $"https://pan.baidu.com/cms/fgid?method=query&clienttype=9&version=3.0.20.63&time=1731441395&rand=6f0e1e64572533db2cd6b44a731f5ee58244ffba&devuid=BDIMXV2-O_9432D545AA3849D19EFD762333A53888-C_0-D_E823_8FA6_BF53_0001_001B_448B_4A73_734B.-M_088FC3E23825-V_3EBDE1E0&channel=0&version_app=7.46.5.113&path={path}&uk={BaiduAccount.uk}&vip=0";
+
+            //string url = $"https://pan.baidu.com/api/checkapl/download?clienttype=8&channel=00000000000000000000000040000001&version=7.46.5.113&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}&vip=0&logid={new_logid}";
+            using var nclient = new HttpClient();
+            nclient.DefaultRequestHeaders.Add("User-Agent", Baidu.netdisk_user_agent);
+            nclient.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
+            nclient.DefaultRequestHeaders.Add("Accept", "*/*");
+            nclient.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
+            nclient.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            nclient.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+            nclient.DefaultRequestHeaders.Add("Host", "pan.baidu.com");
+
+            HttpResponseMessage ncontent = await nclient.GetAsync(url);
+            BaiduAccount.UpdateCookie(ncontent.Headers);
+            var ntask_content = Task.Run(() => ncontent.Content.ReadAsStringAsync());
+            ntask_content.Wait();
+            Trace.WriteLine(ntask_content.Result);
+            return ntask_content.Result;
+        }
+        /// <summary>
+        /// Get download link from local web disk
+        /// </summary>
+        /// <param name="path"></param>
+        public async void GetFileDownloadLink(string path)
+        {
+            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
+            string orig_path = path;
+            path = WebUtility.UrlEncode(path);
+
+            Trace.WriteLine("times: "+time);
+            //await CMS(orig_path);
+
+            string url = $"http://d.pcs.baidu.com/rest/2.0/pcs/file?app_id=250528&method=locatedownload&check_blue=1&es=1&esl=1&ant=1&path={path}&ver=4.0&dtype=1&err_ver=1.0&ehps=1&eck=1&vip={BaiduAccount.vip}&open_pflag=2&vip={BaiduAccount.vip}&dpkg=1&sd=0&clienttype=9&version=3.0.20.63&time={time}&rand={rand}&devuid={devuid}&channel=0&version_app=7.46.5.113";
+
+
+            using var client = new HttpClient();
+            //client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
+            client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "netdisk;P2SP;3.0.20.63;netdisk;7.46.5.113;PC;PC-Windows;10.0.22631;WindowsBaiduYunGuanJia");
+            client.DefaultRequestHeaders.Add("Accept", "*/*");
+            client.DefaultRequestHeaders.Add("Connection", "keep-alive");
+            //client.DefaultRequestHeaders.Add("Accept-Encoding", "");
+            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            client.DefaultRequestHeaders.Add("Host", "d.pcs.baidu.com");
+            var data = new StringContent(" ", Encoding.UTF8, "application/x-www-form-urlencoded");
+            HttpResponseMessage content = await client.PostAsync(url, data);
+            BaiduAccount.UpdateCookie(content.Headers);
+            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
+            task_content.Wait();
+            Trace.WriteLine(task_content.Result);
+            Dictionary<string, object>? body
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+            if (body != null && body["urls"] is JArray urls)
+            {
+                foreach (JObject keyValuePairs in urls)
+                {
+                    Trace.WriteLine(keyValuePairs["url"]);
+                }
+            }
+
+            //return "";
+
+        }
     }
 }
+ 

@@ -35,8 +35,8 @@
 					<PathIcon Data="{StaticResource refresh}" Height="15" Width="15"/>
 				</Button>
 			</Grid>
-			<Separator Grid.Row="1" Margin="0" Padding="0"></Separator>
-			<ProgressBar Grid.Row="2" Margin="0" Padding="0"></ProgressBar>
+			<!--Separator Grid.Row="1" Margin="0" Padding="0"></Separator-->
+			<!--ProgressBar Grid.Row="2" Margin="0" Padding="0"></ProgressBar-->
 			<ScrollViewer Grid.Row="3" Margin="0" Padding="0" VerticalAlignment="Stretch">
 				<Panel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
 					<StackPanel x:Name="FileListViewer" VerticalAlignment="Stretch">

@@ -59,4 +59,8 @@
       <DependentUpon>ItemShowLine.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Download\" />
+  </ItemGroup>
 </Project>
