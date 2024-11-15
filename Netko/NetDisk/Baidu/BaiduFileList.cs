@@ -727,7 +727,7 @@ namespace Netko.NetDisk.Baidu
             BaiduAccount.UpdateCookie(content.Headers);
             var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
             task_content.Wait();
-            Trace.WriteLine(task_content.Result);
+            //Trace.WriteLine(task_content.Result);
             Dictionary<string, object>? body
                 = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
             if (body != null && body["urls"] is JArray urls)

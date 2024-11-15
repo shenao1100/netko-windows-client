@@ -230,6 +230,7 @@ public partial class ItemShowLine : UserControl
             }
             if (isFile)
             {
+                Trace.WriteLine(SelfFile.Size.ToString());
                 baiduFileList.GetFileDownloadLink(SelfFile.Path);
             }
         }
