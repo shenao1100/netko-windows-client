@@ -11,6 +11,7 @@ using Netko.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Reactive;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Input;
@@ -18,13 +19,14 @@ namespace Netko.Views;
 
 public partial class MainView : UserControl
 {
-    UserControl Page_Netdisk = new NetdiskPage();
-    UserControl Page_Home = new HomePage();
-    UserControl Page_Transfer = new TransferPage();
-    UserControl Page_Setting = new SettingPage();
-    UserControl Page_Upload = new UploadPage();
-    UserControl Page_History = new HistoryPage();
-    UserControl Page_Transmit = new TransmitPage();
+    NetdiskPage Page_Netdisk = new NetdiskPage();
+    HomePage Page_Home = new HomePage();
+    TransferPage Page_Transfer = new TransferPage();
+
+    SettingPage Page_Setting = new SettingPage();
+    UploadPage Page_Upload = new UploadPage();
+    HistoryPage Page_History = new HistoryPage();
+    TransmitPage Page_Transmit = new TransmitPage();
     UserControl CurrentPage {  get; set; }
 
     public MainView()
@@ -33,12 +35,17 @@ public partial class MainView : UserControl
         InitializeComponent();
         ContentPanel1.Children.Add(Page_Home);
         Page_Home.Opacity = 1;
+
+        
         Home.Background = new SolidColorBrush(Color.Parse("#30FFFFFF"));
         CurrentPage = Page_Home;
 
+        Page_Netdisk.TransferPage = Page_Transfer;
+        Page_Netdisk.init();
+
     }
     //Init all pages
-    
+
     public void unFold()
     {
         foreach (var button in SideButtonBar.Children)

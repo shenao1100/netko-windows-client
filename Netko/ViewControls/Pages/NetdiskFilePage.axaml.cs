@@ -33,6 +33,7 @@ public partial class NetdiskFilePage : UserControl
     private Color selectedColor;
     private Color unselectedColor;
     public Grid OverlayReservedGrid { get; set; }
+    public TransferPage TransferPage { get; set; }
 
     public NetdiskFilePage()
     {
@@ -287,6 +288,8 @@ public partial class NetdiskFilePage : UserControl
         foreach (BDFile file_b in list_.File)
         {
             ItemShowLine FileBlock = new ItemShowLine();
+            FileBlock.TransferPage = TransferPage;
+            Trace.WriteLine(TransferPage.ToString());
             // set enter, refresh command
             FileBlock.Func = () => ChangePage(user, file_b.Path, 1);
             FileBlock.Refresh = () => ChangePage(baiduFileList, currentPath, 1, insert_back_history: false);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Avalonia.Threading;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -7,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 
 namespace Netko.Download
 {
@@ -25,29 +27,43 @@ namespace Netko.Download
         private string Url { get; set; }
         private string UserAgent { get; set; }
 
-        private long downloadSize = 0;
-        private float downloadProgress = 0;
-        private long downloaded = 0;
-        private long totalSize = 0;
+        public Action<Downloader> CallBack { get; set; }
 
-        public long downloadBlockSize = 5054287;
+        private Dictionary<int, string> linkList = new Dictionary<int, string>();
+
+        public float downloadProgress = 0;
+        public long downloaded = 0;
+        public long totalSize = 0;
+        public int linkCount = 0;
+        public long downloadBlockSize = 500087;
         public Downloader(string url, string user_agent, string file_path, long total_size, int thread)
         {
             TotalThread = thread;
             CurrentThread = 0;
             Url = url;
+            linkList.Add(linkCount, url);
+            linkCount++;
+
             UserAgent = user_agent;
             totalSize = total_size;
 
             FileStream = new FileStream(file_path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            FileStream.SetLength(total_size);
         }
+        public void AddUrl(string url)
+        {
+            linkList.Add(linkCount, url);
+            linkCount++;
+
+        }
+
         private void CalcProgress()
         {
-            if (downloadSize > 0)
+            if (downloaded > 0)
             {
-                downloadProgress = totalSize / downloadSize;
+                downloadProgress = (float)downloaded / totalSize;
             }
-            Trace.WriteLine(downloadProgress.ToString() + "\r");
+            Console.WriteLine(downloadProgress.ToString() + "\r");
         }
         private List<Range> CalcRange()
         {
@@ -60,7 +76,7 @@ namespace Netko.Download
                     ranges.Add(new Range
                     {
                         from = calced_size,
-                        to = totalSize,
+                        to = totalSize
                     });
                     break;
 
@@ -79,40 +95,54 @@ namespace Netko.Download
             return ranges;
         }
 
-        public async Task DownloadThread(Range range)
+        public async Task DownloadThread(Range range, string url)
         {
 
             long pointer = range.from;
-            using (HttpClient client = new HttpClient())
+            try
             {
-                client.DefaultRequestHeaders.Add("Range", $"bytes={range.from}-{range.to}");
-                client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
-                using (HttpResponseMessage response = await client.GetAsync(Url))
+                using (HttpClient client = new HttpClient())
                 {
-                    response.EnsureSuccessStatusCode();
+                    client.DefaultRequestHeaders.Add("Range", $"bytes={range.from}-{range.to}");
+                    client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
 
-                    long? totalSize = response.Content.Headers.ContentLength;
-                    using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+                    client.Timeout = TimeSpan.FromSeconds(10);
+                    using (HttpResponseMessage response = await client.GetAsync(url))
                     {
-                        byte[] buffer = new byte[8192];
-                        int bytesRead;
-                        while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                        {
-                            //await write 
-                            downloaded += bytesRead;
-                            lock (_lock)
-                            {
-                                Console.WriteLine("WriteTo: " + pointer.ToString() + " By: " + range.from.ToString());
-                                CalcRange();
-                                FileStream.Seek(pointer, SeekOrigin.Begin);
-                                FileStream.Write(buffer, 0, bytesRead);
-                            }
-                            pointer += bytesRead;
+                        response.EnsureSuccessStatusCode();
 
+                        long? totalSize = response.Content.Headers.ContentLength;
+                        using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+                        {
+                            byte[] buffer = new byte[1000];
+                            int bytesRead;
+                            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                            {
+                                //await write 
+                                downloaded += bytesRead;
+                                lock (_lock)
+                                {
+                                    Console.WriteLine("WriteTo: " + pointer.ToString() + " By: " + range.from.ToString());
+                                    CalcProgress();
+                                    Dispatcher.UIThread.InvokeAsync(() =>
+                                    {
+                                        CallBack?.Invoke(this); // 在 UI 线程中调用
+                                    });
+                                    FileStream.Seek(pointer, SeekOrigin.Begin);
+                                    FileStream.Write(buffer, 0, bytesRead);
+                                }
+                                pointer += bytesRead;
+
+                            }
                         }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                await DownloadThread(range, url);
+            }
+
         }
         public void releaseFile()
         {
@@ -124,17 +154,22 @@ namespace Netko.Download
         }
         public async void Run()
         {
+            List<Range> rangeLsit = CalcRange();
             SemaphoreSlim semaphore = new SemaphoreSlim(TotalThread);
-            Task[] tasks = new Task[TotalThread];
-            int thread_id = 0;
-            foreach (Range range in CalcRange())
+            Console.WriteLine(rangeLsit.Count.ToString());
+            Task[] tasks = new Task[rangeLsit.Count];
+            for (int i = 0; i < rangeLsit.Count; i++)
             {
                 await semaphore.WaitAsync();
-                tasks[thread_id] = Task.Run(async () =>
+                int threadId = i;
+                int arrangeLinkId = threadId % linkList.Count;
+                tasks[threadId] = Task.Run(async () =>
                 {
                     try
                     {
-                        await DownloadThread(range);
+                        Console.WriteLine(threadId.ToString());
+                        Console.WriteLine(threadId.ToString() + " | " + arrangeLinkId.ToString() + "|" + rangeLsit[threadId].from.ToString() + ": " + rangeLsit[threadId].to.ToString() + "Has started\n");
+                        await DownloadThread(rangeLsit[threadId], linkList[arrangeLinkId]);
                     }
                     finally
                     {

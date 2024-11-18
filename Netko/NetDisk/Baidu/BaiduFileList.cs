@@ -15,6 +15,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using DynamicData;
 
 namespace Netko.NetDisk.Baidu
 {
@@ -702,13 +703,12 @@ namespace Netko.NetDisk.Baidu
         /// Get download link from local web disk
         /// </summary>
         /// <param name="path"></param>
-        public async void GetFileDownloadLink(string path)
+        public async Task<List<string>> GetFileDownloadLink(string path)
         {
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
             string orig_path = path;
             path = WebUtility.UrlEncode(path);
 
-            Trace.WriteLine("times: "+time);
             //await CMS(orig_path);
 
             string url = $"http://d.pcs.baidu.com/rest/2.0/pcs/file?app_id=250528&method=locatedownload&check_blue=1&es=1&esl=1&ant=1&path={path}&ver=4.0&dtype=1&err_ver=1.0&ehps=1&eck=1&vip={BaiduAccount.vip}&open_pflag=2&vip={BaiduAccount.vip}&dpkg=1&sd=0&clienttype=9&version=3.0.20.63&time={time}&rand={rand}&devuid={devuid}&channel=0&version_app=7.46.5.113";
@@ -728,17 +728,18 @@ namespace Netko.NetDisk.Baidu
             var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
             task_content.Wait();
             //Trace.WriteLine(task_content.Result);
+            List<string> link = new List<string>();
             Dictionary<string, object>? body
                 = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
             if (body != null && body["urls"] is JArray urls)
             {
                 foreach (JObject keyValuePairs in urls)
                 {
-                    Trace.WriteLine(keyValuePairs["url"]);
+                    link.Add(keyValuePairs["url"]!.ToString());
                 }
             }
 
-            //return "";
+            return link;
 
         }
     }

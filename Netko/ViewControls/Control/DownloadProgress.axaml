@@ -18,8 +18,8 @@
 			<Grid Grid.Column="0" ColumnDefinitions="Auto, Auto, *">
 				<Image Margin="3" Grid.Column="0" Width="40" Height="40" Source="/Assets/FileIcon/test.png"></Image>
 				<StackPanel Grid.Column="1" VerticalAlignment="Center">
-					<Label Margin="3 0">Download File Name</Label>
-					<Label Margin="3 0" Opacity=".7" FontSize="10">64.0MB/128.0MB 50% 3.2MB/s</Label>
+					<Label Margin="3 0" x:Name="filename">Download File Name</Label>
+					<Label Margin="3 0" Opacity=".7" FontSize="10" x:Name="description">正在获取...</Label>
 				</StackPanel>
 				<StackPanel HorizontalAlignment="Right" Grid.Column="2" VerticalAlignment="Center">
 					<DockPanel>
@@ -39,7 +39,7 @@
 
 
 			</DockPanel>
-			<ProgressBar Value="50" Grid.Row="1" Margin="0"></ProgressBar>
+			<ProgressBar Value="0" Grid.Row="1" Margin="0" x:Name="progress_bar"></ProgressBar>
 		</Grid>
 	</Grid>
 </UserControl>

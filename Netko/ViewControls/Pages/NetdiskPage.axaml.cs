@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Netko.NetDisk;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Netko;
 
@@ -11,6 +12,7 @@ public partial class NetdiskPage : UserControl
     private Dictionary<UserSection, UserControl> UserSectionPageDict = new Dictionary<UserSection, UserControl>();
     private UserControl NowShowPage;
 
+    public TransferPage TransferPage { get; set; }
     public NetdiskPage()
     {
         InitializeComponent();
@@ -23,12 +25,7 @@ public partial class NetdiskPage : UserControl
         // UserSectionPageDict.Add(UserSectionObj, loginPage);
         ChangePage(loginPage);
         UserSectionDockPanel.Children.Add(UserSectionObj);
-        // init user from config file
-        foreach (AccountStruct account in MeowSetting.GetAllAccount())
-        {
-            if (account.cookie == null) continue;
-            AddAccount(account.cookie);
-        }
+        
 
         // login server to receive cookie
         CookieReciver cookieReciver = new CookieReciver();
@@ -37,6 +34,15 @@ public partial class NetdiskPage : UserControl
         cookieReciver.CallBack = (cookie) => AddAccount(cookie);
 
         
+    }
+    public void init()
+    {
+        // init user from config file
+        foreach (AccountStruct account in MeowSetting.GetAllAccount())
+        {
+            if (account.cookie == null) continue;
+            AddAccount(account.cookie);
+        }
     }
     private void RemoveAccount(UserControl FilePage,  UserControl UserSectionObj, string token)
     {
@@ -51,6 +57,8 @@ public partial class NetdiskPage : UserControl
     {
         UserSection UserSectionObj = new UserSection();
         NetdiskFilePage FilePage = new NetdiskFilePage();
+        Trace.WriteLine(TransferPage.ToString());
+        FilePage.TransferPage = TransferPage;
         UserSectionObj.ChangeAction = () => ChangePage(FilePage);
         
         FilePage.UpdateUserSectionName = (name) => UserSectionObj.SetName(name);
