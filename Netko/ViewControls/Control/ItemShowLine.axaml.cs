@@ -233,7 +233,7 @@ public partial class ItemShowLine : UserControl
             {
                 Trace.WriteLine(SelfFile.Size.ToString());
                 List<string> url_list = await baiduFileList.GetFileDownloadLink(SelfFile.Path);
-                TransferPage.addTask(url_list, SelfFile.Size, MeowSetting.GetDownloadPath() + "\\" + SelfFile.Name, "netdisk;P2SP;3.0.20.63;netdisk;7.46.5.113;PC;PC-Windows;10.0.22631;WindowsBaiduYunGuanJia");
+                TransferPage.addTask(url_list, SelfFile.Size, MeowSetting.GetDownloadPath() + "\\" + SelfFile.Name, "netdisk;P2SP;3.0.20.63;netdisk;7.46.5.113;PC;PC-Windows;10.0.22631;WindowsBaiduYunGuanJia", SelfFile.Name);
             }
         }
         else

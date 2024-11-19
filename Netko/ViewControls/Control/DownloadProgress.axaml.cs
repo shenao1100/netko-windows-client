@@ -5,15 +5,35 @@ using Netko.NetDisk.Baidu;
 using Netko.Download;
 using System;
 using System.Collections.Generic;
+using Avalonia.Media;
+using System.Diagnostics;
 
 namespace Netko;
 
 public partial class DownloadProgress : UserControl
 {
     public Downloader DownloadInstance { get; set; }
+    public Action ControlDestory { get; set; }
     public DownloadProgress()
     {
         InitializeComponent();
+    }
+    /// <summary>
+    /// Get Geometry svg from resource xaml
+    /// </summary>
+    /// <param name="resource_name">key for StreamGeometry you want</param>
+    /// <returns></returns>
+    private Geometry? TryGetGeometry(string resource_name)
+    {
+        var is_res_exist = Application.Current!.Resources.TryGetResource(resource_name, null, out var res);
+        if (is_res_exist && res is Geometry geom)
+        {
+            return geom;
+        }
+        else
+        {
+            return null;
+        }
     }
     public static string FormatSize(long size)
     {
@@ -45,17 +65,57 @@ public partial class DownloadProgress : UserControl
         _size = double.Round(_size, 2);
         return _size.ToString() + unit;
     }
+
     public void updateDownloadProgress(Downloader downloadInstance)
     {
         progress_bar.Value = Convert.ToInt32(downloadInstance.downloadProgress * 100);
-        description.Content = FormatSize(downloadInstance.downloaded) + "/" + FormatSize(downloadInstance.totalSize) + "\t" + float.Round(downloadInstance.downloadProgress, 2).ToString() + "%";
+        description.Content = FormatSize(downloadInstance.downloaded) + "/" + FormatSize(downloadInstance.totalSize) + "\t" + float.Round(downloadInstance.downloadProgress*100, 2).ToString() + "%";
+        if (downloadInstance.isPaused)
+        {
+            description.Content += "\t已暂停";
+        }
+        else
+        {
+
+            description.Content += $"\t线程数:{downloadInstance.downloadingThread.ToString()}";
+            description.Content += "\t正在下载";
+
+        }
+        if (downloadInstance.downloaded == downloadInstance.totalSize || downloadInstance.isComplete)
+        {
+            ControlDestory();
+        }
+    }
+    private void Delete(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        DownloadInstance.Cancel();
     }
 
-    public void init(List<string> download_url, long size, string download_path, string user_agent)
+    private void tooglePause(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DownloadInstance.isPaused)
+        {
+
+
+             toogle_pause.Data = (StreamGeometry)this.FindResource("pause");
+             DownloadInstance.Continue();
+
+            
+        }
+        else
+        {
+            
+             toogle_pause.Data = (StreamGeometry)this.FindResource("continue");
+             DownloadInstance.Pause();
+            
+        }
+    }
+    public void init(List<string> download_url, long size, string download_path, string user_agent, string name)
     {
 
         DownloadInstance = new Downloader(download_url[0], user_agent, download_path, size, 1);
         DownloadInstance.CallBack = (downloadIst) => { updateDownloadProgress(downloadIst); };
+        filename.Content = name;
         foreach (var item in download_url)
         {
             DownloadInstance.AddUrl(item);

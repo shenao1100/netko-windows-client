@@ -7,29 +7,34 @@
 	<UserControl.Styles>
 		<Style>
 			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
+			<Style.Resources>
+				<StreamGeometry x:Key="continue">M10.856 8.155A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189ZM12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2ZM3.5 12a8.5 8.5 0 1 1 17 0 8.5 8.5 0 0 1-17 0Z</StreamGeometry>
+				<StreamGeometry x:Key="pause">M10.5 8.25a.75.75 0 0 0-1.5 0v7.5a.75.75 0 0 0 1.5 0v-7.5Zm4.5 0a.75.75 0 0 0-1.5 0v7.5a.75.75 0 0 0 1.5 0v-7.5ZM12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2ZM3.5 12a8.5 8.5 0 1 1 17 0 8.5 8.5 0 0 1-17 0Z</StreamGeometry>
+
+			</Style.Resources>
 		</Style>
 	</UserControl.Styles>
 	<Grid ColumnDefinitions="*" VerticalAlignment="Top" Margin="3" >
 		<Border Background="{DynamicResource CatalogBaseHighColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 6 1 #40000000">
 			<!--BoxShadow="0 0 3 1 #20000000"-->
 		</Border>
-		<Grid RowDefinitions="Auto, Auto" Margin="3">
+		<Grid RowDefinitions="Auto, Auto" Margin="0">
 
-			<Grid Grid.Column="0" ColumnDefinitions="Auto, Auto, *">
-				<Image Margin="3" Grid.Column="0" Width="40" Height="40" Source="/Assets/FileIcon/test.png"></Image>
+			<Grid Grid.Column="0" ColumnDefinitions="Auto, Auto, *" Margin="3">
+				<Image Margin="3" Grid.Column="0" Width="40" Height="40" Source="/Assets/FileIcon/icons8-document-188.png"></Image>
 				<StackPanel Grid.Column="1" VerticalAlignment="Center">
 					<Label Margin="3 0" x:Name="filename">Download File Name</Label>
 					<Label Margin="3 0" Opacity=".7" FontSize="10" x:Name="description">正在获取...</Label>
 				</StackPanel>
 				<StackPanel HorizontalAlignment="Right" Grid.Column="2" VerticalAlignment="Center">
 					<DockPanel>
-						<Button Margin="3" Height="23" Width="23" Background="Transparent" VerticalAlignment="Center">
+						<Button Margin="3" Height="23" Width="23" Background="Transparent" VerticalAlignment="Center" IsVisible="False">
 							<PathIcon Data="{StaticResource open}" Height="15" Width="15"/>
 						</Button>
-						<Button Margin="3" Height="23" Width="23" Background="Transparent" VerticalAlignment="Center">
-							<PathIcon Data="{StaticResource pause}" Height="15" Width="15"/>
+						<Button Margin="3" Height="23" Width="23" Background="Transparent" VerticalAlignment="Center" Click="tooglePause">
+							<PathIcon Data="{StaticResource pause}" Height="15" Width="15" x:Name="toogle_pause"/>
 						</Button>
-						<Button Margin="3" Height="23" Width="23" Background="Transparent" VerticalAlignment="Center">
+						<Button Margin="3" Height="23" Width="23" Background="Transparent" VerticalAlignment="Center" Click="Delete">
 							<PathIcon Data="{StaticResource delete_outline}" Height="15" Width="15"/>
 						</Button>
 					</DockPanel>
@@ -39,7 +44,7 @@
 
 
 			</DockPanel>
-			<ProgressBar Value="0" Grid.Row="1" Margin="0" x:Name="progress_bar"></ProgressBar>
+			<ProgressBar Value="0" Grid.Row="1" Margin="3 0" x:Name="progress_bar"></ProgressBar>
 		</Grid>
 	</Grid>
 </UserControl>

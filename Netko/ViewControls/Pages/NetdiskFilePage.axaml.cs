@@ -289,7 +289,6 @@ public partial class NetdiskFilePage : UserControl
         {
             ItemShowLine FileBlock = new ItemShowLine();
             FileBlock.TransferPage = TransferPage;
-            Trace.WriteLine(TransferPage.ToString());
             // set enter, refresh command
             FileBlock.Func = () => ChangePage(user, file_b.Path, 1);
             FileBlock.Refresh = () => ChangePage(baiduFileList, currentPath, 1, insert_back_history: false);

@@ -4,6 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Netko.PropertiesOverlay">
+	<UserControl.Styles>
+		<Style>
+			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
+		</Style>
+	</UserControl.Styles>
+
 	<UserControl.Transitions>
 		<Transitions>
 			<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
@@ -15,6 +21,38 @@
 		<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
 			<Border Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
 			<StackPanel>
+				<StackPanel>
+					<Label Margin="5" FontSize="20" Padding="10 20 3 3">属性</Label>
+					<StackPanel x:Name="SettingSection">
+						<StackPanel.Transitions>
+							<Transitions>
+								<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+								<DoubleTransition Property="Height" Duration="0:0:0.2"/>
+							</Transitions>
+						</StackPanel.Transitions>
+						<Grid MinHeight="60" Margin="15 3">
+							<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="5" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+							</Border>
+							<StackPanel>
+								<DockPanel>
+									<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
+										<PathIcon Data="{StaticResource calendar}" Height="17" Width="17" Margin="15"/>
+									</StackPanel>
+									<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5 0">
+										<Label FontSize="15" Margin="0">有效期</Label>
+										<Label Foreground="Gray" Margin="0" FontSize="12">分享链接有效期，注意隐私安全</Label>
+									</StackPanel>
+									<StackPanel DockPanel.Dock="Right" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+
+									</StackPanel>
+								</DockPanel>
+							</StackPanel>
+
+
+						</Grid>
+					</StackPanel>
+				</StackPanel>
+
 			</StackPanel>
 
 		</Grid>

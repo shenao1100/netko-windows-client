@@ -22,6 +22,8 @@
     <None Remove="Assets\FileIcon\icons8-folder-188.png" />
     <None Remove="Assets\logo_new.png" />
     <None Remove="Assets\NetdiskIcon\BaiduCloud.png" />
+    <None Remove="Assets\SVG\continue.svg" />
+    <None Remove="assets\svg\pause.svg" />
   </ItemGroup>
 
   

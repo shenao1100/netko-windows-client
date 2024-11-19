@@ -25,7 +25,6 @@
 		</DockPanel>
 		<ScrollViewer Grid.Row="2">
 			<StackPanel x:Name="DownloadListContiner" Margin="10 0">
-				<Button Click="add_task_test">Add Task</Button>
 			</StackPanel>
 		</ScrollViewer>
 

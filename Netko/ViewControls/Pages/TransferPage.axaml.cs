@@ -15,16 +15,19 @@ public partial class TransferPage : UserControl
     }
 
 
-    public void add_task_test(object sender, RoutedEventArgs e)
+    public void destoryTask(DownloadProgress downloadProgress)
     {
-        UserControl task_demo = new DownloadProgress();
-        DownloadListContiner.Children.Add(task_demo);
+        if (DownloadListContiner.Children.Contains(downloadProgress))
+        { 
+            DownloadListContiner.Children.Remove(downloadProgress);
+        }
     }
 
-    public void addTask(List<string> download_url, long size, string download_path, string user_agent)
+    public void addTask(List<string> download_url, long size, string download_path, string user_agent, string name)
     {
         DownloadProgress download_progress = new DownloadProgress();
-        download_progress.init(download_url, size, download_path, user_agent);
+        download_progress.ControlDestory = () => { destoryTask(download_progress); };
+        download_progress.init(download_url, size, download_path, user_agent, name);
         DownloadListContiner.Children.Add(download_progress);
     }
 }
