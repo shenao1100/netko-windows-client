@@ -57,7 +57,7 @@
 							<PathIcon Data="{StaticResource folder_add}"/>
 						</MenuItem.Icon>
 					</MenuItem>
-					<MenuItem Header="属性" Click="" x:Name="DockpanelProp" Margin="3">
+					<MenuItem Header="属性" Click="PropertiesOnMenu" x:Name="DockpanelProp" Margin="3">
 						<MenuItem.Icon>
 							<PathIcon Data="{StaticResource detail}"/>
 						</MenuItem.Icon>
@@ -68,7 +68,7 @@
 			<Image Source="/Assets/FileIcon/icons8-folder-188.png" Height="45" Grid.Column="0" Margin="3" x:Name="ItemIcon"></Image>
 			<Grid RowDefinitions="Auto, Auto" Grid.Column="1" VerticalAlignment="Center" Margin="5 0">
 				<Label Grid.Row="0" FontSize="14" Padding="0 3" x:Name="FileName">测试文件.zip</Label>
-				<Label Opacity=".7" Grid.Row="1" FontSize="10" Margin="0" Padding="0">128.0MB 2077-7-7 13:45</Label>
+				<Label Opacity=".7" Grid.Row="1" FontSize="10" Margin="0" Padding="0" x:Name="detail_label">128.0MB 2077-7-7 13:45</Label>
 
 			</Grid>
 			</Grid>

@@ -20,42 +20,91 @@
 
 		<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
 			<Border Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
+			<ScrollViewer>
 			<StackPanel>
 				<StackPanel>
 					<Label Margin="5" FontSize="20" Padding="10 20 3 3">属性</Label>
-					<StackPanel x:Name="SettingSection">
+					<StackPanel MinWidth="350">
 						<StackPanel.Transitions>
 							<Transitions>
 								<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
 								<DoubleTransition Property="Height" Duration="0:0:0.2"/>
 							</Transitions>
 						</StackPanel.Transitions>
+						<!--Name-->
 						<Grid MinHeight="60" Margin="15 3">
 							<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="5" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
 							</Border>
 							<StackPanel>
 								<DockPanel>
-									<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
-										<PathIcon Data="{StaticResource calendar}" Height="17" Width="17" Margin="15"/>
+									<StackPanel VerticalAlignment="Top" DockPanel.Dock="Left" Margin="5" >
+										<PathIcon Data="{StaticResource folder_outline}" Height="17" Width="17" Margin="15" VerticalAlignment="Top"/>
 									</StackPanel>
-									<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5 0">
-										<Label FontSize="15" Margin="0">有效期</Label>
-										<Label Foreground="Gray" Margin="0" FontSize="12">分享链接有效期，注意隐私安全</Label>
+									<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
+										<Label FontSize="14" Margin="0">名称</Label>
+										<Label Foreground="Gray" Margin="0" FontSize="12" x:Name="name_label">...</Label>
+										<Label FontSize="14" Margin="0">路径</Label>
+										<Label Foreground="Gray" Margin="0" FontSize="12" x:Name="path_label">...</Label>
 									</StackPanel>
 									<StackPanel DockPanel.Dock="Right" HorizontalAlignment="Stretch" VerticalAlignment="Center">
 
 									</StackPanel>
 								</DockPanel>
 							</StackPanel>
-
-
 						</Grid>
+						<!--Date-->
+
+						<Grid MinHeight="60" Margin="15 3">
+							<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="5" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+							</Border>
+							<StackPanel>
+								<DockPanel>
+									<StackPanel VerticalAlignment="Top" DockPanel.Dock="Left" Margin="5" >
+										<PathIcon Data="{StaticResource calendar}" Height="17" Width="17" Margin="15" VerticalAlignment="Top"/>
+									</StackPanel>
+									<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
+										<Label FontSize="14" Margin="0">创建日期</Label>
+										<Label Foreground="Gray" Margin="0" FontSize="12" x:Name="ctime_label">...</Label>
+										<Label FontSize="14" Margin="0">修改日期</Label>
+										<Label Foreground="Gray" Margin="0" FontSize="12" x:Name="mtime_label">...</Label>
+										<Label FontSize="14" Margin="0" IsVisible="False">访问日期</Label>
+										<Label Foreground="Gray" Margin="0" FontSize="12" x:Name="atime_label" IsVisible="False">....</Label>
+									</StackPanel>
+									<StackPanel DockPanel.Dock="Right" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+
+									</StackPanel>
+								</DockPanel>
+							</StackPanel>
+						</Grid>
+						<!--Size-->
+						<Grid MinHeight="60" Margin="15 3" x:Name="size_block">
+							<Border Background="{DynamicResource CatalogBaseHighColor}" CornerRadius="5" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000">
+							</Border>
+							<StackPanel>
+								<DockPanel>
+									<StackPanel VerticalAlignment="Top" DockPanel.Dock="Left" Margin="5" >
+										<PathIcon Data="{StaticResource database}" Height="17" Width="17" Margin="15" VerticalAlignment="Top"/>
+									</StackPanel>
+									<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5 0">
+										<Label FontSize="14" Margin="0">大小</Label>
+										<Label Foreground="Gray" Margin="0" FontSize="12" x:Name="size_label">...</Label>
+									</StackPanel>
+									<StackPanel DockPanel.Dock="Right" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+
+									</StackPanel>
+								</DockPanel>
+							</StackPanel>
+						</Grid>
+
+
+						<Button HorizontalAlignment="Right" Margin="20 5" Width="100" Click="Close" >关闭</Button>
 					</StackPanel>
 				</StackPanel>
 
 			</StackPanel>
-
+			</ScrollViewer>
 		</Grid>
+
 
 	</Grid>
 </UserControl>

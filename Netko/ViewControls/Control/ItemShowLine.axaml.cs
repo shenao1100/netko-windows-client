@@ -97,6 +97,13 @@ public partial class ItemShowLine : UserControl
         }
 
     }
+    private string FormatDate(long timeStamp)
+    {
+        DateTime startTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        DateTime dateTime = startTime.AddSeconds(timeStamp).ToLocalTime();
+        return dateTime.ToString("yyyy/MM/dd HH:mm:ss");
+    }
+
     /// <summary>
     /// Init item, set type and icon
     /// </summary>
@@ -121,7 +128,16 @@ public partial class ItemShowLine : UserControl
         }
         ItemIcon.Source = ImageHelper.LoadFromResource(uri);
         FileName.Content = name;
+        if (is_dir)
+        {
 
+            detail_label.Content = $"{FormatDate(SelfDir.ServerCtime)}";
+        }
+        else
+        {
+            detail_label.Content = $"{FormatDate(SelfFile.ServerCtime)}\t{DownloadProgress.FormatSize(SelfFile.Size)}";
+
+        }
     }
 
     private void SetMultiOperationCommand()
@@ -449,6 +465,24 @@ public partial class ItemShowLine : UserControl
         shareLinkOverlay.Opacity = 1;
     }
 
+    private async void PropertiesOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        PropertiesOverlay propertiesOverlay = new PropertiesOverlay();
+        if (isDir)
+        {
+            propertiesOverlay.selfDir = SelfDir;
+            propertiesOverlay.isFile = false;
+
+        }
+        else
+        {
+            propertiesOverlay.selfFile = SelfFile;
+            propertiesOverlay.isFile = true;
+        }
+
+        OverlayReservedGrid.Children.Add(propertiesOverlay);
+        propertiesOverlay.Show();
+    }
     /*
      * ==========================
      *      Multi file operation
