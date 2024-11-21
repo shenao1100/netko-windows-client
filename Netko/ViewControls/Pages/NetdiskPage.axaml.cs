@@ -1,7 +1,11 @@
 using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Styling;
 using Netko.NetDisk;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -12,6 +16,8 @@ public partial class NetdiskPage : UserControl
     private Dictionary<UserSection, UserControl> UserSectionPageDict = new Dictionary<UserSection, UserControl>();
     private UserControl NowShowPage;
 
+    private int CurrentPageIndex = 0;
+    private int PageIndex = 0;
     public TransferPage TransferPage { get; set; }
     public NetdiskPage()
     {
@@ -20,10 +26,12 @@ public partial class NetdiskPage : UserControl
         LoginMainPage loginPage = new LoginMainPage();
         UserSectionObj.SetAvatar("avares://Netko/Assets/add.png", false);
         UserSectionObj.SetName("µÇÈë");
-        UserSectionObj.ChangeAction = () => ChangePage(loginPage);
+        PageIndex++;
+        int ThisPageIndex = PageIndex;
+        UserSectionObj.ChangeAction = () => ChangePage(loginPage, ThisPageIndex);
         UserSectionObj.DeleteAction = () => RemovePage(loginPage, UserSectionObj);
         // UserSectionPageDict.Add(UserSectionObj, loginPage);
-        ChangePage(loginPage);
+        ChangePage(loginPage, ThisPageIndex);
         UserSectionDockPanel.Children.Add(UserSectionObj);
         
 
@@ -57,12 +65,14 @@ public partial class NetdiskPage : UserControl
     {
         UserSection UserSectionObj = new UserSection();
         NetdiskFilePage FilePage = new NetdiskFilePage();
+        PageIndex++;
+        int ThisPageIndex = PageIndex;
         Trace.WriteLine(TransferPage.ToString());
         FilePage.TransferPage = TransferPage;
-        UserSectionObj.ChangeAction = () => ChangePage(FilePage);
+        UserSectionObj.ChangeAction = () => ChangePage(FilePage, ThisPageIndex);
         
         FilePage.UpdateUserSectionName = (name) => UserSectionObj.SetName(name);
-        ChangePage(FilePage);
+        ChangePage(FilePage, ThisPageIndex);
         UserSectionDockPanel.Children.Add(UserSectionObj);
         string token = await FilePage.initUser(cookie);
 
@@ -82,15 +92,92 @@ public partial class NetdiskPage : UserControl
             FileListGrid.Children.Remove(page);
         }
     }
+
+    private async void FlyFromRight()
+    {
+        var RaiseAnimation = new Animation
+        {
+            Duration = TimeSpan.FromSeconds(0.18),
+            Easing = new QuadraticEaseInOut(),
+            Children = {
+                new KeyFrame
+                {
+                Cue = new Cue(0),
+
+                Setters =
+                    {
+                        new Setter(UserControl.MarginProperty, new Thickness(200, 0, -200, 0)),
+                        new Setter(UserControl.OpacityProperty, 0.3)
+                    }
+                },
+                new KeyFrame
+                {
+                    Cue = new Cue(1),
+                    Setters =
+                    {
+                        new Setter(UserControl.MarginProperty, new Thickness(0, 0, 0, 0)),
+                        new Setter(UserControl.OpacityProperty, 1.0)
+                    }
+                }
+
+            },
+
+        };
+        await RaiseAnimation.RunAsync(FileListGrid);
+    }
+    private async void FlyFromLeft()
+    {
+        var RaiseAnimation = new Animation
+        {
+            Duration = TimeSpan.FromSeconds(0.18),
+            Easing = new QuadraticEaseInOut(),
+            Children = {
+                new KeyFrame
+                {
+                Cue = new Cue(0),
+
+                Setters =
+                    {
+                        new Setter(UserControl.MarginProperty, new Thickness(-200, 0, 200, 0)),
+                        new Setter(UserControl.OpacityProperty, 0.3)
+                    }
+                },
+                new KeyFrame
+                {
+                    Cue = new Cue(1),
+                    Setters =
+                    {
+                        new Setter(UserControl.MarginProperty, new Thickness(0, 0, 0, 0)),
+                        new Setter(UserControl.OpacityProperty, 1.0)
+                    }
+                }
+
+            },
+
+        };
+        await RaiseAnimation.RunAsync(FileListGrid);
+    }
     /// <summary>
     /// change current page into Page
     /// </summary>
     /// <param name="Page"></param>
-    public void ChangePage(UserControl Page)
+    public async void ChangePage(UserControl Page, int PageIndex)
     {
+        
+
         FileListGrid.Children.Clear();
         FileListGrid.Children.Add(Page);
         NowShowPage = Page;
+        if (PageIndex < CurrentPageIndex)
+        {
+            FlyFromLeft();
+        }
+        else if (PageIndex > CurrentPageIndex)
+        {
+            FlyFromRight();
+        }
+        CurrentPageIndex = PageIndex;
+        //await RaiseAnimation.RunAsync(FileListGrid);
     }
     /// <summary>
     /// Create Login page and usersection
@@ -99,14 +186,16 @@ public partial class NetdiskPage : UserControl
     /// <param name="e"></param>
     private void AddLoginPage(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
+        PageIndex++;
         UserSection UserSectionObj = new UserSection();
         LoginMainPage loginPage = new LoginMainPage();
         UserSectionObj.SetAvatar("avares://Netko/Assets/add.png", false);
         UserSectionObj.SetName("µÇÈë");
-        UserSectionObj.ChangeAction = () => ChangePage(loginPage);
+        int ThisPageIndex = PageIndex;
+        UserSectionObj.ChangeAction = () => ChangePage(loginPage, ThisPageIndex);
         UserSectionObj.DeleteAction = () => RemovePage(loginPage, UserSectionObj);
         // UserSectionPageDict.Add(UserSectionObj, loginPage);
-        ChangePage(loginPage);
+        ChangePage(loginPage, ThisPageIndex);
         UserSectionDockPanel.Children.Add(UserSectionObj);
 
     }

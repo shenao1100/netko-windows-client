@@ -37,9 +37,10 @@
 			</Grid>
 			<!--Separator Grid.Row="1" Margin="0" Padding="0"></Separator-->
 			<!--ProgressBar Grid.Row="2" Margin="0" Padding="0"></ProgressBar-->
-			<ScrollViewer Grid.Row="3" Margin="0" Padding="0" VerticalAlignment="Stretch">
+			<ScrollViewer Grid.Row="3" Margin="0" Padding="0" VerticalAlignment="Stretch" ClipToBounds="True">
+
 				<Panel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-					<StackPanel x:Name="FileListViewer" VerticalAlignment="Stretch">
+					<StackPanel x:Name="FileListViewer" VerticalAlignment="Stretch" >
 						<StackPanel.Transitions>
 							<Transitions>
 								<DoubleTransition Property="Opacity" Duration="0:0:0.1"/>

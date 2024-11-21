@@ -42,14 +42,8 @@
 				</Border>
 				<ScrollViewer>
 					<StackPanel Margin="7">
-						<Label>nihao</Label>
-						<Label>nihao</Label>
-						<Label>nihao</Label>
-						<Label>nihao</Label>
-						<Label>nihao</Label>
-						<Label>nihao</Label>
-						<Label>nihao</Label>
-						<Label>nihao</Label>
+						<Label HorizontalAlignment="Center" VerticalAlignment="Center">Ah oh, This Page Hasn't Finish Yet.</Label>
+
 					</StackPanel>
 				</ScrollViewer>
 				

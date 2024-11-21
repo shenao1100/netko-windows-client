@@ -19,7 +19,7 @@
 
 
 		<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-			<Border Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
+			<Border BorderBrush="Aqua" BorderThickness="0.7" Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
 			<ScrollViewer>
 			<StackPanel>
 				<StackPanel>
@@ -40,15 +40,18 @@
 									<StackPanel VerticalAlignment="Top" DockPanel.Dock="Left" Margin="5" >
 										<PathIcon Data="{StaticResource folder_outline}" Height="17" Width="17" Margin="15" VerticalAlignment="Top"/>
 									</StackPanel>
+									<ScrollViewer HorizontalScrollBarVisibility="Auto">
 									<StackPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="5">
 										<Label FontSize="14" Margin="0">名称</Label>
 										<Label Foreground="Gray" Margin="0" FontSize="12" x:Name="name_label">...</Label>
 										<Label FontSize="14" Margin="0">路径</Label>
 										<Label Foreground="Gray" Margin="0" FontSize="12" x:Name="path_label">...</Label>
 									</StackPanel>
+									</ScrollViewer>
 									<StackPanel DockPanel.Dock="Right" HorizontalAlignment="Stretch" VerticalAlignment="Center">
 
 									</StackPanel>
+									
 								</DockPanel>
 							</StackPanel>
 						</Grid>

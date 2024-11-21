@@ -14,6 +14,8 @@ public partial class DownloadProgress : UserControl
 {
     public Downloader DownloadInstance { get; set; }
     public Action ControlDestory { get; set; }
+
+    public Action StatusUpdateCallback { get; set; }
     public DownloadProgress()
     {
         InitializeComponent();
@@ -85,29 +87,35 @@ public partial class DownloadProgress : UserControl
         {
             ControlDestory();
         }
+        updatePauseStatus();
     }
     private void Delete(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         DownloadInstance.Cancel();
     }
-
-    private void tooglePause(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void updatePauseStatus()
     {
         if (DownloadInstance.isPaused)
         {
-
-
-             toogle_pause.Data = (StreamGeometry)this.FindResource("pause");
-             DownloadInstance.Continue();
-
-            
+            toogle_pause.Data = (StreamGeometry)this.FindResource("continue");
         }
         else
         {
-            
+            toogle_pause.Data = (StreamGeometry)this.FindResource("pause");
+        }
+    }
+    private void tooglePause(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        StatusUpdateCallback();
+        if (DownloadInstance.isPaused)
+        { 
+             toogle_pause.Data = (StreamGeometry)this.FindResource("pause");
+             DownloadInstance.Continue();
+        }
+        else
+        {
              toogle_pause.Data = (StreamGeometry)this.FindResource("continue");
              DownloadInstance.Pause();
-            
         }
     }
     public void init(List<string> download_url, long size, string download_path, string user_agent, string name)

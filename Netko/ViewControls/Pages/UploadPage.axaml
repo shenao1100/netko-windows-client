@@ -20,5 +20,6 @@
 			<Label Margin="5" FontSize="25">上传管理</Label>
 		</DockPanel>
 		<Separator Grid.Row="1" Grid.Column="0" Margin="0" Padding="0"></Separator>
+		<Label VerticalAlignment="Center" HorizontalAlignment="Center">Ah oh, This Page Hasn't Finished Yet</Label>
 	</Grid>
 </UserControl>

@@ -18,6 +18,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
+using DynamicData;
 
 namespace Netko;
 public static class ImageHelper
@@ -247,7 +248,10 @@ public partial class ItemShowLine : UserControl
             }
             if (isFile)
             {
-                Trace.WriteLine(SelfFile.Size.ToString());
+
+                FlyNoticeOverlay flyNoticeOverlay = new FlyNoticeOverlay();
+                OverlayReservedGrid.Children.Add(flyNoticeOverlay);
+                flyNoticeOverlay.Run($"{SelfFile.Name} 已添加进下载队列");
                 List<string> url_list = await baiduFileList.GetFileDownloadLink(SelfFile.Path);
                 TransferPage.addTask(url_list, SelfFile.Size, MeowSetting.GetDownloadPath() + "\\" + SelfFile.Name, "netdisk;P2SP;3.0.20.63;netdisk;7.46.5.113;PC;PC-Windows;10.0.22631;WindowsBaiduYunGuanJia", SelfFile.Name);
             }

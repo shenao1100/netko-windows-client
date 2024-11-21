@@ -96,7 +96,7 @@
 						</DockPanel>
 
 					</Button>
-					<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Upload" Background="Transparent">
+					<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="Upload" Background="Transparent" IsVisible="False">
 						<Button.Transitions>
 							<Transitions>
 								<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ExponentialEaseOut"/>
@@ -108,7 +108,7 @@
 						</DockPanel>
 					</Button>
 
-					<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="History" Background="Transparent">
+					<Button DockPanel.Dock="Top" Margin="5" Click="Change" Width="130" x:Name="History" Background="Transparent" IsVisible="False">
 						<Button.Transitions>
 							<Transitions>
 								<DoubleTransition Property="Width" Duration="0:0:0.2"  Easing="ExponentialEaseOut"/>

@@ -11,7 +11,7 @@
 	</UserControl.Transitions>
 	<Grid Background="{DynamicResource CatalogBaseLowColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 		<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-			<Border Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
+			<Border BorderBrush="Aqua" BorderThickness="0.7" Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
 			<StackPanel>
 				<Label Margin="5" FontSize="20" Padding="10 20 3 3" x:Name="Message">Explain</Label>
 				<TextBox Margin="10 0" Width="300" BorderThickness="0" x:Name="Input"></TextBox>

@@ -4,6 +4,9 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using System.Threading.Tasks;
 using System;
+using Avalonia.Animation.Easings;
+using Avalonia.Animation;
+using Avalonia.Styling;
 
 namespace Netko;
 
@@ -13,14 +16,57 @@ public partial class FlyNoticeOverlay : UserControl
     {
         InitializeComponent();
     }
-    public async void OnWindowOpened()
+    public async void Run(string content)
     {
-        // 等待窗口完全加载
-        await Task.Delay(100);
+        ContentLabel.Content = content;
+        var RaiseAnimation = new Animation
+        {
+            Duration = TimeSpan.FromSeconds(3),
+            Easing = new QuadraticEaseInOut(),
+            Children = {
+                new KeyFrame
+                {
+                Cue = new Cue(0),
 
-        // 获取TranslateTransform并更改属性
-        var translateTransform = (TranslateTransform)this.RenderTransform;
-        translateTransform.X = 0;
-        translateTransform.Y = 0;
+                Setters =
+                    {
+                        new Setter(UserControl.MarginProperty, new Thickness(7, 7, -200, 7)),
+                        new Setter(UserControl.OpacityProperty, 0.3)
+                    }
+                },
+                new KeyFrame
+                {
+                    Cue = new Cue(0.1),
+                    Setters =
+                    {
+                        new Setter(UserControl.MarginProperty, new Thickness(7,7,7,7)),
+                        new Setter(UserControl.OpacityProperty, 1.0)
+                    }
+                },
+                new KeyFrame
+                {
+                    Cue = new Cue(0.9),
+                    Setters =
+                    {
+                        new Setter(UserControl.MarginProperty, new Thickness(7,7,7,7)),
+                        new Setter(UserControl.OpacityProperty, 1.0)
+                    }
+                },
+                new KeyFrame
+                {
+                    Cue = new Cue(1),
+                    Setters =
+                    {
+                        new Setter(UserControl.MarginProperty, new Thickness(7,7,-200,7)),
+                        new Setter(UserControl.OpacityProperty, 0.0)
+                    }
+                }
+
+            },
+
+        };
+        await RaiseAnimation.RunAsync(OutShell);
+        
+        this.IsVisible = false;
     }
 }

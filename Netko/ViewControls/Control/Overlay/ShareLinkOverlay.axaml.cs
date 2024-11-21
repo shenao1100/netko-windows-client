@@ -42,7 +42,6 @@ public partial class ShareLinkOverlay : UserControl
         this.Opacity = 0;
         await Task.Delay(200);
         this.IsVisible = false;
-
     }
     private async void GetShareLink(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {

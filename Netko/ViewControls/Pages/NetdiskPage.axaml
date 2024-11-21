@@ -16,7 +16,7 @@
 		</Transitions>
 	</UserControl.Transitions>
 	<Grid ColumnDefinitions="*" RowDefinitions="40, Auto, *">
-		<Grid Grid.Column="0" Grid.Row="0" ColumnDefinitions="*, 0" RowDefinitions="Auto, Auto" VerticalAlignment="Center">
+		<Grid Grid.Column="0" Grid.Row="0" ColumnDefinitions="*, 0" RowDefinitions="Auto, *" VerticalAlignment="Center">
 				<!--Change User selection-->
 			<DockPanel Grid.Row="0" Grid.Column="0">
 				<ScrollViewer HorizontalScrollBarVisibility="Auto">
@@ -30,8 +30,9 @@
 			</DockPanel>
 		</Grid>
 		<Separator Grid.Row="1" Margin="0" Padding="0"></Separator>
-		<Grid Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-			<Grid x:Name="FileListGrid"></Grid>
+		<Grid Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="OutlineGrid">
+
+			<Grid x:Name="FileListGrid" HorizontalAlignment="Stretch" Grid.Column="1"></Grid>
 			
 		</Grid>
 	</Grid>

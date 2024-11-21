@@ -16,14 +16,23 @@
 	</UserControl.Transitions>
 	<Grid ColumnDefinitions="*" RowDefinitions="Auto, 3, *">
 		<DockPanel  Grid.Row="0" Grid.Column="0">
-			<!-->PathIcon Data="{StaticResource setting}" Height="30" Width="30" Margin="5"/>
-			<Label Margin="5" FontSize="25">设置</Label>
+			<Label Margin="5" FontSize="20" Padding="10 20 3 3" DockPanel.Dock="Top">下载</Label>
+			<DockPanel DockPanel.Dock="Top" Margin="10 3">
+				<Button Margin="3 0" Click="tooglePauseAll">
+					<DockPanel>
+						<PathIcon DockPanel.Dock="Left" Height="14" VerticalAlignment="Center" Data="{StaticResource pause}" x:Name="pause_icon"/>
+						<Label DockPanel.Dock="Left" VerticalAlignment="Center" x:Name="pause_label">全部暂停</Label>
+					</DockPanel>
+				</Button>
+				<Button Margin="3 0" Background="Red" Click="RemoveAll">
+					<DockPanel>
+						<PathIcon DockPanel.Dock="Left" Height="14" VerticalAlignment="Center" Data="{StaticResource delete_outline}"/>
+						<Label DockPanel.Dock="Left" VerticalAlignment="Center">全部取消</Label>
+					</DockPanel>
+				</Button>
+			</DockPanel>
 		</DockPanel>
-		<Separator Grid.Row="1" Grid.Column="0" Margin="0" Padding="0"></Separator-->
-			<Label Margin="5" FontSize="20" Padding="10 20 3 3">下载</Label>
-
-		</DockPanel>
-		<ScrollViewer Grid.Row="2">
+		<ScrollViewer Grid.Row="2" ClipToBounds="True">
 			<StackPanel x:Name="DownloadListContiner" Margin="10 0">
 			</StackPanel>
 		</ScrollViewer>

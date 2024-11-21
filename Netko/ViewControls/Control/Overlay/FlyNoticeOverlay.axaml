@@ -4,23 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Netko.FlyNoticeOverlay">
-	<UserControl.RenderTransform>
-		<!-- 使用TranslateTransform移动位置 -->
-		<TranslateTransform X="300" Y="300" />
-	</UserControl.RenderTransform>
+	
+	<Grid Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="7 7 -200 7" x:Name="OutShell">
+		<Border BorderBrush="Aqua" BorderThickness="0.7" Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
 
-	<UserControl.Transitions>
-		<!-- 位置平移动画 -->
-		<TransformOperationsTransition Property="RenderTransform">
-			<TransformOperationsTransition.Easing>
-				<SineEaseInOut />
-			</TransformOperationsTransition.Easing>
-			<TransformOperationsTransition.Duration>
-				0:0:0.5
-			</TransformOperationsTransition.Duration>
-		</TransformOperationsTransition>
-	</UserControl.Transitions>
-	<Grid Background="Green" HorizontalAlignment="Center" VerticalAlignment="Center">
-		<Label>nih</Label>
+		<Label x:Name="ContentLabel">nih</Label>
 	</Grid>
 </UserControl>
