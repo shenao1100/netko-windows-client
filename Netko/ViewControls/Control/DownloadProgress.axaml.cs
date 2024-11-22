@@ -12,7 +12,7 @@ namespace Netko;
 
 public partial class DownloadProgress : UserControl
 {
-    public Downloader DownloadInstance { get; set; }
+    public IDownload DownloadInstance { get; set; }
     public Action ControlDestory { get; set; }
 
     public Action StatusUpdateCallback { get; set; }
@@ -68,22 +68,22 @@ public partial class DownloadProgress : UserControl
         return _size.ToString() + unit;
     }
 
-    public void updateDownloadProgress(Downloader downloadInstance)
+    public void updateDownloadProgress(IDownload downloadInstance)
     {
-        progress_bar.Value = Convert.ToInt32(downloadInstance.downloadProgress * 100);
-        description.Content = FormatSize(downloadInstance.downloaded) + "/" + FormatSize(downloadInstance.totalSize) + "\t" + float.Round(downloadInstance.downloadProgress*100, 2).ToString() + "%";
-        if (downloadInstance.isPaused)
+        progress_bar.Value = Convert.ToInt32(downloadInstance.Status().downloadProgress * 100);
+        description.Content = FormatSize(downloadInstance.Status().downloaded) + "/" + FormatSize(downloadInstance.Status().totalSize) + "\t" + float.Round(downloadInstance.Status().downloadProgress*100, 2).ToString() + "%";
+        if (downloadInstance.Status().isPaused)
         {
             description.Content += "\t已暂停";
         }
         else
         {
 
-            description.Content += $"\t线程数:{downloadInstance.downloadingThread.ToString()}";
+            description.Content += $"\t线程数:{downloadInstance.Status().downloadingThread.ToString()}";
             description.Content += "\t正在下载";
 
         }
-        if (downloadInstance.downloaded == downloadInstance.totalSize || downloadInstance.isComplete)
+        if (downloadInstance.Status().downloaded == downloadInstance.Status().totalSize || downloadInstance.Status().isComplete)
         {
             ControlDestory();
         }
@@ -95,7 +95,7 @@ public partial class DownloadProgress : UserControl
     }
     private void updatePauseStatus()
     {
-        if (DownloadInstance.isPaused)
+        if (DownloadInstance.Status().isPaused)
         {
             toogle_pause.Data = (StreamGeometry)this.FindResource("continue");
         }
@@ -106,8 +106,8 @@ public partial class DownloadProgress : UserControl
     }
     private void tooglePause(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        StatusUpdateCallback();
-        if (DownloadInstance.isPaused)
+        
+        if (DownloadInstance.Status().isPaused)
         { 
              toogle_pause.Data = (StreamGeometry)this.FindResource("pause");
              DownloadInstance.Continue();
@@ -117,12 +117,13 @@ public partial class DownloadProgress : UserControl
              toogle_pause.Data = (StreamGeometry)this.FindResource("continue");
              DownloadInstance.Pause();
         }
+        StatusUpdateCallback();
     }
     public void init(List<string> download_url, long size, string download_path, string user_agent, string name)
     {
 
         DownloadInstance = new Downloader(download_url[0], user_agent, download_path, size, 1);
-        DownloadInstance.CallBack = (downloadIst) => { updateDownloadProgress(downloadIst); };
+        DownloadInstance.SetCallBack(() => { updateDownloadProgress(DownloadInstance); });
         filename.Content = name;
         foreach (var item in download_url)
         {

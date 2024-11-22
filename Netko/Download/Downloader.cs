@@ -14,13 +14,9 @@ using System.Threading.Tasks;
 
 namespace Netko.Download
 {
-    public class Range
-    {
-        public long from { get; set; }
-        public long to { get; set; }
-    }
+    
 
-    public class Downloader
+    public class Downloader: IDownload
     {
         // 锁
         private readonly object _lock = new object();
@@ -35,7 +31,7 @@ namespace Netko.Download
         private string UserAgent { get; set; }
         private string filePath { get; set; }
 
-        public Action<Downloader>? CallBack { get; set; }
+        public Action? CallBack { get; set; }
 
         private Dictionary<int, string> linkList = new Dictionary<int, string>();
 
@@ -49,6 +45,8 @@ namespace Netko.Download
         public bool isPaused = false;
         public bool isDownloading = true;
         public bool isComplete = false;
+
+
         public Downloader(string url, string user_agent, string file_path, long total_size, int thread)
         {
             TotalThread = thread;
@@ -70,7 +68,10 @@ namespace Netko.Download
             linkCount++;
 
         }
-
+        public void SetCallBack(Action callBack)
+        {
+            CallBack = callBack;
+        }
         private void CalcProgress()
         {
             if (downloaded > 0)
@@ -130,7 +131,7 @@ namespace Netko.Download
             resetEvent.Reset();
             isPaused = true;
             CalcProgress();
-            CallBack?.Invoke(this);
+            CallBack?.Invoke();
 
         }
 
@@ -142,7 +143,7 @@ namespace Netko.Download
             resetEvent.Set();
             isPaused = false;
             CalcProgress();
-            CallBack?.Invoke(this);
+            CallBack?.Invoke();
 
         }
         public void Cancel()
@@ -152,8 +153,24 @@ namespace Netko.Download
             cts.Cancel();
             isComplete = true;
             CalcProgress();
-            CallBack?.Invoke(this);
+            CallBack?.Invoke();
 
+        }
+        public DownloadStatus Status()
+        {
+            return new DownloadStatus
+            {
+                downloadProgress = downloadProgress,
+                downloaded = downloaded,
+                totalSize = totalSize,
+                linkCount = linkCount,
+                downloadingThread = downloadingThread,
+                downloadBlockSize = downloadBlockSize,
+
+                isPaused = isPaused,
+                isDownloading = isDownloading,
+                isComplete = isComplete,
+            };
         }
         public async Task DownloadThread(Range range, string url)
         {
@@ -193,7 +210,7 @@ namespace Netko.Download
                                     CalcProgress();
                                     Dispatcher.UIThread.InvokeAsync(() =>
                                     {
-                                        CallBack?.Invoke(this); // 在 UI 线程中调用
+                                        CallBack?.Invoke(); // 在 UI 线程中调用
                                     });
                                     FileStream.Seek(pointer, SeekOrigin.Begin);
                                     FileStream.Write(buffer, 0, bytesRead);
@@ -259,7 +276,7 @@ namespace Netko.Download
             }
             releaseFile();
             CalcProgress();
-            CallBack?.Invoke(this); 
+            CallBack?.Invoke(); 
 
         }
 

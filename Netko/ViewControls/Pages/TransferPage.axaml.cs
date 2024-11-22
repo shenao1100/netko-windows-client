@@ -25,26 +25,32 @@ public partial class TransferPage : UserControl
         }
         foreach (DownloadProgress progress in downloadTaskList)
         {
-            Trace.WriteLine(progress.DownloadInstance.isDownloading.ToString());
-            if (!progress.DownloadInstance.isPaused)
+            Trace.WriteLine(progress.DownloadInstance.Status().isDownloading.ToString());
+            if (!progress.DownloadInstance.Status().isPaused)
             {
                 pause_label.Content = "全部暂停";
-                pause_icon.Data = (StreamGeometry)this.FindResource("pause");
+                pause_icon.Data = (StreamGeometry)this.FindResource("pause")!;
                 // all pause
                 return false;
             }
         }
         pause_label.Content = "全部继续";
-        pause_icon.Data = (StreamGeometry)this.FindResource("resume");
+        pause_icon.Data = (StreamGeometry)this.FindResource("resume")!;
 
         // all resume
         return true;
     }
     public void RemoveAll(object sender, RoutedEventArgs e)
     {
-        foreach (DownloadProgress progress in downloadTaskList)
+        if (downloadTaskList.Count == 0)
         {
-            progress.DownloadInstance.Cancel();
+            return;
+
+        }
+        int count = downloadTaskList.Count;
+        for (int i = 0; i < count; i++)
+        {
+            downloadTaskList[0].DownloadInstance.Cancel();
         }
 
     }
