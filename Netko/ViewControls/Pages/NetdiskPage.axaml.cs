@@ -97,7 +97,7 @@ public partial class NetdiskPage : UserControl
     {
         var RaiseAnimation = new Animation
         {
-            Duration = TimeSpan.FromSeconds(0.18),
+            Duration = TimeSpan.FromSeconds(0.15),
             Easing = new QuadraticEaseInOut(),
             Children = {
                 new KeyFrame
@@ -129,7 +129,7 @@ public partial class NetdiskPage : UserControl
     {
         var RaiseAnimation = new Animation
         {
-            Duration = TimeSpan.FromSeconds(0.18),
+            Duration = TimeSpan.FromSeconds(0.15),
             Easing = new QuadraticEaseInOut(),
             Children = {
                 new KeyFrame

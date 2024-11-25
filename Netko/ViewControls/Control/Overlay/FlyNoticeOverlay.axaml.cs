@@ -18,11 +18,12 @@ public partial class FlyNoticeOverlay : UserControl
     }
     public async void Run(string content)
     {
-        ContentLabel.Content = content;
+        ContentLabel.Text = content;
+        OutShell.Opacity = 0;
         var RaiseAnimation = new Animation
         {
             Duration = TimeSpan.FromSeconds(3),
-            Easing = new QuadraticEaseInOut(),
+            Easing = new SineEaseOut(),
             Children = {
                 new KeyFrame
                 {
@@ -45,7 +46,7 @@ public partial class FlyNoticeOverlay : UserControl
                 },
                 new KeyFrame
                 {
-                    Cue = new Cue(0.9),
+                    Cue = new Cue(0.95),
                     Setters =
                     {
                         new Setter(UserControl.MarginProperty, new Thickness(7,7,7,7)),

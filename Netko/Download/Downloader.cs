@@ -190,6 +190,7 @@ namespace Netko.Download
                         resetEvent.WaitOne();
                         if (cts.IsCancellationRequested)
                         {
+                            releaseFile();
                             // exit thread
                             return;
                         }
@@ -201,7 +202,12 @@ namespace Netko.Download
                             while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                             {
                                 resetEvent.WaitOne();
-
+                                if (cts.IsCancellationRequested)
+                                {
+                                    releaseFile();
+                                    // exit thread
+                                    return;
+                                }
                                 //await write 
                                 downloaded += bytesRead;
                                 lock (_lock)
@@ -228,15 +234,32 @@ namespace Netko.Download
             }
 
         }
+        private bool isFileReleased() {
+            try
+            {
+                return FileStream.SafeFileHandle.IsClosed;
+            }
+            catch (ObjectDisposedException)
+            {
+                return true;
+            }
+        }
         public void releaseFile()
         {
             lock (_lock)
             {
-                FileStream.Close();
+                if (!isFileReleased())
+                {
+                    FileStream.Close();
+
+                }
             }
             if (cts.IsCancellationRequested)
             {
-                File.Delete(filePath);   
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
             }
             isDownloading = false;
         }

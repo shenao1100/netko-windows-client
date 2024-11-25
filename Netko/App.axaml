@@ -10,6 +10,11 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
 		<vm:MainViewModel />
 	</Design.DataContext>
+	<Application.Styles>
+		<Style>
+			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
+		</Style>
+	</Application.Styles>
 	<Application.Resources>
 		<ResourceDictionary>
 			<!-- Resources used only in the control catalog -->

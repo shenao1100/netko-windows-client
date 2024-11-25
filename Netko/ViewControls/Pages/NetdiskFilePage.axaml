@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Netko.NetdiskFilePage">
+             x:Class="Netko.NetdiskFilePage" xmlns:lv="using:Netko">
 	<UserControl.Styles>
 		<Style>
 			<StyleInclude Source="/GlobalSVGstyle.axaml"></StyleInclude>
@@ -37,23 +37,25 @@
 			</Grid>
 			<!--Separator Grid.Row="1" Margin="0" Padding="0"></Separator-->
 			<!--ProgressBar Grid.Row="2" Margin="0" Padding="0"></ProgressBar-->
-			<ScrollViewer Grid.Row="3" Margin="0" Padding="0" VerticalAlignment="Stretch" ClipToBounds="True">
+			<ScrollViewer Grid.Row="3" Margin="0" Padding="0" VerticalAlignment="Stretch" ClipToBounds="True" ScrollChanged="OnScrollChanged">
 
 				<Panel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-					<StackPanel x:Name="FileListViewer" VerticalAlignment="Stretch" >
+					<StackPanel x:Name="FileListViewer" VerticalAlignment="Stretch">
 						<StackPanel.Transitions>
 							<Transitions>
 								<DoubleTransition Property="Opacity" Duration="0:0:0.1"/>
 							</Transitions>
 						</StackPanel.Transitions>
-
-
+						
+						
 					</StackPanel>
 				</Panel>
 			</ScrollViewer>
 
 		</Grid>
+		<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="SelectAllOverlay"/>
 		<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="OverlayReserved"/>
+		<StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="NotificationOverlay"/>
 
 	</Panel>
 

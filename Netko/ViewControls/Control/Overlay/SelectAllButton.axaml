@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Netko.SelectAllButton">
+	<Grid HorizontalAlignment="Right" VerticalAlignment="Bottom">
+		<Button CornerRadius="7" Height="55" Width="55" Classes="accent" Margin="10" Click="ToogleSelect">
+			<!--Style Selector="^.accent">
+				<Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+					<Setter Property="Background" Value="{DynamicResource AccentButtonBackground}" />
+					<Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrush}" />
+					<Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
+				</Style>
+
+				<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+					<Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPointerOver}" />
+					<Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushPointerOver}" />
+					<Setter Property="Foreground" Value="{DynamicResource AccentButtonForegroundPointerOver}" />
+				</Style>
+
+				<Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+					<Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPressed}" />
+					<Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushPressed}" />
+					<Setter Property="Foreground" Value="{DynamicResource AccentButtonForegroundPressed}" />
+				</Style>
+
+				<Style Selector="^:disabled /template/ ContentPresenter#PART_ContentPresenter">
+					<Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundDisabled}" />
+					<Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushDisabled}" />
+					<Setter Property="Foreground" Value="{DynamicResource AccentButtonForegroundDisabled}" />
+				</Style>
+			</Style-->
+
+			<PathIcon HorizontalAlignment="Center" VerticalAlignment="Center" Data="{StaticResource check}"/>
+		</Button>
+	</Grid>
+</UserControl>

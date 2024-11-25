@@ -62,7 +62,7 @@ public partial class ItemShowLine : UserControl
     private bool is_selected = false;
     private bool single_menu_operation = true;
     public Grid OverlayReservedGrid { get; set; }
-
+    public StackPanel OverlayNotification {  get; set; }
     public TransferPage TransferPage { get; set; }
     public ItemShowLine()
     {
@@ -227,13 +227,28 @@ public partial class ItemShowLine : UserControl
             }
         }
     }
+    public void toogleSelect()
+    {
+        if (isDir)
+        {
+            is_selected = (!baiduFileList.DirIsSelected(SelfDir)) ? true : false;
+            baiduFileList.ToggleSelectDir(SelfDir);
+
+        }
+        if (isFile)
+        {
+            is_selected = (!baiduFileList.FileIsSelected(SelfFile)) ? true : false;
+            baiduFileList.ToggleSelectFile(SelfFile);
+        }
+        UpdateColor();
+    }
 
         /// <summary>
         /// left click and double click, toggle select
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void LeftClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void LeftClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         var currentTime = DateTime.Now;
         var timeDiff = currentTime - lastClickedTime;
@@ -250,26 +265,24 @@ public partial class ItemShowLine : UserControl
             {
 
                 FlyNoticeOverlay flyNoticeOverlay = new FlyNoticeOverlay();
-                OverlayReservedGrid.Children.Add(flyNoticeOverlay);
+                OverlayNotification.Children.Add(flyNoticeOverlay);
                 flyNoticeOverlay.Run($"{SelfFile.Name} 已添加进下载队列");
-                List<string> url_list = await baiduFileList.GetFileDownloadLink(SelfFile.Path);
-                TransferPage.addTask(url_list, SelfFile.Size, MeowSetting.GetDownloadPath() + "\\" + SelfFile.Name, "netdisk;P2SP;3.0.20.63;netdisk;7.46.5.113;PC;PC-Windows;10.0.22631;WindowsBaiduYunGuanJia", SelfFile.Name);
+                try
+                {
+                    List<string> url_list = await baiduFileList.GetFileDownloadLink(SelfFile.Path);
+                    TransferPage.addTask(url_list, SelfFile.Size, MeowSetting.GetDownloadPath() + "\\" + SelfFile.Name, "netdisk;P2SP;3.0.20.63;netdisk;7.46.5.113;PC;PC-Windows;10.0.22631;WindowsBaiduYunGuanJia", SelfFile.Name);
+                } catch (Exception ex)
+                {
+                    FlyNoticeOverlay err = new FlyNoticeOverlay();
+
+                    err.Run($"{SelfFile.Name}下载出错：{ex}");
+
+                }
             }
         }
         else
         {
-            if (isDir)
-            {
-                is_selected = (!baiduFileList.DirIsSelected(SelfDir)) ? true : false;
-                baiduFileList.ToggleSelectDir(SelfDir);
-
-            }
-            if (isFile)
-            {
-                is_selected = (!baiduFileList.FileIsSelected(SelfFile)) ? true : false;
-                baiduFileList.ToggleSelectFile(SelfFile);
-            }
-            UpdateColor();
+            toogleSelect();
         }
     }
     /// <summary>

@@ -84,17 +84,17 @@ namespace Netko.NetDisk.Baidu
     /// </summary>
     public class RenameItem
     {
-        public string path { get; set; }
-        public string newname { get; set; }
+        public string? path { get; set; }
+        public string? newname { get; set; }
     }
     /// <summary>
     /// For use in serial json obj in move data
     /// </summary>
     public class MoveItem
     {
-        public string path { set; get; }
-        public string dest { set; get; }
-        public string newname { get; set; }
+        public string? path { set; get; }
+        public string? dest { set; get; }
+        public string? newname { get; set; }
     }
     
     public class BaiduFileList(Baidu Account)
@@ -109,7 +109,7 @@ namespace Netko.NetDisk.Baidu
         const string channel_short = "chunlei";
         const string version = "7.46.5.113";
         string devuid = WebUtility.UrlEncode("BDIMXV2-O_" + GenerateSHA1Hash(DateTimeOffset.Now.ToUnixTimeSeconds().ToString()).ToUpper() + "-C_0-D_EF93_EFA6_BE93_0001_001B_448B_4A73_736B.-M_088FC3E93899-V_3FFFE1E0");
-        string rand = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + "meow_rand1";
+        string rand = GenerateSHA1Hash(DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + "meow_rand1");
         string time = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
         string rand2 = GenerateSHA1Hash(DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + "meow");
         static string GenerateSHA1Hash(string input)
@@ -212,6 +212,7 @@ namespace Netko.NetDisk.Baidu
             return fileList;
 
         }
+
         public BDFileList GetSelectedItem()
         {
             if(selectDirList.Count == 0 && selectFileList.Count == 0)

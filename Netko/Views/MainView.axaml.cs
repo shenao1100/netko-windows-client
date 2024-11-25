@@ -6,6 +6,7 @@ using Avalonia.Controls.Chrome;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Metadata;
+using Avalonia.Platform;
 using Avalonia.Styling;
 using Netko.ViewModels;
 using System;
@@ -29,6 +30,8 @@ public partial class MainView : UserControl
     TransmitPage Page_Transmit = new TransmitPage();
     UserControl CurrentPage {  get; set; }
 
+
+    
     public MainView()
     {
         

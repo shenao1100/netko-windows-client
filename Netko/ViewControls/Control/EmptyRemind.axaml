@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Netko.EmptyRemind">
+	<Grid x:Name="empty_inform" Margin="100">
+		<Border Background="{DynamicResource CatalogBaseHighColor}" BorderBrush="{DynamicResource AccentButtonBackground}" BorderThickness="0.7" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 6 1 #20000000"/>
+		<StackPanel>
+			<Label Margin="5" FontSize="20" Padding="10 20 3 3" x:Name="Message">无项目</Label>
+			<Label Margin="10 0" Width="300" BorderThickness="0" HorizontalAlignment="Left">此文件夹为空</Label>
+			<Separator Margin="0 5" Padding="0"></Separator>
+			<DockPanel>
+				<Button HorizontalAlignment="Right" Margin="5" x:Name="SendButton" DockPanel.Dock="Right" Classes="accent" Click="NewFolderOnMenu">
+					<DockPanel>
+						<PathIcon Data="{StaticResource folder_add}"/>
+						<Label>新建文件夹</Label>
+					</DockPanel>
+
+				</Button>
+
+			</DockPanel>
+		</StackPanel>
+	</Grid>
+</UserControl>
