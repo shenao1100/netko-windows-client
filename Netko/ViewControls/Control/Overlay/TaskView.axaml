@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Netko.TaskView">
+	<Grid Width="270" VerticalAlignment="Top">
+		<Border BorderThickness="0.7" Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
+
+		<StackPanel>
+			<DockPanel HorizontalAlignment="Stretch">
+				<TextBlock x:Name="Title" TextWrapping="Wrap" Margin="15 10 0 3" FontSize="18">Title</TextBlock>
+				<Button Height="20" Width="20" Margin="3" Padding="0" DockPanel.Dock="Right" HorizontalAlignment="Right" Background="Transparent"><PathIcon Data="{StaticResource forward}" Width="13"/></Button>
+			</DockPanel>
+			<TextBlock x:Name="Content" TextWrapping="Wrap" Margin="20 3">Content here</TextBlock>
+			<TextBlock x:Name="SecondaryContent" Foreground="Gray" TextWrapping="Wrap" Margin="20 3">Content here</TextBlock>
+			<ProgressBar Margin="15 5" x:Name="progress_bar"/>
+
+		</StackPanel>
+	</Grid>
+</UserControl>

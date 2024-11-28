@@ -79,6 +79,12 @@ namespace Netko.NetDisk.Baidu
         public BDDir[] Dir;
     }
     
+    public class TaskStatus
+    {
+        public int Progress;
+        public bool isError;
+        public string Status = string.Empty;
+    }
     /// <summary>
     /// For use in serialize json obj in Rename data
     /// </summary>
@@ -615,7 +621,7 @@ namespace Netko.NetDisk.Baidu
             }
             path = WebUtility.UrlEncode(path);
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string url = $"https://pan.baidu.com/api/list?dir={path}&page={page}&num={num}&clienttype=8&channel={channel}&version=7.45.0.109&devuid=BDIMXV2%2dO%5f9432D545AA3849D19EFD762333A53888%2dC%5f0%2dD%5fE823%5f8FA6%5fBF53%5f0001%5f001B%5f448B%5f4A73%5f734B%2e%2dM%5f088FC3E23825%2dV%5f3EBDE1E0&rand=17a15c3f37fc5bd28a6fea151d1c7c6f67fb1c22&time=1728903683&rand2=b4e5cb179b298309a26dd85e95596c2ac1cd2300&vip=2&logid={log_id}&desc=1&order=time";
+            string url = $"https://pan.baidu.com/api/list?dir={path}&page={page}&num={num}&clienttype=8&channel={channel}&version=7.45.0.109&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}&vip={BaiduAccount.vip}&logid={log_id}&desc=1&order=time";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", Baidu.netdisk_user_agent);
             client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
@@ -642,6 +648,39 @@ namespace Netko.NetDisk.Baidu
             BDFileList fileList = new BDFileList();
             return fileList;
             
+        }
+        public async Task<TaskStatus> GetProgress(string request_id)
+        {
+            string url = $"https://pan.baidu.com/share/taskquery?taskid={request_id}&clienttype=0&app_id=250528&web=1";
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", Baidu.netdisk_user_agent);
+            client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
+            client.DefaultRequestHeaders.Add("Accept", "*/*");
+            client.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
+            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+            client.DefaultRequestHeaders.Add("Host", "pan.baidu.com");
+            HttpResponseMessage content = await client.GetAsync(url);
+            BaiduAccount.UpdateCookie(content.Headers);
+            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
+            task_content.Wait();
+
+            Dictionary<string, object>? body
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+            TaskStatus status = new TaskStatus();
+            if (body != null && Convert.ToInt32(body["errno"]) == 0)
+            {
+                if (body.ContainsKey("status") && body.ContainsKey("task_errno"))
+                {
+                    status.Status = Convert.ToString(body["status"])!;
+                    status.isError = false;
+                    status.Progress = Convert.ToInt32(body["progress"]);
+                    return status;
+                }
+            }
+
+            status.isError = true;
+            return status;
         }
         /// <summary>
         /// Check if file is legal to download
@@ -701,7 +740,7 @@ namespace Netko.NetDisk.Baidu
             return ntask_content.Result;
         }
         /// <summary>
-        /// Get download link from local web disk
+        /// Get download link from local netdisk
         /// </summary>
         /// <param name="path"></param>
         public async Task<List<string>> GetFileDownloadLink(string path)

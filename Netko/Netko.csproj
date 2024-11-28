@@ -60,5 +60,8 @@
     <Compile Update="ViewControls\Control\ItemShowLine.axaml.cs">
       <DependentUpon>ItemShowLine.axaml</DependentUpon>
     </Compile>
+    <Compile Update="ViewControls\Pages\DownloadPage.axaml.cs">
+      <DependentUpon>DownloadPage.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

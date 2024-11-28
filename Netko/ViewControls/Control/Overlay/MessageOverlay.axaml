@@ -19,7 +19,7 @@
 				<Label Margin="20 10" x:Name="content">Login expired, please relogin</Label>
 				<Separator Margin="0 5" Padding="0"></Separator>
 
-				<Button HorizontalAlignment="Right" Margin="5" Click="Close">Understand</Button>
+				<Button HorizontalAlignment="Right" Margin="5" Click="Close">继续</Button>
 			</StackPanel>
 
 		</Grid>

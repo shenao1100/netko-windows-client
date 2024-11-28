@@ -1,0 +1,14 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Netko.TaskProber" xmlns:nk="clr-namespace:Netko">
+	<Grid Width="300" VerticalAlignment="Stretch" HorizontalAlignment="Right">
+		<ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+			<StackPanel>
+				<nk:TaskView/>
+			</StackPanel>
+		</ScrollViewer>
+	</Grid>
+</UserControl>
