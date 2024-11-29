@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Netko.NetDisk;
 using Netko.NetDisk.Baidu;
 using System;
 
@@ -9,7 +10,7 @@ namespace Netko;
 public partial class EmptyRemind : UserControl
 {
     public Grid OverlayReservedGrid { get; set; }
-    public BaiduFileList baiduFileList { get; set; }
+    public IFileList baiduFileList { get; set; }
     public Action Refresh { get; set; }
     public string ParentPath { get; set; }
 

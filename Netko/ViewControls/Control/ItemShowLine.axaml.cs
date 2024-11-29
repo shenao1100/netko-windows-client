@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
 using DynamicData;
+using Netko.NetDisk;
 
 namespace Netko;
 public static class ImageHelper
@@ -54,7 +55,7 @@ public partial class ItemShowLine : UserControl
     //public Color HoverBG;
     //public Color LeaveBG;
     private DateTime lastClickedTime;
-    public BaiduFileList baiduFileList {  get; set; }
+    public IFileList baiduFileList {  get; set; }
     public BDDir SelfDir;
     public BDFile SelfFile;
     public bool isFile;

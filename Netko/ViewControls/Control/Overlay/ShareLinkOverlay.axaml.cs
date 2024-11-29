@@ -8,12 +8,13 @@ using static System.Net.Mime.MediaTypeNames;
 using TextCopy;
 using System;
 using Avalonia.Media;
+using Netko.NetDisk;
 
 namespace Netko;
 
 public partial class ShareLinkOverlay : UserControl
 {
-    public BaiduFileList baiduFileList {  get; set; }
+    public IFileList baiduFileList {  get; set; }
     public BDFile[] FileList { get; set; }
     public BDDir[] DirList { get; set; }
 

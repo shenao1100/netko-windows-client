@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Netko.NetDisk;
 namespace Netko;
 
 public partial class NetdiskFilePage : UserControl
@@ -24,7 +25,7 @@ public partial class NetdiskFilePage : UserControl
     private List<string> backHistory = new List<string>();
     private List<string> forwardHistory = new List<string>();
     private string? currentPath {  get; set; }
-    private BaiduFileList? baiduFileList {  get; set; }
+    private IFileList? baiduFileList {  get; set; }
 
     // for file action use
     private List<BDDir> selectDirList = new List<BDDir>();
@@ -248,7 +249,7 @@ public partial class NetdiskFilePage : UserControl
     /// <param name="user">This function will use BaiduFileList to parse file list</param>
     /// <param name="go_path">Path need to parse, for ep. "/"</param>
     /// <param name="page">1: 1-1000 items, 2: 1001-2000 items...</param>
-    private async void ChangePage(BaiduFileList user, 
+    private async void ChangePage(IFileList user, 
         string go_path, 
         int page, 
         bool insert_back_history=true, 
@@ -355,17 +356,17 @@ public partial class NetdiskFilePage : UserControl
     /// <param name="cookie">user cookie</param>
     public async Task<string> initUser(string cookie)
     {
-        Baidu test_user = new Baidu(cookie);
+        INetdisk test_user = new Baidu(cookie);
         await test_user.init();
         if (UpdateUserSectionName != null) {
-            UpdateUserSectionName(test_user.name);
+            UpdateUserSectionName(test_user.GetAccountInfo().Name);
         }
 
-        BaiduFileList Filelist = new BaiduFileList(test_user);
+        IFileList Filelist = new BaiduFileList(test_user);
         baiduFileList = Filelist;
-        MeowSetting.InsertAccount(cookie, test_user.bdstoken);
+        MeowSetting.InsertAccount(cookie, test_user.GetAccountInfo().Token);
         ChangePage(Filelist, "/", 1);
-        return test_user.bdstoken;
+        return test_user.GetAccountInfo().Token;
     }
     
 

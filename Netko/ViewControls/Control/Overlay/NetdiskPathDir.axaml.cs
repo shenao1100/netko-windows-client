@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Netko.NetDisk;
 using Netko.NetDisk.Baidu;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace Netko;
 public partial class NetdiskPathDir : UserControl
 {
     public BDDir selfDir {  get; set; }
-    public BaiduFileList baiduFileList { get; set; }
+    public IFileList baiduFileList { get; set; }
     //public List<NetdiskPathDir> netdiskPathDirs { get; set; }
     public Button ExpandButton { get; set; }
     public Action<string, NetdiskPathDir> tooglePathCommand {  get; set; } 

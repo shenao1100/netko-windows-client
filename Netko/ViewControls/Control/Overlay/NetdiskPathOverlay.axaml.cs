@@ -4,6 +4,7 @@ using Avalonia.Controls.Chrome;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
+using Netko.NetDisk;
 using Netko.NetDisk.Baidu;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +16,7 @@ public partial class NetdiskPathOverlay : UserControl
 {
 
     private string currentPath { get; set; }
-    public BaiduFileList baiduFileList { get; set; }
+    public IFileList baiduFileList { get; set; }
 
     private TaskCompletionSource<string> _taskCompletionSource;
 

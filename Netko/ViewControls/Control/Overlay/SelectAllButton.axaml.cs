@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Netko.NetDisk;
 using Netko.NetDisk.Baidu;
 using System.Collections.Generic;
 
@@ -8,7 +9,7 @@ namespace Netko;
 
 public partial class SelectAllButton : UserControl
 {
-    public BaiduFileList baiduFileList { get; set; }
+    public IFileList baiduFileList { get; set; }
     public BDFileList list_ { get; set; }
     // for toogle select
     public Dictionary<BDDir, ItemShowLine> DirDict = new Dictionary<BDDir, ItemShowLine>();

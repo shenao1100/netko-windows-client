@@ -4,9 +4,16 @@ using Avalonia.Markup.Xaml;
 using System;
 
 namespace Netko;
+public enum TaskStatusIndicate
+{
+    InQueue,
+    Working,
+    Done,
+}
 
 public partial class TaskView : UserControl
 {
+    
     public TaskView()
     {
         InitializeComponent();

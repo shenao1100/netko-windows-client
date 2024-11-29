@@ -79,12 +79,7 @@ namespace Netko.NetDisk.Baidu
         public BDDir[] Dir;
     }
     
-    public class TaskStatus
-    {
-        public int Progress;
-        public bool isError;
-        public string Status = string.Empty;
-    }
+    
     /// <summary>
     /// For use in serialize json obj in Rename data
     /// </summary>
@@ -103,9 +98,10 @@ namespace Netko.NetDisk.Baidu
         public string? newname { get; set; }
     }
     
-    public class BaiduFileList(Baidu Account)
+    public class BaiduFileList(INetdisk Account): IFileList
     {
-        public Baidu BaiduAccount = Account;
+
+        public Baidu BaiduAccount = (Baidu)Account;
         public Dictionary<string, BDFileList> FileListTemp = new Dictionary<string, BDFileList>();
 
         private List<BDDir> selectDirList = new List<BDDir>();
@@ -118,6 +114,12 @@ namespace Netko.NetDisk.Baidu
         string rand = GenerateSHA1Hash(DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + "meow_rand1");
         string time = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
         string rand2 = GenerateSHA1Hash(DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + "meow");
+
+        public const string app_id = "250528";
+        public const string clienttype = "0";
+        public const string netdisk_user_agent = "netdisk";
+        public const string broswer_user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.52";
+
         static string GenerateSHA1Hash(string input)
         {
             using (SHA1 sha1 = SHA1.Create())  // 创建 SHA-1 实例
@@ -376,9 +378,9 @@ namespace Netko.NetDisk.Baidu
         {
             
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string url = $"https://pan.baidu.com/api/create?clienttype={Baidu.clienttype}&channel={channel}&version={version}&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}";
+            string url = $"https://pan.baidu.com/api/create?clienttype={clienttype}&channel={channel}&version={version}&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}";
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", Baidu.netdisk_user_agent);
+            client.DefaultRequestHeaders.Add("User-Agent", netdisk_user_agent);
             client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
@@ -515,7 +517,7 @@ namespace Netko.NetDisk.Baidu
                 new KeyValuePair<string, string>("filelist", jsonString)
             });
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string url = $"https://pan.baidu.com/api/filemanager?opera=move&async=1&onnest=fail&channel={channel_short}&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            string url = $"https://pan.baidu.com/api/filemanager?opera=move&async=2&onnest=fail&channel={channel_short}&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
@@ -623,7 +625,7 @@ namespace Netko.NetDisk.Baidu
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
             string url = $"https://pan.baidu.com/api/list?dir={path}&page={page}&num={num}&clienttype=8&channel={channel}&version=7.45.0.109&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}&vip={BaiduAccount.vip}&logid={log_id}&desc=1&order=time";
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", Baidu.netdisk_user_agent);
+            client.DefaultRequestHeaders.Add("User-Agent", netdisk_user_agent);
             client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
@@ -649,11 +651,12 @@ namespace Netko.NetDisk.Baidu
             return fileList;
             
         }
+
         public async Task<TaskStatus> GetProgress(string request_id)
         {
             string url = $"https://pan.baidu.com/share/taskquery?taskid={request_id}&clienttype=0&app_id=250528&web=1";
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", Baidu.netdisk_user_agent);
+            client.DefaultRequestHeaders.Add("User-Agent", netdisk_user_agent);
             client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
@@ -672,9 +675,27 @@ namespace Netko.NetDisk.Baidu
             {
                 if (body.ContainsKey("status") && body.ContainsKey("task_errno"))
                 {
-                    status.Status = Convert.ToString(body["status"])!;
+                    string status_str = Convert.ToString(body["status"])!;
+                    switch (status_str.ToLower())
+                    {
+                        case "running":
+                            status.Status = TaskStatusIndicate.Working;
+                            status.Progress = Convert.ToInt32(body["progress"]);
+
+                            break;
+                        case "success":
+                            status.Status = TaskStatusIndicate.Done;
+                            status.Progress = 0;
+
+                            break;
+                        default:
+                            status.Status = TaskStatusIndicate.InQueue;
+                            status.Progress = 0;
+
+                            break;
+
+                    }
                     status.isError = false;
-                    status.Progress = Convert.ToInt32(body["progress"]);
                     return status;
                 }
             }
@@ -686,7 +707,7 @@ namespace Netko.NetDisk.Baidu
         /// Check if file is legal to download
         /// </summary>
         /// <param name="path"></param>
-        public async void downloadPreProcess(string path)
+        private async void downloadPreProcess(string path)
         {
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
             string new_logid = WebUtility.UrlEncode($"=MTczMTQxMjU5NSw4Nw==&path{path}");
@@ -694,7 +715,7 @@ namespace Netko.NetDisk.Baidu
             path = WebUtility.UrlEncode(path);
             string url = $"https://pan.baidu.com/api/checkapl/download?clienttype=8&channel={channel}&version=7.46.5.113&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}&vip=0&logid={new_logid}";
             using var nclient = new HttpClient();
-            nclient.DefaultRequestHeaders.Add("User-Agent", Baidu.netdisk_user_agent);
+            nclient.DefaultRequestHeaders.Add("User-Agent", netdisk_user_agent);
             nclient.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
             nclient.DefaultRequestHeaders.Add("Accept", "*/*");
             nclient.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
@@ -714,7 +735,7 @@ namespace Netko.NetDisk.Baidu
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public async Task<string> CMS(string path)
+        private async Task<string> CMS(string path)
         {
             string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
             string new_logid = WebUtility.UrlEncode($"=MTczMTQxMjU5NSw4Nw==&path{path}");
@@ -724,7 +745,7 @@ namespace Netko.NetDisk.Baidu
 
             //string url = $"https://pan.baidu.com/api/checkapl/download?clienttype=8&channel=00000000000000000000000040000001&version=7.46.5.113&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}&vip=0&logid={new_logid}";
             using var nclient = new HttpClient();
-            nclient.DefaultRequestHeaders.Add("User-Agent", Baidu.netdisk_user_agent);
+            nclient.DefaultRequestHeaders.Add("User-Agent", netdisk_user_agent);
             nclient.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
             nclient.DefaultRequestHeaders.Add("Accept", "*/*");
             nclient.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");

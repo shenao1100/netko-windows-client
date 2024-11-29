@@ -15,7 +15,7 @@ using Newtonsoft.Json.Linq;
 namespace Netko.NetDisk.Baidu
 {
 
-    public class Baidu(string cookie)
+    public class Baidu(string cookie): INetdisk
     {
         public Dictionary<string, string?> cookie = new Dictionary<string, string?>();      // contain BDUSS & STOKEN & PANPSC
         public string init_cookie_string = cookie;
@@ -162,6 +162,15 @@ namespace Netko.NetDisk.Baidu
             Trace.WriteLine("Cookie: " + GetCookie());
             Trace.WriteLine("time: " + timestamp.ToString());
         }
+        public AccountInfo GetAccountInfo()
+        {
+            return new AccountInfo
+            {
+                InitCookie = init_cookie_string,
+                Name = name,
+                Token = bdstoken,
+            };
+        }
         public async Task<string> refresh_logid()
         {
             string url = "https://pan.baidu.com/";
@@ -239,7 +248,7 @@ namespace Netko.NetDisk.Baidu
             }
         }
 
-        public async Task<bool> GetUkStoken()
+        private async Task<bool> GetUkStoken()
         {
             /*
              * Get vars
