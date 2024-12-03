@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Netko.TaskView">
-	<Grid Width="270" VerticalAlignment="Top">
-		<Border BorderThickness="0.7" Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
+	<Grid Width="270" VerticalAlignment="Top" Margin="7">
+		<Border BorderThickness="0.7" Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 7 8 #20000000"/>
 
-		<StackPanel>
+		<StackPanel Margin="7">
 			<DockPanel HorizontalAlignment="Stretch">
 				<TextBlock x:Name="Title" TextWrapping="Wrap" Margin="15 10 0 3" FontSize="18">Title</TextBlock>
 				<Button Height="20" Width="20" Margin="3" Padding="0" DockPanel.Dock="Right" HorizontalAlignment="Right" Background="Transparent"><PathIcon Data="{StaticResource forward}" Width="13"/></Button>

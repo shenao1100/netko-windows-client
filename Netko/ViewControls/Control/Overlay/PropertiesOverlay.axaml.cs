@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using Netko.NetDisk.Baidu;
 using System;
 using System.Threading.Tasks;
+using Netko.NetDisk;
 
 namespace Netko;
 

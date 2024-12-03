@@ -17,7 +17,7 @@
 	<Panel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
 		<Grid ColumnDefinitions="*" RowDefinitions="Auto, Auto, Auto, *" VerticalAlignment="Stretch">
-			<Grid ColumnDefinitions="Auto, Auto, Auto, *, Auto, Auto">
+			<Grid ColumnDefinitions="Auto, Auto, Auto, *, Auto, Auto, Auto">
 				<Button Grid.Row="0" Grid.Column="0" Background="Transparent" Click="Home">
 					<PathIcon Data="{StaticResource home}" Height="15" Width="15"/>
 				</Button>
@@ -33,6 +33,9 @@
 				</Button>
 				<Button Grid.Row="0" Grid.Column="5" Background="Transparent" Click="Refresh">
 					<PathIcon Data="{StaticResource refresh}" Height="15" Width="15"/>
+				</Button>
+				<Button Grid.Row="0" Grid.Column="6" Background="Transparent" Click="ExpandTaskProber">
+					<PathIcon Data="{StaticResource aleart}" Height="15" Width="15"/>
 				</Button>
 			</Grid>
 			<!--Separator Grid.Row="1" Margin="0" Padding="0"></Separator-->
@@ -56,7 +59,7 @@
 		<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="SelectAllOverlay"/>
 		<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="OverlayReserved"/>
 		<StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="NotificationOverlay"/>
-
+		<lv:TaskProber x:Name="task_prober"/>
 	</Panel>
 
 </UserControl>

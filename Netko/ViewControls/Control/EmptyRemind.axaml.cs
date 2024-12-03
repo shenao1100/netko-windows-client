@@ -25,7 +25,7 @@ public partial class EmptyRemind : UserControl
         DialogOverlay inputName = new DialogOverlay();
         OverlayReservedGrid.Children.Add(inputName);
         string? filename = await inputName.ShowDialog("请输入新建文件夹的名称", "创建");
-        if (await baiduFileList.CreateDir(ParentPath + "/" + filename))
+        if ((await baiduFileList.CreateDir(ParentPath + "/" + filename)).Success)
         {
             Refresh();
             return;

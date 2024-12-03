@@ -4,10 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Netko.TaskProber" xmlns:nk="clr-namespace:Netko">
-	<Grid Width="300" VerticalAlignment="Stretch" HorizontalAlignment="Right">
+	
+	<Grid Width="300" VerticalAlignment="Stretch" HorizontalAlignment="Right" x:Name="MainFrame">
+		<Border BorderThickness="0.7" Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
+
 		<ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-			<StackPanel>
-				<nk:TaskView/>
+			<StackPanel x:Name="TaskViewPanel">
+				<DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Top">
+					<Label DockPanel.Dock="Left" Margin="10" FontSize="27">任务</Label>
+					<Button DockPanel.Dock="Right" Width="30" Height="30" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10" Click="CloseTaskProber">
+						<PathIcon Data="{StaticResource forward}"/>
+					</Button>
+				</DockPanel>
+
 			</StackPanel>
 		</ScrollViewer>
 	</Grid>

@@ -47,6 +47,7 @@ public partial class NetdiskFilePage : UserControl
         GetColor();
         OverlayReservedGrid = OverlayReserved;
         OverlayNotification = NotificationOverlay;
+        task_prober.Close();
     }
 
     private async void FadeOut()
@@ -231,6 +232,10 @@ public partial class NetdiskFilePage : UserControl
         if (baiduFileList == null || currentPath == null) { return; }
         ChangePage(baiduFileList, currentPath, 1, insert_back_history:false);
     }
+    private void ExpandTaskProber(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        task_prober.Open();
+    }
     private void OnScrollChanged(object? sender, ScrollChangedEventArgs e)
     {
         if (sender is ScrollViewer scrollViewer)
@@ -303,7 +308,7 @@ public partial class NetdiskFilePage : UserControl
             DirBlock.baiduFileList = user;
             DirBlock.OverlayReservedGrid = OverlayReservedGrid;
             DirBlock.OverlayNotification = OverlayNotification;
-
+            DirBlock.taskProber = task_prober;
             DirBlock.ParentPath = currentPath;
             // append to viewer
             FileListViewer.Children.Add(DirBlock);
@@ -327,6 +332,8 @@ public partial class NetdiskFilePage : UserControl
             FileBlock.baiduFileList = user;
             FileBlock.OverlayReservedGrid = OverlayReservedGrid;
             FileBlock.OverlayNotification = OverlayNotification;
+            FileBlock.taskProber = task_prober;
+
             FileBlock.ParentPath = currentPath;
             // append to viewer
             FileListViewer.Children.Add(FileBlock);

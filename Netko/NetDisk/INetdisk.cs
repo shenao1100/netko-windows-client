@@ -8,6 +8,72 @@ using System.Threading.Tasks;
 
 namespace Netko.NetDisk
 {
+    public struct BDDir
+    {
+        public long Category;
+        public long ExtentTinyint7;
+        public long FromType;
+        public long ID;
+        public long IsScene;
+        public long LocalCtime;
+        public long LocalMtime;
+        public long OperID;
+        public long OwnerID;
+        public long OwnerType;
+        public string Path;
+        public long pl;
+        public string RealCategory;
+        public long ServerAtime;
+        public long ServerCtime;
+        public string Name;
+        public long ServerMtime;
+        public long Share;
+        public long Size;
+        public long TkBindID;
+        public long UnList;
+        public long WpFile;
+    }
+    public struct BDFile
+    {
+        public long Category;
+        public long ExtentTinyint7;
+        public long FromType;
+        public long ID;
+        public long IsScene;
+        public long LocalCtime;
+        public long LocalMtime;
+        public long OperID;
+        public long OwnerID;
+        public long OwnerType;
+        public string Path;
+        public string MD5;
+        public long pl;
+        public string RealCategory;
+        public long ServerAtime;
+        public long ServerCtime;
+        public string Name;
+        public long ServerMtime;
+        public long Share;
+        public long Size;
+        public long TkBindID;
+        public long UnList;
+        public long WpFile;
+    }
+
+
+    public struct BDFileList
+    {
+        public string Path;
+        public BDFile[] File;
+        public BDDir[] Dir;
+    }
+    public class NetdiskResult
+    {
+        public bool Success;
+        public string? Msg;
+        public int ResultID;
+        public string? TaskID = string.Empty;
+    }
     public class AccountInfo
     {
         public string? InitCookie = null;
@@ -43,12 +109,12 @@ namespace Netko.NetDisk
         string IntegrateFilelist(BDFile[]? files, BDDir[]? dirs);
         string IntegrateIDlist(BDFile[]? files, BDDir[]? dirs);
 
-        Task<bool> CreateDir(string path);
-        Task<bool> Rename(string[] file_list, string[] name_list);
-        Task<bool> Copy(string[] file_list, string[] name_list, string[] target_path_list);
-        Task<bool> Move(string[] file_list, string[] name_list, string[] target_path_list);
+        Task<NetdiskResult> CreateDir(string path);
+        Task<NetdiskResult> Rename(string[] file_list, string[] name_list, bool isAsync = false);
+        Task<NetdiskResult> Copy(string[] file_list, string[] name_list, string[] target_path_list, bool isAsync = false);
+        Task<NetdiskResult> Move(string[] file_list, string[] name_list, string[] target_path_list, bool isAsync = false);
         Task<string?> ShareFile(string file_id_list, string password, int period);
-        Task<bool> DeleteFile(string file_list);
+        Task<NetdiskResult> DeleteFile(string file_list, bool isAsync = false);
         Task<BDFileList> GetFileList(int page, int num = 1000, string path = "/", bool clear_select_list = true);
         Task<TaskStatus> GetProgress(string request_id);
         Task<List<string>> GetFileDownloadLink(string path);
