@@ -291,7 +291,15 @@ public partial class NetdiskFilePage : UserControl
         selectAllButton.FileDict = FileDict;
 
         long itemCount = 0;
-
+        if (list_.Dir == null || list_.File == null)
+        {
+            FileListViewer.Opacity = 1;
+            SelectAllOverlay.Children.Remove(selectAllButton);
+            EmptyRemind empty_label = new EmptyRemind();
+            empty_label.ShowError("不存在的文件夹\n你来到了没有文件的荒原");
+            FileListViewer.Children.Add(empty_label);
+            return;
+        }
 
         foreach (BDDir dir_b in list_.Dir)
         {

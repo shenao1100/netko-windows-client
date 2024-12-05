@@ -34,7 +34,7 @@
 				<Button Grid.Row="0" Grid.Column="5" Background="Transparent" Click="Refresh">
 					<PathIcon Data="{StaticResource refresh}" Height="15" Width="15"/>
 				</Button>
-				<Button Grid.Row="0" Grid.Column="6" Background="Transparent" Click="ExpandTaskProber">
+				<Button Grid.Row="0" Grid.Column="6" Background="Red" Click="ExpandTaskProber" Margin="3">
 					<PathIcon Data="{StaticResource aleart}" Height="15" Width="15"/>
 				</Button>
 			</Grid>

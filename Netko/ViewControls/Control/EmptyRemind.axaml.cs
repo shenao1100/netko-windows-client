@@ -19,7 +19,13 @@ public partial class EmptyRemind : UserControl
     {
         InitializeComponent();
     }
-
+    public void ShowError(string content)
+    {
+        Message.Content = "´íÎó";
+        ContentLabel.Content = content;
+        ButtonPanel.IsVisible = false;
+        ContentSperator.IsVisible = false;
+    }
     private async void NewFolderOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         DialogOverlay inputName = new DialogOverlay();

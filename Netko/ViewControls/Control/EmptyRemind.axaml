@@ -8,9 +8,9 @@
 		<Border Background="{DynamicResource CatalogBaseHighColor}" BorderBrush="{DynamicResource AccentButtonBackground}" BorderThickness="0.7" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 6 1 #20000000"/>
 		<StackPanel>
 			<Label Margin="5" FontSize="20" Padding="10 20 3 3" x:Name="Message">无项目</Label>
-			<Label Margin="10 0" Width="300" BorderThickness="0" HorizontalAlignment="Left">此文件夹为空</Label>
-			<Separator Margin="0 5" Padding="0"></Separator>
-			<DockPanel>
+			<Label Margin="10 0" Width="300" BorderThickness="0" HorizontalAlignment="Left" x:Name="ContentLabel">此文件夹为空</Label>
+			<Separator Margin="0 5" Padding="0" x:Name="ContentSperator"></Separator>
+			<DockPanel x:Name="ButtonPanel" >
 				<Button HorizontalAlignment="Right" Margin="5" x:Name="SendButton" DockPanel.Dock="Right" Classes="accent" Click="NewFolderOnMenu">
 					<DockPanel>
 						<PathIcon Data="{StaticResource folder_add}"/>
