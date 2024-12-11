@@ -1,13 +1,19 @@
-﻿using Netko.NetDisk.Baidu;
+﻿using Netko.Download;
+using Netko.NetDisk.Baidu;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Netko.NetDisk
 {
+    public enum NetDiskType
+    {
+
+    }
     public struct BDDir
     {
         public long Category;
@@ -79,6 +85,9 @@ namespace Netko.NetDisk
         public string? InitCookie = null;
         public string? Name = null;
         public string? Token = null;
+        public long? storage_total;
+        public long? storage_free;
+        public long? storage_used;
     }
     public class TaskStatus
     {
@@ -101,6 +110,7 @@ namespace Netko.NetDisk
     }
     public interface IFileList
     {
+        AccountInfo GetAccountInfo();
         BDFileList GetSelectedItem();
         bool ToggleSelectDir(BDDir Dir);
         bool DirIsSelected(BDDir Dir);
@@ -118,7 +128,7 @@ namespace Netko.NetDisk
         Task<BDFileList> GetFileList(int page, int num = 1000, string path = "/", bool clear_select_list = true);
         Task<TaskStatus> GetProgress(string request_id);
         Task<List<string>> GetFileDownloadLink(string path);
-
+        DownloadConfig ChooseDownloadMethod();
     }
 
 }

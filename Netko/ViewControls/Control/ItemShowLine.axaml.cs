@@ -20,6 +20,7 @@ using System.Linq;
 using System.Collections.Generic;
 using DynamicData;
 using Netko.NetDisk;
+using Netko.Download;
 
 namespace Netko;
 public static class ImageHelper
@@ -56,6 +57,7 @@ public partial class ItemShowLine : UserControl
     //public Color LeaveBG;
     private DateTime lastClickedTime;
     public IFileList baiduFileList {  get; set; }
+
     public BDDir SelfDir;
     public BDFile SelfFile;
     public bool isFile;
@@ -273,20 +275,24 @@ public partial class ItemShowLine : UserControl
             if (isFile)
             {
 
-                FlyNoticeOverlay flyNoticeOverlay = new FlyNoticeOverlay();
+                /*FlyNoticeOverlay flyNoticeOverlay = new FlyNoticeOverlay();
                 OverlayNotification.Children.Add(flyNoticeOverlay);
                 flyNoticeOverlay.Run($"{SelfFile.Name} 已添加进下载队列");
                 try
                 {
                     List<string> url_list = await baiduFileList.GetFileDownloadLink(SelfFile.Path);
-                    TransferPage.addTask(url_list, SelfFile.Size, MeowSetting.GetDownloadPath() + "\\" + SelfFile.Name, "netdisk;P2SP;3.0.20.63;netdisk;7.46.5.113;PC;PC-Windows;10.0.22631;WindowsBaiduYunGuanJia", SelfFile.Name);
-                } catch (Exception ex)
+                    DownloadConfig downloadConfig = baiduFileList.ChooseDownloadMethod();
+                    IDownload download = null;
+                    TransferPage.addTask(url_list, SelfFile.Size, MeowSetting.GetDownloadPath() + "\\" + SelfFile.Name, "netdisk;P2SP;3.0.20.63;netdisk;7.46.5.113;PC;PC-Windows;10.0.22631;WindowsBaiduYunGuanJia", SelfFile.Name, baiduFileList.GetAccountInfo().InitCookie);
+
+                }
+                catch (Exception ex)
                 {
                     FlyNoticeOverlay err = new FlyNoticeOverlay();
 
                     err.Run($"{SelfFile.Name}下载出错：{ex}");
 
-                }
+                }*/
             }
         }
         else
@@ -578,7 +584,7 @@ public partial class ItemShowLine : UserControl
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private async void ShareOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void ShareOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         ShareLinkOverlay shareLinkOverlay = new ShareLinkOverlay();
         shareLinkOverlay.baiduFileList = baiduFileList;
@@ -597,7 +603,7 @@ public partial class ItemShowLine : UserControl
         shareLinkOverlay.Opacity = 1;
     }
 
-    private async void PropertiesOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void PropertiesOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         PropertiesOverlay propertiesOverlay = new PropertiesOverlay();
         if (isDir)
@@ -614,6 +620,38 @@ public partial class ItemShowLine : UserControl
 
         OverlayReservedGrid.Children.Add(propertiesOverlay);
         propertiesOverlay.Show();
+    }
+    private async void DownloadOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        FlyNoticeOverlay flyNoticeOverlay = new FlyNoticeOverlay();
+        OverlayNotification.Children.Add(flyNoticeOverlay);
+        if (isFile)
+        {
+            flyNoticeOverlay.Run($"{SelfFile.Name} 已添加进下载队列");
+        }
+        else
+        {
+            flyNoticeOverlay.Run($"文件夹暂不支持下载");
+            return;
+        }
+        try
+        {
+            List<string> url_list = await baiduFileList.GetFileDownloadLink(SelfFile.Path);
+            DownloadConfig downloadConfig = baiduFileList.ChooseDownloadMethod();
+            downloadConfig.FileName = SelfFile.Name;
+            downloadConfig.FilePath = FilePathOperate.GetAvailablePath(sub_path:null, file_name: SelfFile.Name);
+            downloadConfig.FileSize = SelfFile.Size;
+            downloadConfig.Url = url_list[0];
+            url_list.Remove(url_list[0]);
+            TransferPage.addTask(url_list, downloadConfig);
+        }
+        catch (Exception ex)
+        {
+            FlyNoticeOverlay err = new FlyNoticeOverlay();
+
+            err.Run($"{SelfFile.Name}下载出错：{ex}");
+
+        }
     }
     /*
      * ==========================

@@ -36,9 +36,9 @@ namespace Netko.NetDisk.Baidu
 
         public string name = "";
         public string headphoto_url = "";
-        public int storage_total = 0;
-        public int storage_used = 0;
-        public int storage_free = 0;
+        public long storage_total = 0;
+        public long storage_used = 0;
+        public long storage_free = 0;
         public const string app_id = "250528";
         public const string channel = "chunlei";
         public const string clienttype = "0";
@@ -169,6 +169,9 @@ namespace Netko.NetDisk.Baidu
                 InitCookie = init_cookie_string,
                 Name = name,
                 Token = bdstoken,
+                storage_used = storage_used,
+                storage_total = storage_total,
+                storage_free = storage_free,
             };
         }
         public async Task<string> refresh_logid()
@@ -189,7 +192,43 @@ namespace Netko.NetDisk.Baidu
             return log_id;
         }
         //https://passport.baidu.com/v2/api/getqrcode?lp=pc&qrloginfrom=pc&gid=D37084C-AEB7-493A-992C-9ED15CD1CEEC&callback=tangram_guid_1729166374201&apiver=v3&tt=1729166374830&tpl=netdisk&logPage=traceId%3Apc_loginv5_1729166375%2ClogPage%3Aloginv5&_=1729166374832
+        public async Task<bool> GetStorageUsage()
+        {
+            string url = $"https://pan.baidu.com/api/quota";
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", netdisk_user_agent);
+            client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
+            client.DefaultRequestHeaders.Add("Accept", "*/*");
+            client.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
+            client.DefaultRequestHeaders.Add("Cookie", GetCookie());
+            client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+            client.DefaultRequestHeaders.Add("Host", "pan.baidu.com");
 
+            HttpResponseMessage content = await client.GetAsync(url);
+
+            UpdateCookie(content.Headers);
+            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
+            task_content.Wait();
+            Trace.WriteLine(task_content.Result);
+
+            Dictionary<string, object>? body
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+            if (body != null && Convert.ToInt32(body["errno"]) == 0)
+            {
+                if (body.TryGetValue("result", out object? resultObj) && resultObj != null)
+                {
+                    JObject result = JObject.Parse(resultObj.ToString() ?? "{}");
+                    storage_total = Convert.ToInt64(result["total"]);
+                    storage_used = Convert.ToInt64(result["used"]);
+                    storage_free = storage_total - storage_used;
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         public async Task<bool> initial_info()
         {
             /*
@@ -331,7 +370,10 @@ namespace Netko.NetDisk.Baidu
                 throw new Exception("Get UK, Stoken failed.");
             }
             Trace.WriteLine("COOKIE: ------" + GetCookie());
-
+            if (!await GetStorageUsage())
+            {
+                throw new Exception("Get storage useage failed.");
+            }
             if (!await initial_info())
             {
                 throw new Exception("Get basic info failed.");

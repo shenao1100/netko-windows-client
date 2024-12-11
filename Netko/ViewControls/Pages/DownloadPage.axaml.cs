@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Netko.Download;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -86,13 +87,13 @@ public partial class TransferPage : UserControl
         }
     }
 
-    public void addTask(List<string> download_url, long size, string download_path, string user_agent, string name)
+    public void addTask(List<string> download_url, DownloadConfig downloadConfig)
     {
         DownloadProgress download_progress = new DownloadProgress();
         downloadTaskList.Add(download_progress);
         download_progress.ControlDestory = () => { destoryTask(download_progress); };
         download_progress.StatusUpdateCallback = () => {UpdateTooglePauseButton(); };
-        download_progress.init(download_url, size, download_path, user_agent, name);
+        download_progress.init(download_url, downloadConfig);
         DownloadListContiner.Children.Add(download_progress);
     }
 }

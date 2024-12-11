@@ -318,6 +318,7 @@ public partial class NetdiskFilePage : UserControl
             DirBlock.OverlayNotification = OverlayNotification;
             DirBlock.taskProber = task_prober;
             DirBlock.ParentPath = currentPath;
+
             // append to viewer
             FileListViewer.Children.Add(DirBlock);
 

@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="50"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="500"
              x:Class="Netko.UserSection"
 			 >
 	<UserControl.Styles>
@@ -39,9 +39,40 @@
 					<Label x:Name="UserName" VerticalAlignment="Center" FontSize="13" Margin="5 0" Padding="0" MinWidth="150">请稍后...</Label>
 				</DockPanel>
 
+				<Button.ContextMenu>
+					<ContextMenu IsVisible="True" x:Name="context_menu" Width="200">
 
+						<MenuItem x:Name="DockpanelOpen" Margin="3" Height="60">
+							<MenuItem.Icon>
+								<StackPanel Width="60" Height="60">
+									<PathIcon Width="60" Height="60" Data="{StaticResource open}" />
+								</StackPanel>
+							</MenuItem.Icon>
+							<MenuItem.Header>
+								<StackPanel>
+									<Label>Name</Label>
+									<Label FontSize="10" Foreground="Gray">1T/2T</Label>
+									<ProgressBar Margin="0" Value="50"/>
+								</StackPanel>
+							</MenuItem.Header>
+						</MenuItem>
+
+						<MenuItem Margin="3" Click="CpoyCookie">
+							<MenuItem.Icon>
+								<StackPanel>
+									<PathIcon Data="{StaticResource open}" />
+								</StackPanel>
+							</MenuItem.Icon>
+							<MenuItem.Header>
+								<Label>复制Cookie</Label>
+							</MenuItem.Header>
+						</MenuItem>
+
+						
+					</ContextMenu>
+				</Button.ContextMenu>
 			</Button>
-
+			
 			<Button Width="20" Background="Transparent" Grid.Column="1" Grid.Row="0" Click="RemoveBtClick">
 				<PathIcon x:Name="RemoveBt" Data="{StaticResource dismiss}" Height="10" Width="10"/>
 			</Button>

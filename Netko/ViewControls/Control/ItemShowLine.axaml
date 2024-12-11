@@ -57,6 +57,11 @@
 							<PathIcon Data="{StaticResource folder_add}"/>
 						</MenuItem.Icon>
 					</MenuItem>
+					<MenuItem Header="下载" Click="DownloadOnMenu" x:Name="DockpanelDownload" Margin="3">
+						<MenuItem.Icon>
+							<PathIcon Data="{StaticResource download}"/>
+						</MenuItem.Icon>
+					</MenuItem>
 					<MenuItem Header="属性" Click="PropertiesOnMenu" x:Name="DockpanelProp" Margin="3">
 						<MenuItem.Icon>
 							<PathIcon Data="{StaticResource detail}"/>

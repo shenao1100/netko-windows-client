@@ -1,4 +1,4 @@
-Ôªøusing Avalonia.Threading;
+using Avalonia.Threading;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -14,15 +15,15 @@ using System.Threading.Tasks;
 
 namespace Netko.Download
 {
-    
 
-    public class Downloader: IDownload
+
+    public class MultiThreadDownloader : IDownload
     {
-        // ÈîÅ
+        // À¯
         private readonly object _lock = new object();
-        // ÈòªÂ°û
+        // ◊Ë»˚
         private readonly ManualResetEvent resetEvent = new ManualResetEvent(true);
-        // ÂèñÊ∂à‰ø°Âè∑
+        // »°œ˚–≈∫≈
         private CancellationTokenSource cts = new CancellationTokenSource();
         private FileStream FileStream { get; set; }
         private int TotalThread { get; set; }
@@ -42,14 +43,14 @@ namespace Netko.Download
         public int downloadingThread = 0;
         public long downloadBlockSize = 500087;
         public int BufferSize = 1000;
-        //public long downloadBlockSize = 32767;
 
         public bool isPaused = false;
         public bool isDownloading = true;
         public bool isComplete = false;
         private string? Cookie = null;
 
-        public Downloader(DownloadConfig config)
+
+        public MultiThreadDownloader(DownloadConfig config)
         {
             TotalThread = config.DownloadThread;
             CurrentThread = 0;
@@ -62,7 +63,7 @@ namespace Netko.Download
             UserAgent = config.UserAgent;
             totalSize = config.FileSize;
             filePath = config.FilePath;
-            Cookie = config.Cookie;    
+            Cookie = config.Cookie;
 
             FileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             FileStream.SetLength(totalSize);
@@ -96,37 +97,38 @@ namespace Netko.Download
                 isDownloading = false;
                 isComplete = true;
             }
-            
+
             Console.WriteLine(downloadProgress.ToString() + "\r");
         }
         private List<Range> CalcRange()
         {
-            List<Range> ranges = new List<Range>();
-            long calced_size = 0;
-            while (true)
+            var range = new List<Range>();
+            long start = 0;
+            if (totalSize > 0)
             {
-                if (calced_size + downloadBlockSize > totalSize)
+                long average_size = totalSize / TotalThread;
+                for (int i = 0; i < TotalThread; i++)
                 {
-                    ranges.Add(new Range
+                    if (i == TotalThread - 1)
                     {
-                        from = calced_size,
-                        to = totalSize
-                    });
-                    break;
-
-                }
-                else
-                {
-                    ranges.Add(new Range
+                        range.Add(new Range
+                        {
+                            from = start,
+                            to = totalSize
+                        });
+                    }
+                    else
                     {
-                        from = calced_size,
-                        to = calced_size + downloadBlockSize,
-                    });
+                        range.Add(new Range
+                        {
+                            from = start,
+                            to = start + average_size
+                        });
+                        start += average_size;
+                    }
                 }
-                calced_size += downloadBlockSize + 1;
-
             }
-            return ranges;
+            return range;
         }
         /// <summary>
         /// block thread to pause
@@ -159,8 +161,6 @@ namespace Netko.Download
             isComplete = true;
             CalcProgress();
             CallBack?.Invoke();
-            releaseFile();
-
 
         }
         public DownloadStatus Status()
@@ -181,7 +181,7 @@ namespace Netko.Download
         }
         public async Task DownloadThread(Range range, string url)
         {
-            bool isCounted = false;
+
             long pointer = range.from;
             try
             {
@@ -199,17 +199,9 @@ namespace Netko.Download
                     client.DefaultRequestHeaders.Add("Range", $"bytes={range.from}-{range.to}");
                     client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
 
-                    //client.Timeout = TimeSpan.FromSeconds(10);
-                    downloadingThread++;
-                    isCounted = true;
+                    client.Timeout = TimeSpan.FromSeconds(10);
                     using (HttpResponseMessage response = await client.GetAsync(url))
                     {
-                        if (cts.IsCancellationRequested)
-                        {
-                            releaseFile();
-                            // exit thread
-                            return;
-                        }
                         try
                         {
                             response.EnsureSuccessStatusCode();
@@ -217,23 +209,25 @@ namespace Netko.Download
                         }
                         catch (Exception ex)
                         {
+                            Trace.WriteLine(response.StatusCode);
                             throw ex;
                         }
 
-
                         resetEvent.WaitOne();
-                        
+                        if (cts.IsCancellationRequested)
+                        {
+                            releaseFile();
+                            // exit thread
+                            return;
+                        }
                         long? totalSize = response.Content.Headers.ContentLength;
-                        
                         using (Stream contentStream = await response.Content.ReadAsStreamAsync())
                         {
                             byte[] buffer = new byte[BufferSize];
                             int bytesRead;
-                            
                             while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                             {
                                 resetEvent.WaitOne();
-
                                 if (cts.IsCancellationRequested)
                                 {
                                     releaseFile();
@@ -247,7 +241,7 @@ namespace Netko.Download
                                     CalcProgress();
                                     Dispatcher.UIThread.InvokeAsync(() =>
                                     {
-                                        CallBack?.Invoke(); // Âú® UI Á∫øÁ®ã‰∏≠Ë∞ÉÁî®
+                                        CallBack?.Invoke(); // ‘⁄ UI œﬂ≥Ã÷–µ˜”√
                                     });
                                     FileStream.Seek(pointer, SeekOrigin.Begin);
                                     FileStream.Write(buffer, 0, bytesRead);
@@ -255,31 +249,19 @@ namespace Netko.Download
                                 pointer += bytesRead;
 
                             }
-                            
                         }
-                    }
-                    if (isCounted)
-                    {
-                        downloadingThread--;
-                        isCounted = false;
                     }
                 }
             }
             catch (Exception ex)
             {
-                if (isCounted)
-                {
-                    downloadingThread--;
-                    isCounted = false;
-
-                }
-                await Task.Delay(500);
                 Trace.WriteLine(ex.ToString());
                 await DownloadThread(range, url);
             }
 
         }
-        private bool isFileReleased() {
+        private bool isFileReleased()
+        {
             try
             {
                 return FileStream.SafeFileHandle.IsClosed;
@@ -327,17 +309,15 @@ namespace Netko.Download
                 {
                     try
                     {
-                        
+                        downloadingThread++;
                         await DownloadThread(rangeLsit[threadId], linkList[arrangeLinkId]);
-                        
+                        downloadingThread--;
                     }
                     finally
                     {
                         semaphore.Release();
                     }
                 });
-                //await Task.Delay(300);
-
             }
             if (!tasks.Contains(null))
             {
@@ -346,7 +326,7 @@ namespace Netko.Download
             }
             releaseFile();
             CalcProgress();
-            CallBack?.Invoke(); 
+            CallBack?.Invoke();
 
         }
 

@@ -4,11 +4,14 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Netko.NetDisk;
+using Newtonsoft.Json.Bson;
 using System;
 using System.IO;
 using System.Net.Http;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
+using TextCopy;
 
 namespace Netko;
 
@@ -42,6 +45,7 @@ public partial class UserSection : UserControl
 
     public Action DeleteAction;
     public Action ChangeAction;
+    public INetdisk? NetdiskInsdence = null ;
     public UserSection()
     {
         InitializeComponent();
@@ -68,12 +72,35 @@ public partial class UserSection : UserControl
 
         }
     }
+    private void CpoyCookie(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (NetdiskInsdence != null)
+        {
+            ClipboardService.SetText(NetdiskInsdence.GetCookie());
+
+        }
+    }
+    public void SetAsNetdisk(INetdisk netdisk)
+    {
+        NetdiskInsdence = netdisk;
+        AccountInfo info = netdisk.GetAccountInfo();
+
+    }
     private void RemoveBtClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        DeleteAction();
+        if (DeleteAction != null)
+        {
+            DeleteAction();
+
+        }
     }
     private void PageChangeBtClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        ChangeAction();
+        if (ChangeAction != null)
+        {
+
+            ChangeAction();
+        }
+        
     }
 }

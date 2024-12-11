@@ -119,15 +119,19 @@ public partial class DownloadProgress : UserControl
         }
         StatusUpdateCallback();
     }
-    public void init(List<string> download_url, long size, string download_path, string user_agent, string name)
+    public void init(List<string>? download_url, DownloadConfig downloadConfig)
     {
 
-        DownloadInstance = new Downloader(download_url[0], user_agent, download_path, size, 1);
+        DownloadInstance = DownloadFactory.Create(downloadConfig);// new Downloader(download_url[0], "netdisk;P2SP;2.2.101.200;netdisk;12.17.2;PGEM10;android-android;9;JSbridge4.4.0;jointBridge;1.1.0;", download_path, size, 5, cookie);
+        Trace.WriteLine(downloadConfig.Url);
         DownloadInstance.SetCallBack(() => { updateDownloadProgress(DownloadInstance); });
-        filename.Content = name;
-        foreach (var item in download_url)
+        filename.Content = downloadConfig.FileName;
+        if (download_url != null)
         {
-            DownloadInstance.AddUrl(item);
+            foreach (var item in download_url)
+            {
+                DownloadInstance.AddUrl(item);
+            }
         }
         DownloadInstance.Run();
     }

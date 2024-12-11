@@ -16,6 +16,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using DynamicData;
+using System.Xml.Linq;
+using Netko.Download;
 
 namespace Netko.NetDisk.Baidu
 {
@@ -62,6 +64,18 @@ namespace Netko.NetDisk.Baidu
         public const string netdisk_user_agent = "netdisk";
         public const string broswer_user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.52";
 
+        public AccountInfo GetAccountInfo()
+        {
+            return new AccountInfo
+            {
+                InitCookie = BaiduAccount.init_cookie_string,
+                Name = BaiduAccount.name,
+                Token = BaiduAccount.bdstoken,
+                storage_used = BaiduAccount.storage_used,
+                storage_total = BaiduAccount.storage_total,
+                storage_free = BaiduAccount.storage_free,
+            };
+        }
         static string GenerateSHA1Hash(string input)
         {
             using (SHA1 sha1 = SHA1.Create())  // 创建 SHA-1 实例
@@ -796,13 +810,15 @@ namespace Netko.NetDisk.Baidu
             path = WebUtility.UrlEncode(path);
 
             //await CMS(orig_path);
-
-            string url = $"http://d.pcs.baidu.com/rest/2.0/pcs/file?app_id=250528&method=locatedownload&check_blue=1&es=1&esl=1&ant=1&path={path}&ver=4.0&dtype=1&err_ver=1.0&ehps=1&eck=1&vip={BaiduAccount.vip}&open_pflag=2&vip={BaiduAccount.vip}&dpkg=1&sd=0&clienttype=9&version=3.0.20.63&time={time}&rand={rand}&devuid={devuid}&channel=0&version_app=7.46.5.113";
+            //https://d.pcs.baidu.com/rest/2.0/pcs/file?app_id=250528&method=locatedownload&check_blue=1&es=1&esl=1&ant=1&path=%2F%5BAcgFun.net%5D%E5%90%8C%E4%BA%BA%E6%B8%B8%E6%88%8F%E5%AE%89%E5%8D%93%E7%89%88No.7961.7z&ver=4.0&dtype=1&err_ver=1.0&ehps=1&eck=1&vip=0&clienttype=17&version=2.2.101.200&channel=0&version_app=12.17.2&apn_id=1_0&freeisp=0&queryfree=0&cuid=BE810DBE5D1FD4327F66DE30AD7ECBBF%7CVJ3ISVMPX&use=0
+            //string url = $"https://d.pcs.baidu.com/rest/2.0/pcs/file?app_id=250528&method=locatedownload&check_blue=1&es=1&esl=1&ant=1&path={path}&ver=4.0&dtype=1&err_ver=1.0&ehps=1&eck=1&vip=1&open_pflag=2&vip={BaiduAccount.vip}&dpkg=1&sd=0&clienttype=9&version=3.0.20.63&time={time}&rand={rand}&devuid={devuid}&channel=0&version_app=7.46.5.113";
+            string url = $"https://d.pcs.baidu.com/rest/2.0/pcs/file?app_id=250528&method=locatedownload&check_blue=1&es=1&esl=1&ant=1&path={path}&ver=4.0&dtype=1&err_ver=1.0&ehps=1&eck=1&vip=1&open_pflag=2&clienttype=17&version=2.2.101.200&channel=0&version_app=12.17.2&apn_id=1_0&freeisp=0&queryfree=0&cuid=BE810DBE5D1FD4327F66DE30AD7ECBBF%7CVJ3ISVMPX&use=0";
 
 
             using var client = new HttpClient();
             //client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
-            client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "netdisk;P2SP;3.0.20.63;netdisk;7.46.5.113;PC;PC-Windows;10.0.22631;WindowsBaiduYunGuanJia");
+            //client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "netdisk;P2SP;3.0.20.63;netdisk;7.46.5.113;PC;PC-Windows;10.0.22631;WindowsBaiduYunGuanJia");
+            client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "netdisk;P2SP;2.2.101.200;netdisk;12.17.2;PGEM10;android-android;9;JSbridge4.4.0;jointBridge;1.1.0;");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Connection", "keep-alive");
             //client.DefaultRequestHeaders.Add("Accept-Encoding", "");
@@ -827,6 +843,33 @@ namespace Netko.NetDisk.Baidu
 
             return link;
 
+        }
+        public DownloadConfig ChooseDownloadMethod()
+        {
+            // PC: netdisk;P2SP;3.0.20.63;netdisk;7.46.5.113;PC;PC-Windows;10.0.22631;WindowsBaiduYunGuanJia
+
+            if (BaiduAccount.is_svip || BaiduAccount.is_vip)
+            {
+                return new DownloadConfig
+                {
+                    Cookie = GetAccountInfo().InitCookie,
+                    method = DownloadMethod.ParticalDownload,
+                    DownloadThread = 8,
+                    UserAgent = "netdisk;P2SP;2.2.101.200;netdisk;12.17.2;PGEM10;android-android;9;JSbridge4.4.0;jointBridge;1.1.0;"
+                };
+            }
+            else
+            {
+                return new DownloadConfig
+                {
+                    Cookie = GetAccountInfo().InitCookie,
+                    method = DownloadMethod.ParticalDownload,
+                    DownloadThread = 1,
+                    UserAgent = "netdisk;P2SP;2.2.101.200;netdisk;12.17.2;PGEM10;android-android;9;JSbridge4.4.0;jointBridge;1.1.0;"
+
+                };
+                 
+            }
         }
     }
 }
