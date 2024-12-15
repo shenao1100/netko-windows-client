@@ -10,8 +10,8 @@ namespace Netko;
 
 public partial class PropertiesOverlay : UserControl
 {
-    public BDDir selfDir {  get; set; }
-    public BDFile selfFile { get; set; }
+    public NetDir selfDir {  get; set; }
+    public NetFile selfFile { get; set; }
     public bool isFile = false;
     public PropertiesOverlay()
     {

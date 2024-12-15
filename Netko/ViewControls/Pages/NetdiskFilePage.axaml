@@ -27,7 +27,7 @@
 				<Button Grid.Row="0" Grid.Column="2" Background="Transparent" x:Name="ForwardButton" Click="Forward">
 					<PathIcon Data="{StaticResource forward}" Height="15" Width="15"/>
 				</Button>
-				<TextBox Grid.Row="0" Grid.Column="3" BorderBrush="Transparent" Background="" x:Name="PathTextBox"></TextBox>
+				<TextBox Grid.Row="0" Grid.Column="3" BorderBrush="Transparent" x:Name="PathTextBox"></TextBox>
 				<Button Grid.Row="0" Grid.Column="4" Background="Transparent" Click="GotoDir">
 					<PathIcon Data="{StaticResource enter}" Height="15" Width="15"/>
 				</Button>

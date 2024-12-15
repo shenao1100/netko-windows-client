@@ -1,16 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml;
-using Avalonia.Media;
-using Avalonia.Styling;
 using System.Diagnostics;
 using System;
-using System.Runtime.CompilerServices;
-using Netko.NetDisk.Baidu;
 using Avalonia.Markup.Xaml.MarkupExtensions;
-using Microsoft.CodeAnalysis.Scripting.Hosting;
-using System.Xml.Serialization;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using System.IO;
@@ -18,11 +11,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
-using DynamicData;
 using Netko.NetDisk;
 using Netko.Download;
 
 namespace Netko;
+
 public static class ImageHelper
 {
     public static Bitmap LoadFromResource(Uri resourceUri)
@@ -47,61 +40,57 @@ public static class ImageHelper
         }
     }
 }
+
 public partial class ItemShowLine : UserControl
 {
-    public Action Func {  get; set; }
-    public Action Refresh {  get; set; }
+    public Action Func { get; set; }
+    public Action Refresh { get; set; }
+
     public string ParentPath { get; set; }
-    private StackPanel FileListViewer;
+
+    //private StackPanel FileListViewer;
     //public Color HoverBG;
     //public Color LeaveBG;
-    private DateTime lastClickedTime;
-    public IFileList baiduFileList {  get; set; }
+    private DateTime _lastClickedTime;
+    public IFileList baiduFileList { get; set; }
 
-    public BDDir SelfDir;
-    public BDFile SelfFile;
-    public bool isFile;
-    public bool isDir;
-    private bool is_selected = false;
-    private bool single_menu_operation = true;
+    public NetDir SelfDir;
+    public NetFile SelfFile;
+    private bool _isFile;
+    private bool _isDir;
+    private bool _isSelected = false;
+    private bool _singleMenuOperation = true;
     public Grid OverlayReservedGrid { get; set; }
-    public StackPanel OverlayNotification {  get; set; }
+    public StackPanel OverlayNotification { get; set; }
     public TransferPage TransferPage { get; set; }
     public TaskProber taskProber { get; set; }
+
     public ItemShowLine()
     {
         InitializeComponent();
-        lastClickedTime = DateTime.Now;
-        Application.Current.ActualThemeVariantChanged += (sender, args) =>
-        {
-            UpdateColor();
-        };
+        _lastClickedTime = DateTime.Now;
+        Application.Current!.ActualThemeVariantChanged += (sender, args) => { UpdateColor(); };
     }
 
-    private void UpdateColor() 
+    private void UpdateColor()
     {
-        /*var hover_backgound = Application.Current.Resources.TryGetResource("CatalogBaseHighColor", null, out var Hresource);
-        if (hover_backgound && Hresource is Color Backgound)
+        if (_isSelected)
         {
-             HoverBG = Backgound;
-        }
-        var leave_background = Application.Current.Resources.TryGetResource("CatalogBaseMediumColor", null, out var Lresource);
-        if (leave_background && Lresource is Color Background)
-        {
-            LeaveBG = Background;
-        }*/
-        if (is_selected)
-        {
-            //BorderBackground.Background = new SolidColorBrush(HoverBG);
             BorderBackground[!Border.BackgroundProperty] = new DynamicResourceExtension("HoverColor");
         }
         else
         {
             BorderBackground[!Border.BackgroundProperty] = new DynamicResourceExtension("CatalogBaseHighColor");
-            //BorderBackground.Background = new SolidColorBrush(LeaveBG);
         }
-
     }
+
+    private void ShowInfo(string message)
+    {
+        FlyNoticeOverlay flyNoticeOverlay = new FlyNoticeOverlay();
+        OverlayNotification.Children.Add(flyNoticeOverlay);
+        flyNoticeOverlay.Run(message);
+    }
+
     private string FormatDate(long timeStamp)
     {
         DateTime startTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -113,48 +102,50 @@ public partial class ItemShowLine : UserControl
     /// Init item, set type and icon
     /// </summary>
     /// <param name="name">file name</param>
-    /// <param name="is_dir"></param>
-    public void Init(string name, bool is_dir)
+    /// <param name="isDir"></param>
+    public void Init(string name, bool isDir)
     {
         Uri uri;
-        if (is_dir)
+        if (isDir)
         {
-            isDir = true;
-            isFile = false;
+            _isDir = true;
+            _isFile = false;
             uri = new Uri("avares://Netko/Assets/FileIcon/icons8-folder-188.png");
         }
         else
         {
-
             DockpanelOpen.IsVisible = false;
-            isDir = false;
-            isFile = true;
+            _isDir = false;
+            _isFile = true;
             uri = new Uri("avares://Netko/Assets/FileIcon/icons8-document-188.png");
         }
+
         ItemIcon.Source = ImageHelper.LoadFromResource(uri);
         FileName.Content = name;
-        if (is_dir)
+        if (isDir)
         {
-
             detail_label.Content = $"{FormatDate(SelfDir.ServerCtime)}";
         }
         else
         {
             detail_label.Content = $"{FormatDate(SelfFile.ServerCtime)}\t{DownloadProgress.FormatSize(SelfFile.Size)}";
-
         }
     }
 
-    public void RefreshCallback(string pervious_path)
+    public void RefreshCallback(string perviousPath)
     {
-        if (pervious_path == ParentPath)
+        if (perviousPath == ParentPath)
         {
             Refresh();
         }
     }
+
     private void SetMultiOperationCommand()
     {
-        if (!single_menu_operation) { return; }
+        if (!_singleMenuOperation)
+        {
+            return;
+        }
 
         //DockpanelOpen.Click -= OepnOnMenu;
         DockpanelDelete.Click -= DeleteOnMenu;
@@ -166,11 +157,16 @@ public partial class ItemShowLine : UserControl
         DockpanelMove.Click += MultiMoveOnMenu;
         DockpanelDuplicate.Click += MultiCopyOnMenu;
         DockpanelShare.Click += MultiShareOnMenu;
-        single_menu_operation = false;
+        _singleMenuOperation = false;
     }
-    private void SetSingleOperationCommand() 
+
+    private void SetSingleOperationCommand()
     {
-        if (single_menu_operation) { return; }
+        if (_singleMenuOperation)
+        {
+            return;
+        }
+
         DockpanelDelete.Click -= MultiDeleteOnMenu;
         DockpanelMove.Click -= MultiMoveOnMenu;
         DockpanelDuplicate.Click -= MultiCopyOnMenu;
@@ -180,8 +176,8 @@ public partial class ItemShowLine : UserControl
         DockpanelMove.Click += MoveOnMenu;
         DockpanelDuplicate.Click += CopyOnMenu;
         DockpanelShare.Click += ShareOnMenu;
-        single_menu_operation = true;
-    } 
+        _singleMenuOperation = true;
+    }
 
     /// <summary>
     /// right click to open menu, has been abandoned
@@ -196,10 +192,11 @@ public partial class ItemShowLine : UserControl
         {
             return;
         }
-        if (isFile)
+
+        if (_isFile)
         {
-            BDFileList filelist = baiduFileList.GetSelectedItem();
-            if (filelist.File == null && filelist.Dir == null || !filelist.File!.Contains(SelfFile))
+            FileList filelist = baiduFileList.GetSelectedItem();
+            if (!filelist.File!.Contains(SelfFile))
             {
                 // single select
                 SetSingleOperationCommand();
@@ -215,66 +212,65 @@ public partial class ItemShowLine : UserControl
                 SetMultiOperationCommand();
             }
         }
-        if (isDir)
+
+        if (_isDir)
         {
-            BDFileList filelist = baiduFileList.GetSelectedItem();
-            if (filelist.File == null && filelist.Dir == null || !filelist.Dir!.Contains(SelfDir))
+            FileList filelist = baiduFileList.GetSelectedItem();
+            if (!filelist.Dir!.Contains(SelfDir))
             {
                 // single select
                 SetSingleOperationCommand();
-
             }
             else if (filelist.Dir!.Contains(SelfDir) && filelist.Dir!.Count() == 1 && filelist.File!.Count() == 0)
             {
                 //single select
                 SetSingleOperationCommand();
-
             }
             else
             {
                 //multi file
                 SetMultiOperationCommand();
-
             }
         }
     }
+
     public void toogleSelect()
     {
-        if (isDir)
+        if (_isDir)
         {
-            is_selected = (!baiduFileList.DirIsSelected(SelfDir)) ? true : false;
+            _isSelected = (!baiduFileList.DirIsSelected(SelfDir)) ? true : false;
             baiduFileList.ToggleSelectDir(SelfDir);
-
         }
-        if (isFile)
+
+        if (_isFile)
         {
-            is_selected = (!baiduFileList.FileIsSelected(SelfFile)) ? true : false;
+            _isSelected = (!baiduFileList.FileIsSelected(SelfFile)) ? true : false;
             baiduFileList.ToggleSelectFile(SelfFile);
         }
+
         UpdateColor();
     }
 
-        /// <summary>
-        /// left click and double click, toggle select
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+    /// <summary>
+    /// left click and double click, toggle select
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void LeftClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         var currentTime = DateTime.Now;
-        var timeDiff = currentTime - lastClickedTime;
-        lastClickedTime = currentTime;
-        
+        var timeDiff = currentTime - _lastClickedTime;
+        _lastClickedTime = currentTime;
+
         if (timeDiff.TotalMilliseconds <= 250)
         {
-            if (isDir)
+            if (_isDir)
             {
                 Func();
-
             }
-            if (isFile)
-            {
 
+            if (_isFile)
+            {
                 /*FlyNoticeOverlay flyNoticeOverlay = new FlyNoticeOverlay();
                 OverlayNotification.Children.Add(flyNoticeOverlay);
                 flyNoticeOverlay.Run($"{SelfFile.Name} 已添加进下载队列");
@@ -300,8 +296,9 @@ public partial class ItemShowLine : UserControl
             toogleSelect();
         }
     }
+
     /// <summary>
-    /// Menu funcion: open
+    /// Menu function: open
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -315,21 +312,30 @@ public partial class ItemShowLine : UserControl
         DialogOverlay inputName = new DialogOverlay();
         OverlayReservedGrid.Children.Add(inputName);
         string? filename = await inputName.ShowDialog("请输入新建文件夹的名称", "创建");
-        if ((await baiduFileList.CreateDir(ParentPath + "/" + filename)).Success)
+        try
         {
-            Refresh();
-            return;
+            if ((await baiduFileList.CreateDir(ParentPath + "/" + filename)).Success)
+            {
+                Refresh();
+                return;
+            }
+            else
+            {
+                MessageOverlay message = new MessageOverlay();
+                OverlayReservedGrid.Children.Add(message);
+                message.SetMessage("创建失败", $"创建{ParentPath + "/" + filename}时遇到错误");
+                return;
+            }
         }
-        else
+        catch (Exception ex)
         {
-            MessageOverlay message = new MessageOverlay();
-            OverlayReservedGrid.Children.Add(message);
-            message.SetMessage("创建失败", $"创建{ParentPath + "/" + filename}时遇到错误");
-            return;
+            ShowInfo(ex.Message);
         }
+        
     }
+
     /// <summary>
-    /// Menu funcion: copy
+    /// Menu function: copy
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -339,63 +345,74 @@ public partial class ItemShowLine : UserControl
         netdiskPathOverlay.baiduFileList = baiduFileList;
         netdiskPathOverlay.ShowInitDir();
         OverlayReservedGrid.Children.Add(netdiskPathOverlay);
-        string? target_path = await netdiskPathOverlay.ShowDialog("请选择目标文件夹", "复制");
-        string self_path, self_name;
-        if (isDir)
+        string? targetPath = await netdiskPathOverlay.ShowDialog("请选择目标文件夹", "复制");
+        string selfPath, selfName;
+        if (_isDir)
         {
-            self_name = SelfDir.Name;
-            self_path = SelfDir.Path;
+            selfName = SelfDir.Name;
+            selfPath = SelfDir.Path;
         }
         else
         {
-            self_name = SelfFile.Name;
-            self_path = SelfFile.Path;
+            selfName = SelfFile.Name;
+            selfPath = SelfFile.Path;
         }
-        if (!string.IsNullOrEmpty(target_path))
-        {
-            NetdiskResult netdiskResult = await baiduFileList.Copy([self_path], [self_name], [target_path], isAsync: true);
-            if (netdiskResult.Success && netdiskResult.TaskID != null)
-            {
-                if ((await baiduFileList.GetProgress(netdiskResult.TaskID)).Status == TaskStatusIndicate.Done)
-                {
-                    Refresh();
-                    return;
-                }
-                TaskView task_view = taskProber.AddTask();
-                task_view.SetText("复制文件", $"复制{self_name}到{target_path}", "请稍后\t0%");
-                try
-                {
-                    string current_path = ParentPath;
-                    task_view.SetTask(baiduFileList.GetProgress, netdiskResult.TaskID, () => { RefreshCallback(current_path); });
 
-                }
-                catch (Exception ex)
+        try
+        {
+            if (!string.IsNullOrEmpty(targetPath))
+            {
+                NetdiskResult netdiskResult =
+                    await baiduFileList.Copy([selfPath], [selfName], [targetPath], isAsync: true);
+                if (netdiskResult.Success && netdiskResult.TaskId != null)
                 {
-                    Trace.WriteLine(ex);
+                    if ((await baiduFileList.GetProgress(netdiskResult.TaskId)).Status == TaskStatusIndicate.Done)
+                    {
+                        Refresh();
+                        return;
+                    }
+
+                    TaskView taskView = taskProber.AddTask();
+                    taskView.SetText("复制文件", $"复制{selfName}到{targetPath}", "请稍后\t0%");
+                    try
+                    {
+                        string currentPath = ParentPath;
+                        taskView.SetTask(baiduFileList.GetProgress, netdiskResult.TaskId,
+                            () => { RefreshCallback(currentPath); });
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine(ex);
+                    }
                 }
+                else
+                {
+                    MessageOverlay message = new MessageOverlay();
+                    OverlayReservedGrid.Children.Add(message);
+                    string errMsg = string.Empty;
+                    errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "未知错误";
+                    errMsg += $"\t 错误码: {netdiskResult.ResultId.ToString()}";
+                    message.SetMessage("创建失败", errMsg);
+                }
+
             }
             else
             {
                 MessageOverlay message = new MessageOverlay();
                 OverlayReservedGrid.Children.Add(message);
-                string errMsg = string.Empty;
-                errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "未知错误";
-                errMsg += $"\t 错误码: {netdiskResult.ResultID.ToString()}";
-                message.SetMessage("创建失败", errMsg);
+                message.SetMessage("创建失败", $"移动文件{selfPath}时遇到错误");
+                return;
             }
-            //Refresh();
-            return;
         }
-        else
+        catch (Exception ex)
         {
-            MessageOverlay message = new MessageOverlay();
-            OverlayReservedGrid.Children.Add(message);
-            message.SetMessage("创建失败", $"移动文件{self_path}时遇到错误");
-            return;
+            ShowInfo(ex.Message);
         }
+        
     }
+
     /// <summary>
-    /// Menu funcion: move
+    /// Menu function: move
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -405,34 +422,113 @@ public partial class ItemShowLine : UserControl
         netdiskPathOverlay.baiduFileList = baiduFileList;
         netdiskPathOverlay.ShowInitDir();
         OverlayReservedGrid.Children.Add(netdiskPathOverlay);
-        string? target_path = await netdiskPathOverlay.ShowDialog("请选择目标文件夹", "移动");
-        string self_path, self_name;
-        if (isDir)
+        string? targetPath = await netdiskPathOverlay.ShowDialog("请选择目标文件夹", "移动");
+        string selfPath, selfName;
+        if (_isDir)
         {
-            self_name = SelfDir.Name;
-            self_path = SelfDir.Path;
+            selfName = SelfDir.Name;
+            selfPath = SelfDir.Path;
         }
         else
         {
-            self_name = SelfFile.Name;
-            self_path = SelfFile.Path;
+            selfName = SelfFile.Name;
+            selfPath = SelfFile.Path;
         }
-        if (!string.IsNullOrEmpty(target_path)) {
-            NetdiskResult netdiskResult = await baiduFileList.Move([self_path], [self_name], [target_path], isAsync: true);
-            if (netdiskResult.Success && netdiskResult.TaskID != null)
+
+        try
+        {
+            if (!string.IsNullOrEmpty(targetPath))
             {
-                if ((await baiduFileList.GetProgress(netdiskResult.TaskID)).Status == TaskStatusIndicate.Done)
+                NetdiskResult netdiskResult =
+                    await baiduFileList.Move([selfPath], 
+                        [selfName], 
+                        [targetPath], 
+                        isAsync: true);
+                if (netdiskResult.Success && netdiskResult.TaskId != null)
+                {
+                    if ((await baiduFileList.GetProgress(netdiskResult.TaskId)).Status == TaskStatusIndicate.Done)
+                    {
+                        Refresh();
+                        return;
+                    }
+
+                    TaskView taskView = taskProber.AddTask();
+                    taskView.SetText("移动文件", 
+                        $"移动{selfName}到{targetPath}", "请稍后\t0%");
+                    try
+                    {
+                        string currentPath = ParentPath;
+                        taskView.SetTask(baiduFileList.GetProgress, netdiskResult.TaskId,
+                            () => { RefreshCallback(currentPath); });
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine(ex);
+                    }
+                }
+                else
+                {
+                    MessageOverlay message = new MessageOverlay();
+                    OverlayReservedGrid.Children.Add(message);
+                    string errMsg = string.Empty;
+                    errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "未知错误";
+                    errMsg += $"\t 错误码: {netdiskResult.ResultId.ToString()}";
+                    message.SetMessage("创建失败", errMsg);
+                }
+            }
+            else
+            {
+                MessageOverlay message = new MessageOverlay();
+                OverlayReservedGrid.Children.Add(message);
+                message.SetMessage("创建失败", $"移动文件{selfPath}时遇到错误");
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowInfo(ex.Message);
+        }
+        
+    }
+
+    /// <summary>
+    /// Menu function: rename
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private async void RenameOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        DialogOverlay inputName = new DialogOverlay();
+        OverlayReservedGrid.Children.Add(inputName);
+        string? filename = await inputName.ShowDialog("请输入文件的新名称", "重命名", placeHolderS: SelfDir.Name);
+        string selfPath;
+        if (_isDir)
+        {
+            selfPath = SelfDir.Path;
+        }
+        else
+        {
+            selfPath = SelfFile.Path;
+        }
+
+        try
+        {
+            NetdiskResult netdiskResult = await baiduFileList.Rename([selfPath], [filename], isAsync: true);
+            if (netdiskResult.Success && netdiskResult.TaskId != null)
+            {
+                if ((await baiduFileList.GetProgress(netdiskResult.TaskId)).Status == TaskStatusIndicate.Done)
                 {
                     Refresh();
                     return;
                 }
-                TaskView task_view = taskProber.AddTask();
-                task_view.SetText("移动文件", $"移动{self_name}到{target_path}", "请稍后\t0%");
+
+                TaskView taskView = taskProber.AddTask();
+                taskView.SetText("重命名文件", $"正在重命名{selfPath}", "请稍后\t0%");
                 try
                 {
-                    string current_path = ParentPath;
-                    task_view.SetTask(baiduFileList.GetProgress, netdiskResult.TaskID, () => { RefreshCallback(current_path); });
-
+                    string currentPath = ParentPath;
+                    taskView.SetTask(baiduFileList.GetProgress, netdiskResult.TaskId,
+                        () => { RefreshCallback(currentPath); });
                 }
                 catch (Exception ex)
                 {
@@ -445,142 +541,90 @@ public partial class ItemShowLine : UserControl
                 OverlayReservedGrid.Children.Add(message);
                 string errMsg = string.Empty;
                 errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "未知错误";
-                errMsg += $"\t 错误码: {netdiskResult.ResultID.ToString()}";
+                errMsg += $"\t 错误码: {netdiskResult.ResultId.ToString()}";
                 message.SetMessage("创建失败", errMsg);
             }
-            //Refresh();
-            return;
         }
-        else
+        catch (Exception ex)
         {
-            MessageOverlay message = new MessageOverlay();
-            OverlayReservedGrid.Children.Add(message);
-            message.SetMessage("创建失败", $"移动文件{self_path}时遇到错误");
-            return;
+            ShowInfo(ex.Message);
         }
     }
+
     /// <summary>
-    /// Menu funcion: rename
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private async void RenameOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
-        DialogOverlay inputName = new DialogOverlay();
-        OverlayReservedGrid.Children.Add(inputName);
-        string? filename = await inputName.ShowDialog("请输入文件的新名称", "重命名", place_holder:SelfDir.Name);
-        string self_path;
-        if (isDir)
-        {
-            self_path = SelfDir.Path;
-        }
-        else
-        {
-            self_path = SelfFile.Path;
-        }
-
-        NetdiskResult netdiskResult = await baiduFileList.Rename([self_path], [filename], isAsync: true);
-        if (netdiskResult.Success && netdiskResult.TaskID != null)
-        {
-            if ((await baiduFileList.GetProgress(netdiskResult.TaskID)).Status == TaskStatusIndicate.Done)
-            {
-                Refresh();
-                return;
-            }
-            TaskView task_view = taskProber.AddTask();
-            task_view.SetText("重命名文件", $"正在重命名{self_path}", "请稍后\t0%");
-            try
-            {
-                string current_path = ParentPath;
-                task_view.SetTask(baiduFileList.GetProgress, netdiskResult.TaskID, () => { RefreshCallback(current_path); });
-
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex);
-            }
-        }
-        else
-        {
-            MessageOverlay message = new MessageOverlay();
-            OverlayReservedGrid.Children.Add(message);
-            string errMsg = string.Empty;
-            errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "未知错误";
-            errMsg += $"\t 错误码: {netdiskResult.ResultID.ToString()}";
-            message.SetMessage("创建失败", errMsg);
-        }
-        //Refresh();
-        return;
-
-    }
-    /// <summary>
-    /// Menu funcion: delete
+    /// Menu function: delete
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private async void DeleteOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        string delete_filelist, self_name;
+        string deleteFilelist;
         int count = 0;
-        if (isDir)
+        if (_isDir)
         {
             count++;
-            BDDir[] dirlist = new BDDir[1];
-            dirlist[0] = SelfDir;
-            delete_filelist = baiduFileList.IntegrateFilelist(null, dirlist);
-            self_name = SelfDir.Name;
+            List<NetDir> dirList = new List<NetDir>();
+            dirList.Add(SelfDir);
+            deleteFilelist = baiduFileList.IntegrateFilelist(null, dirList);
         }
         else
         {
             count++;
-            BDFile[] filelist = new BDFile[1];
-            filelist[0] = SelfFile;
-            delete_filelist = baiduFileList.IntegrateFilelist(filelist, null);
-            self_name = SelfFile.Name;
+            List<NetFile> fileList = new List<NetFile>();
+            fileList.Add(SelfFile);
+            deleteFilelist = baiduFileList.IntegrateFilelist(fileList, null);
         }
 
-
-        NetdiskResult netdiskResult = await baiduFileList.DeleteFile(delete_filelist, isAsync: true);
-        if (netdiskResult.Success && netdiskResult.TaskID != null)
+        try
         {
-            if ((await baiduFileList.GetProgress(netdiskResult.TaskID)).Status == TaskStatusIndicate.Done)
-            {
-                Refresh();
-                return;
-            }
-            TaskView task_view = taskProber.AddTask();
-            task_view.SetText("删除文件", $"正在删除{count.ToString()}个项目", "请稍后\t0%");
-            try
-            {
-                string current_path = ParentPath;
-                task_view.SetTask(baiduFileList.GetProgress, netdiskResult.TaskID, () => { RefreshCallback(current_path); });
+            NetdiskResult netdiskResult = await baiduFileList.DeleteFile(deleteFilelist, isAsync: true);
 
-            }
-            catch (Exception ex)
+
+            if (netdiskResult.Success && netdiskResult.TaskId != null)
             {
-                Trace.WriteLine(ex);
+                if ((await baiduFileList.GetProgress(netdiskResult.TaskId)).Status == TaskStatusIndicate.Done)
+                {
+                    Refresh();
+                    return;
+                }
+
+                TaskView taskView = taskProber.AddTask();
+
+                taskView.SetText("删除文件", $"正在删除{count.ToString()}个项目", "请稍后\t0%");
+                try
+                {
+                    string currentPath = ParentPath;
+                    taskView.SetTask(baiduFileList.GetProgress, netdiskResult.TaskId,
+                        () => { RefreshCallback(currentPath); });
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex);
+                }
+            }
+            else
+            {
+                MessageOverlay message = new MessageOverlay();
+                OverlayReservedGrid.Children.Add(message);
+                string errMsg = string.Empty;
+                errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "未知错误";
+                errMsg += $"\t 错误码: {netdiskResult.ResultId.ToString()}";
+                message.SetMessage("创建失败", errMsg);
             }
         }
-        else
+        catch (Exception ex)
         {
-            MessageOverlay message = new MessageOverlay();
-            OverlayReservedGrid.Children.Add(message);
-            string errMsg = string.Empty;
-            errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "未知错误";
-            errMsg += $"\t 错误码: {netdiskResult.ResultID.ToString()}";
-            message.SetMessage("创建失败", errMsg);
+            ShowInfo(ex.Message);
         }
-        //Refresh();
-        return;
-
-
     }
+
     private void DockPanel_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
-        Trace.WriteLine("dir rgclicked");
+        return;
     }
+
     /// <summary>
-    /// Menu funcion: share
+    /// Menu function: share
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -588,15 +632,16 @@ public partial class ItemShowLine : UserControl
     {
         ShareLinkOverlay shareLinkOverlay = new ShareLinkOverlay();
         shareLinkOverlay.baiduFileList = baiduFileList;
-        shareLinkOverlay.FileList = null;
-        if (isDir)
+        //shareLinkOverlay.FileList = null;
+        if (_isDir)
         {
-            shareLinkOverlay.DirList = new BDDir[] { SelfDir };
+            shareLinkOverlay.DirList = new List<NetDir>() { SelfDir };
         }
         else
         {
-            shareLinkOverlay.FileList = new BDFile[] { SelfFile };
+            shareLinkOverlay.FileList = new List<NetFile>() { SelfFile };
         }
+
         shareLinkOverlay.Opacity = 0;
 
         OverlayReservedGrid.Children.Add(shareLinkOverlay);
@@ -606,11 +651,10 @@ public partial class ItemShowLine : UserControl
     private void PropertiesOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         PropertiesOverlay propertiesOverlay = new PropertiesOverlay();
-        if (isDir)
+        if (_isDir)
         {
             propertiesOverlay.selfDir = SelfDir;
             propertiesOverlay.isFile = false;
-
         }
         else
         {
@@ -621,11 +665,12 @@ public partial class ItemShowLine : UserControl
         OverlayReservedGrid.Children.Add(propertiesOverlay);
         propertiesOverlay.Show();
     }
+
     private async void DownloadOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         FlyNoticeOverlay flyNoticeOverlay = new FlyNoticeOverlay();
         OverlayNotification.Children.Add(flyNoticeOverlay);
-        if (isFile)
+        if (_isFile)
         {
             flyNoticeOverlay.Run($"{SelfFile.Name} 已添加进下载队列");
         }
@@ -634,23 +679,23 @@ public partial class ItemShowLine : UserControl
             flyNoticeOverlay.Run($"文件夹暂不支持下载");
             return;
         }
+
         try
         {
-            List<string> url_list = await baiduFileList.GetFileDownloadLink(SelfFile.Path);
+            List<string> urlList = await baiduFileList.GetFileDownloadLink(SelfFile.Path);
             DownloadConfig downloadConfig = baiduFileList.ChooseDownloadMethod();
             downloadConfig.FileName = SelfFile.Name;
-            downloadConfig.FilePath = FilePathOperate.GetAvailablePath(sub_path:null, file_name: SelfFile.Name);
+            downloadConfig.FilePath = FilePathOperate.GetAvailablePath(sub_path: null, file_name: SelfFile.Name);
             downloadConfig.FileSize = SelfFile.Size;
-            downloadConfig.Url = url_list[0];
-            url_list.Remove(url_list[0]);
-            TransferPage.addTask(url_list, downloadConfig);
+            downloadConfig.Url = urlList[0];
+            urlList.Remove(urlList[0]);
+            TransferPage.addTask(urlList, downloadConfig);
         }
         catch (Exception ex)
         {
             FlyNoticeOverlay err = new FlyNoticeOverlay();
 
             err.Run($"{SelfFile.Name}下载出错：{ex}");
-
         }
     }
     /*
@@ -660,7 +705,7 @@ public partial class ItemShowLine : UserControl
      */
 
     /// <summary>
-    /// Menu funcion: share
+    /// Menu function: share
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -676,53 +721,61 @@ public partial class ItemShowLine : UserControl
         OverlayReservedGrid.Children.Add(shareLinkOverlay);
         shareLinkOverlay.Opacity = 1;
     }
+
     /// <summary>
-    /// Menu funcion: delete
+    /// Menu function: delete
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private async void MultiDeleteOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        string delete_filelist;
+        string deleteFilelist;
 
-        BDDir[] dirlist = baiduFileList.GetSelectedItem().Dir;
-        BDFile[] filelist = baiduFileList.GetSelectedItem().File;
-        delete_filelist = baiduFileList.IntegrateFilelist(filelist, dirlist);
-        NetdiskResult netdiskResult = await baiduFileList.DeleteFile(delete_filelist, isAsync: true);
-        if (netdiskResult.Success && netdiskResult.TaskID != null)
+        List<NetDir> dirList = baiduFileList.GetSelectedItem().Dir;
+        List<NetFile> fileList = baiduFileList.GetSelectedItem().File;
+        deleteFilelist = baiduFileList.IntegrateFilelist(fileList, dirList);
+        try
         {
-            if ((await baiduFileList.GetProgress(netdiskResult.TaskID)).Status == TaskStatusIndicate.Done)
+            NetdiskResult netdiskResult = await baiduFileList.DeleteFile(deleteFilelist, isAsync: true);
+            if (netdiskResult.Success && netdiskResult.TaskId != null)
             {
-                Refresh();
-                return;
-            }
-            TaskView task_view = taskProber.AddTask();
-            task_view.SetText("删除文件", $"生在删除{(dirlist.Count() + filelist.Count()).ToString()}个对象到", "请稍后\t0%");
-            try
-            {
-                string current_path = ParentPath;
-                task_view.SetTask(baiduFileList.GetProgress, netdiskResult.TaskID, () => { RefreshCallback(current_path); });
+                if ((await baiduFileList.GetProgress(netdiskResult.TaskId)).Status == TaskStatusIndicate.Done)
+                {
+                    Refresh();
+                    return;
+                }
 
+                TaskView taskView = taskProber.AddTask();
+                taskView.SetText("删除文件", $"生在删除{(dirList.Count() + fileList.Count()).ToString()}个对象", "请稍后\t0%");
+                try
+                {
+                    string currentPath = ParentPath;
+                    taskView.SetTask(baiduFileList.GetProgress, netdiskResult.TaskId,
+                        () => { RefreshCallback(currentPath); });
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                Trace.WriteLine(ex);
+                MessageOverlay message = new MessageOverlay();
+                OverlayReservedGrid.Children.Add(message);
+                string errMsg = string.Empty;
+                errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "未知错误";
+                errMsg += $"\t 错误码: {netdiskResult.ResultId.ToString()}";
+                message.SetMessage("创建失败", errMsg);
             }
         }
-        else
+        catch (Exception ex)
         {
-            MessageOverlay message = new MessageOverlay();
-            OverlayReservedGrid.Children.Add(message);
-            string errMsg = string.Empty;
-            errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "未知错误";
-            errMsg += $"\t 错误码: {netdiskResult.ResultID.ToString()}";
-            message.SetMessage("创建失败", errMsg);
+            ShowInfo(ex.Message);
         }
-        return;
-
     }
+
     /// <summary>
-    /// Menu funcion: move
+    /// Menu function: move
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -732,80 +785,95 @@ public partial class ItemShowLine : UserControl
         netdiskPathOverlay.baiduFileList = baiduFileList;
         netdiskPathOverlay.ShowInitDir();
         OverlayReservedGrid.Children.Add(netdiskPathOverlay);
-        string? target_path = await netdiskPathOverlay.ShowDialog("请选择目标文件夹", "移动");
+        string? targetPath = await netdiskPathOverlay.ShowDialog("请选择目标文件夹", "移动");
 
-        List<string> self_path = new List<string>();
-        List<string> self_name = new List<string>();
-        List<string> target_path_list = new List<string>();
+        List<string> selfPath = new List<string>();
+        List<string> selfName = new List<string>();
+        List<string> targetPathList = new List<string>();
         if (baiduFileList.GetSelectedItem().File != null)
         {
-            foreach (BDFile file in baiduFileList.GetSelectedItem().File)
+            foreach (NetFile file in baiduFileList.GetSelectedItem().File)
             {
-                self_name.Add(file.Name);
-                self_path.Add(file.Path);
+                selfName.Add(file.Name);
+                selfPath.Add(file.Path);
             }
         }
         else
         {
             return;
         }
+
         if (baiduFileList.GetSelectedItem().Dir != null)
         {
-            foreach (BDDir dir in baiduFileList.GetSelectedItem().Dir)
+            foreach (NetDir dir in baiduFileList.GetSelectedItem().Dir)
             {
-                self_path.Add(dir.Path);
-                self_name.Add(dir.Name);
+                selfPath.Add(dir.Path);
+                selfName.Add(dir.Name);
             }
         }
-        for (int i = 0; i < self_path.Count; i++)
-        {
-            target_path_list.Add(target_path);
-        }
-        if (!string.IsNullOrEmpty(target_path))
-        {
-            NetdiskResult netdiskResult = await baiduFileList.Move(self_path.ToArray(), self_name.ToArray(), target_path_list.ToArray(), isAsync: true);
-            if (netdiskResult.Success && netdiskResult.TaskID != null)
-            {
-                if ((await baiduFileList.GetProgress(netdiskResult.TaskID)).Status == TaskStatusIndicate.Done)
-                {
-                    Refresh();
-                    return;
-                }
-                TaskView task_view = taskProber.AddTask();
-                task_view.SetText("移动文件", $"移动{target_path_list.Count.ToString()}个对象到{target_path}", "请稍后\t0%");
-                try
-                {
-                    string current_path = ParentPath;
-                    task_view.SetTask(baiduFileList.GetProgress, netdiskResult.TaskID, () => { RefreshCallback(current_path); });
 
-                }
-                catch (Exception ex)
+        for (int i = 0; i < selfPath.Count; i++)
+        {
+            targetPathList.Add(targetPath);
+        }
+
+        try
+        {
+            if (!string.IsNullOrEmpty(targetPath))
+            {
+                NetdiskResult netdiskResult = await baiduFileList.Move(selfPath.ToArray(), selfName.ToArray(),
+                    targetPathList.ToArray(), isAsync: true);
+                if (netdiskResult.Success && netdiskResult.TaskId != null)
                 {
-                    Trace.WriteLine(ex);
+                    if ((await baiduFileList.GetProgress(netdiskResult.TaskId)).Status == TaskStatusIndicate.Done)
+                    {
+                        Refresh();
+                        return;
+                    }
+
+                    TaskView taskView = taskProber.AddTask();
+                    taskView.SetText("移动文件", $"移动{targetPathList.Count.ToString()}个对象到{targetPath}", "请稍后\t0%");
+                    try
+                    {
+                        string currentPath = ParentPath;
+                        taskView.SetTask(baiduFileList.GetProgress, netdiskResult.TaskId,
+                            () => { RefreshCallback(currentPath); });
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine(ex);
+                    }
                 }
+                else
+                {
+                    MessageOverlay message = new MessageOverlay();
+                    OverlayReservedGrid.Children.Add(message);
+                    string errMsg = string.Empty;
+                    errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "未知错误";
+                    errMsg += $"\t 错误码: {netdiskResult.ResultId.ToString()}";
+                    message.SetMessage("创建失败", errMsg);
+                }
+
+                //Refresh();
+                return;
             }
             else
             {
                 MessageOverlay message = new MessageOverlay();
                 OverlayReservedGrid.Children.Add(message);
-                string errMsg = string.Empty;
-                errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "未知错误";
-                errMsg += $"\t 错误码: {netdiskResult.ResultID.ToString()}";
-                message.SetMessage("创建失败", errMsg);
+                message.SetMessage("创建失败", $"移动文件时遇到错误");
+                return;
             }
-            //Refresh();
-            return;
         }
-        else
+        catch (Exception ex)
         {
-            MessageOverlay message = new MessageOverlay();
-            OverlayReservedGrid.Children.Add(message);
-            message.SetMessage("创建失败", $"移动文件时遇到错误");
-            return;
+            ShowInfo(ex.Message);
         }
+        
     }
+
     /// <summary>
-    /// Menu funcion: copy
+    /// Menu function: copy
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -815,66 +883,78 @@ public partial class ItemShowLine : UserControl
         netdiskPathOverlay.baiduFileList = baiduFileList;
         netdiskPathOverlay.ShowInitDir();
         OverlayReservedGrid.Children.Add(netdiskPathOverlay);
-        string? target_path = await netdiskPathOverlay.ShowDialog("请选择目标文件夹", "复制");
-        List<string> self_path = new List<string>();
-        List<string> self_name = new List<string>();
-        List<string> target_path_list = new List<string>();
+        string? targetPath = await netdiskPathOverlay.ShowDialog("请选择目标文件夹", "复制");
+        List<string> selfPath = new List<string>();
+        List<string> selfName = new List<string>();
+        List<string> targetPathList = new List<string>();
         if (baiduFileList.GetSelectedItem().File != null)
         {
-            foreach (BDFile file in baiduFileList.GetSelectedItem().File)
+            foreach (NetFile file in baiduFileList.GetSelectedItem().File)
             {
-                self_name.Add(file.Name);
-                self_path.Add(file.Path);
+                selfName.Add(file.Name);
+                selfPath.Add(file.Path);
             }
         }
+
         if (baiduFileList.GetSelectedItem().Dir != null)
         {
-            foreach (BDDir dir in baiduFileList.GetSelectedItem().Dir)
+            foreach (NetDir dir in baiduFileList.GetSelectedItem().Dir)
             {
-                self_path.Add(dir.Path);
-                self_name.Add(dir.Name);
+                selfPath.Add(dir.Path);
+                selfName.Add(dir.Name);
             }
         }
-            
-        for (int i = 0; i < self_path.Count; i++)
-        {
-            target_path_list.Add(target_path);
-        }
-        if (!string.IsNullOrEmpty(target_path))
-        {
-            NetdiskResult netdiskResult = await baiduFileList.Copy(self_path.ToArray(), self_name.ToArray(), target_path_list.ToArray(), isAsync:true);
-            Trace.WriteLine(netdiskResult.Success.ToString() + netdiskResult.TaskID);
-            if (netdiskResult.Success && netdiskResult.TaskID != null)
-            {
-                if ((await baiduFileList.GetProgress(netdiskResult.TaskID)).Status == TaskStatusIndicate.Done)
-                {
-                    Refresh();
-                    return;
-                }
-                TaskView task_view = taskProber.AddTask();
-                task_view.SetText("复制文件", $"复制{target_path_list.Count.ToString()}个对象到{target_path}", "");
-                try
-                {
-                    string current_path = ParentPath;
-                    task_view.SetTask(baiduFileList.GetProgress, netdiskResult.TaskID, () => { RefreshCallback(current_path); });
 
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine(ex);
-                }
-            }
-            else
+        for (int i = 0; i < selfPath.Count; i++)
+        {
+            targetPathList.Add(targetPath);
+        }
+
+        try
+        {
+            if (!string.IsNullOrEmpty(targetPath))
             {
-                MessageOverlay message = new MessageOverlay();
-                OverlayReservedGrid.Children.Add(message);
-                string errMsg = string.Empty;
-                errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "未知错误";
-                errMsg += $"\t 错误码: {netdiskResult.ResultID.ToString()}";
-                message.SetMessage("创建失败", errMsg);
+                NetdiskResult netdiskResult = await baiduFileList.Copy(selfPath.ToArray(), selfName.ToArray(),
+                    targetPathList.ToArray(), isAsync: true);
+                Trace.WriteLine(netdiskResult.Success.ToString() + netdiskResult.TaskId);
+                if (netdiskResult.Success && netdiskResult.TaskId != null)
+                {
+                    if ((await baiduFileList.GetProgress(netdiskResult.TaskId)).Status == TaskStatusIndicate.Done)
+                    {
+                        Refresh();
+                        return;
+                    }
+
+                    TaskView taskView = taskProber.AddTask();
+                    taskView.SetText("复制文件", $"复制{targetPathList.Count.ToString()}个对象到{targetPath}", "");
+                    try
+                    {
+                        string currentPath = ParentPath;
+                        taskView.SetTask(baiduFileList.GetProgress, netdiskResult.TaskId,
+                            () => { RefreshCallback(currentPath); });
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine(ex);
+                    }
+                }
+                else
+                {
+                    MessageOverlay message = new MessageOverlay();
+                    OverlayReservedGrid.Children.Add(message);
+                    string errMsg = string.Empty;
+                    errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "未知错误";
+                    errMsg += $"\t 错误码: {netdiskResult.ResultId.ToString()}";
+                    message.SetMessage("创建失败", errMsg);
+                }
+
+                //Refresh();
+                return;
             }
-            //Refresh();
-            return;
+        }
+        catch (Exception ex)
+        {
+            ShowInfo(ex.Message);
         }
         
     }

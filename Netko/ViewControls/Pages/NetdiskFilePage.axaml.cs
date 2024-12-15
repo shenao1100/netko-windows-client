@@ -28,14 +28,14 @@ public partial class NetdiskFilePage : UserControl
     private IFileList? baiduFileList {  get; set; }
 
     // for file action use
-    private List<BDDir> selectDirList = new List<BDDir>();
-    private List<BDFile> selectFileList = new List<BDFile>();
+    private List<NetDir> selectDirList = new List<NetDir>();
+    private List<NetFile> selectFileList = new List<NetFile>();
     // for color changing use
     private Color selectedColor;
     private Color unselectedColor;
     // for toogle select
-    public Dictionary<BDDir, ItemShowLine> DirDict = new Dictionary<BDDir, ItemShowLine>();
-    public Dictionary<BDFile, ItemShowLine> FileDict = new Dictionary<BDFile, ItemShowLine>();
+    public Dictionary<NetDir, ItemShowLine> DirDict = new Dictionary<NetDir, ItemShowLine>();
+    public Dictionary<NetFile, ItemShowLine> FileDict = new Dictionary<NetFile, ItemShowLine>();
     public Grid OverlayReservedGrid { get; set; }
     public StackPanel OverlayNotification {  get; set; }
     public TransferPage? TransferPage { get; set; }
@@ -134,7 +134,7 @@ public partial class NetdiskFilePage : UserControl
             //ActionMenu
         }
     }
-    public void ToggleSelectedFile(BDFile file, UserControl userControl)
+    public void ToggleSelectedFile(NetFile file, UserControl userControl)
     {
         if (selectFileList.Contains(file))
         {
@@ -149,7 +149,7 @@ public partial class NetdiskFilePage : UserControl
 
     }
 
-    public void ToogleSelectedFolder(BDDir dir, UserControl userControl)
+    public void ToogleSelectedFolder(NetDir dir, UserControl userControl)
     {
         if (selectDirList.Contains(dir))
         {
@@ -273,7 +273,7 @@ public partial class NetdiskFilePage : UserControl
 
         if (page == 1) { FileListViewer.Opacity = 0; }
 
-        BDFileList list_ = await user.GetFileList(page, path: go_path);
+        FileList list_ = await user.GetFileList(page, path: go_path);
         if (page == 1)
         {
             // clear pervious
@@ -296,12 +296,12 @@ public partial class NetdiskFilePage : UserControl
             FileListViewer.Opacity = 1;
             SelectAllOverlay.Children.Remove(selectAllButton);
             EmptyRemind empty_label = new EmptyRemind();
-            empty_label.ShowError("²»´æÔÚµÄÎÄ¼þ¼Ð\nÄãÀ´µ½ÁËÃ»ÓÐÎÄ¼þµÄ»ÄÔ­");
+            empty_label.ShowError("ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½Ä¼ï¿½ï¿½ï¿½\nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ä»ï¿½Ô­");
             FileListViewer.Children.Add(empty_label);
             return;
         }
 
-        foreach (BDDir dir_b in list_.Dir)
+        foreach (NetDir dir_b in list_.Dir)
         {
             itemCount++;
             ItemShowLine DirBlock = new ItemShowLine();
@@ -312,7 +312,7 @@ public partial class NetdiskFilePage : UserControl
             // set name, BDDir, user, OverelayGrid
             DirBlock.SelfDir = dir_b;
 
-            DirBlock.Init(dir_b.Name, is_dir: true);
+            DirBlock.Init(dir_b.Name, isDir: true);
             DirBlock.baiduFileList = user;
             DirBlock.OverlayReservedGrid = OverlayReservedGrid;
             DirBlock.OverlayNotification = OverlayNotification;
@@ -323,7 +323,7 @@ public partial class NetdiskFilePage : UserControl
             FileListViewer.Children.Add(DirBlock);
 
         }
-        foreach (BDFile file_b in list_.File)
+        foreach (NetFile file_b in list_.File)
         {
             itemCount++;
 
@@ -337,7 +337,7 @@ public partial class NetdiskFilePage : UserControl
             // set name, BDDir, user, OverelayGrid
             FileBlock.SelfFile = file_b;
 
-            FileBlock.Init(file_b.Name, is_dir: false);
+            FileBlock.Init(file_b.Name, isDir: false);
             FileBlock.baiduFileList = user;
             FileBlock.OverlayReservedGrid = OverlayReservedGrid;
             FileBlock.OverlayNotification = OverlayNotification;
@@ -373,7 +373,7 @@ public partial class NetdiskFilePage : UserControl
     public async Task<string> initUser(string cookie)
     {
         INetdisk test_user = new Baidu(cookie);
-        await test_user.init();
+        await test_user.Init();
         if (UpdateUserSectionName != null) {
             UpdateUserSectionName(test_user.GetAccountInfo().Name);
         }

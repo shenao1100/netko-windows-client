@@ -40,7 +40,7 @@
 			</Button>
 			<Panel Margin="0" DockPanel.Dock="Top" x:Name="DragBar" PointerPressed="DragBar_OnDrag" DoubleTapped="DragBar_MaxWin">
 				<!--Provide darker background-->
-				<Border Background="{DynamicResource CatalogBaseMediumColor}" CornerRadius="0 7" Padding="17" Margin="0" Opacity="0" x:Name="Backpanel">
+				<Border Background="{DynamicResource CatalogBaseMediumColor}" CornerRadius="0 7 0 0" Padding="17" Margin="0" Opacity="0" x:Name="Backpanel">
 				</Border>
 				
 				<DockPanel Margin="0"  x:Name="ContentPanel" VerticalAlignment="Center"  Height="40">

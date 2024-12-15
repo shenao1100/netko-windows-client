@@ -14,7 +14,7 @@ namespace Netko.NetDisk
     {
 
     }
-    public struct BDDir
+    public struct NetDir
     {
         public long Category;
         public long ExtentTinyint7;
@@ -39,7 +39,7 @@ namespace Netko.NetDisk
         public long UnList;
         public long WpFile;
     }
-    public struct BDFile
+    public struct NetFile
     {
         public long Category;
         public long ExtentTinyint7;
@@ -67,66 +67,68 @@ namespace Netko.NetDisk
     }
 
 
-    public struct BDFileList
+    public struct FileList
     {
         public string Path;
-        public BDFile[] File;
-        public BDDir[] Dir;
+        public List<NetFile> File;
+        public List<NetDir> Dir;
     }
     public class NetdiskResult
     {
         public bool Success;
         public string? Msg;
-        public int ResultID;
-        public string? TaskID = string.Empty;
+        public int ResultId;
+        public string? TaskId = string.Empty;
     }
     public class AccountInfo
     {
         public string? InitCookie = null;
         public string? Name = null;
         public string? Token = null;
-        public long? storage_total;
-        public long? storage_free;
-        public long? storage_used;
+        public long? StorageTotal;
+        public long? StorageFree;
+        public long? StorageUsed;
     }
     public class TaskStatus
     {
         public int Progress;
-        public bool isError;
+        public bool IsError;
         public TaskStatusIndicate Status;
+        public string? TaskId = string.Empty;
+        public string? Message = string.Empty;
     }
     public interface INetdisk
     {
         AccountInfo GetAccountInfo();
-        string GetParticalCookie(string[] partical_keys);
+        string GetParticalCookie(string[] particalKeys);
         string GetCookie();
-        void ProcessSubCookie(string cookie_);
+        void ProcessSubCookie(string subCookie);
         void UpdateCookie(HttpResponseHeaders headers);
         void debug_info();
         Task<string> refresh_logid();
         Task<bool> initial_info();
-        Task init();
+        Task Init();
 
     }
     public interface IFileList
     {
         AccountInfo GetAccountInfo();
-        BDFileList GetSelectedItem();
-        bool ToggleSelectDir(BDDir Dir);
-        bool DirIsSelected(BDDir Dir);
-        bool FileIsSelected(BDFile File);
-        bool ToggleSelectFile(BDFile file);
-        string IntegrateFilelist(BDFile[]? files, BDDir[]? dirs);
-        string IntegrateIDlist(BDFile[]? files, BDDir[]? dirs);
+        FileList GetSelectedItem();
+        bool ToggleSelectDir(NetDir dir);
+        bool DirIsSelected(NetDir dir);
+        bool FileIsSelected(NetFile file);
+        bool ToggleSelectFile(NetFile file);
+        string IntegrateFilelist(List<NetFile>? files, List<NetDir>? dirs);
+        string IntegrateIDlist(List<NetFile>? files, List<NetDir>? dirs);
 
         Task<NetdiskResult> CreateDir(string path);
-        Task<NetdiskResult> Rename(string[] file_list, string[] name_list, bool isAsync = false);
-        Task<NetdiskResult> Copy(string[] file_list, string[] name_list, string[] target_path_list, bool isAsync = false);
-        Task<NetdiskResult> Move(string[] file_list, string[] name_list, string[] target_path_list, bool isAsync = false);
-        Task<string?> ShareFile(string file_id_list, string password, int period);
-        Task<NetdiskResult> DeleteFile(string file_list, bool isAsync = false);
-        Task<BDFileList> GetFileList(int page, int num = 1000, string path = "/", bool clear_select_list = true);
-        Task<TaskStatus> GetProgress(string request_id);
+        Task<NetdiskResult> Rename(string[] fileList, string[] nameList, bool isAsync = false);
+        Task<NetdiskResult> Copy(string[] fileList, string[] nameList, string[] targetPathList, bool isAsync = false);
+        Task<NetdiskResult> Move(string[] fileList, string[] nameList, string[] targetPathList, bool isAsync = false);
+        Task<string?> ShareFile(string fileIdList, string password, int period);
+        Task<NetdiskResult> DeleteFile(string fileList, bool isAsync = false);
+        Task<FileList> GetFileList(int page, int num = 1000, string path = "/", bool clearSelectList = true);
+        Task<TaskStatus> GetProgress(string requestId);
         Task<List<string>> GetFileDownloadLink(string path);
         DownloadConfig ChooseDownloadMethod();
     }

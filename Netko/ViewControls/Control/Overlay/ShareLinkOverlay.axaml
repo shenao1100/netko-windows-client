@@ -25,7 +25,7 @@
 					<DoubleTransition Property="Height" Duration="0:0:0.2"/>
 				</Transitions>
 			</Grid.Transitions>
-			<Border BorderBrush="Aqua" BorderThickness="1" Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
+			<Border BorderBrush="{DynamicResource AccentButtonBackground}" BorderThickness="1" Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
 			<StackPanel>
 				<Label Margin="5" FontSize="20" Padding="10 20 3 3">分享链接</Label>
 				<StackPanel x:Name="SettingSection">

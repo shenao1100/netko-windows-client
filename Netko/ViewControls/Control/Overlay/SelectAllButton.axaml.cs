@@ -10,10 +10,10 @@ namespace Netko;
 public partial class SelectAllButton : UserControl
 {
     public IFileList baiduFileList { get; set; }
-    public BDFileList list_ { get; set; }
+    public FileList list_ { get; set; }
     // for toogle select
-    public Dictionary<BDDir, ItemShowLine> DirDict = new Dictionary<BDDir, ItemShowLine>();
-    public Dictionary<BDFile, ItemShowLine> FileDict = new Dictionary<BDFile, ItemShowLine>();
+    public Dictionary<NetDir, ItemShowLine> DirDict = new Dictionary<NetDir, ItemShowLine>();
+    public Dictionary<NetFile, ItemShowLine> FileDict = new Dictionary<NetFile, ItemShowLine>();
     public SelectAllButton()
     {
         InitializeComponent();
@@ -21,7 +21,7 @@ public partial class SelectAllButton : UserControl
     public bool IsSelectAll()
     {
         bool isSelectAll = true;
-        foreach (BDDir dir in list_.Dir)
+        foreach (NetDir dir in list_.Dir)
         {
             if (!baiduFileList.DirIsSelected(dir))
             {
@@ -29,7 +29,7 @@ public partial class SelectAllButton : UserControl
                 break;
             }
         }
-        foreach (BDFile file in list_.File)
+        foreach (NetFile file in list_.File)
         {
             if (isSelectAll && !baiduFileList.FileIsSelected(file))
             {
@@ -44,11 +44,11 @@ public partial class SelectAllButton : UserControl
     {
         if (IsSelectAll())
         {
-            foreach (BDDir dir in list_.Dir)
+            foreach (NetDir dir in list_.Dir)
             {
                 DirDict[dir].toogleSelect();
             }
-            foreach (BDFile file in list_.File)
+            foreach (NetFile file in list_.File)
             {
                 FileDict[file].toogleSelect();
             }
@@ -56,14 +56,14 @@ public partial class SelectAllButton : UserControl
         }
         else
         {
-            foreach (BDDir dir in list_.Dir)
+            foreach (NetDir dir in list_.Dir)
             {
                 if (!baiduFileList.DirIsSelected(dir))
                 {
                     DirDict[dir].toogleSelect();
                 }
             }
-            foreach (BDFile file in list_.File)
+            foreach (NetFile file in list_.File)
             {
                 if (!baiduFileList.FileIsSelected(file))
                 {

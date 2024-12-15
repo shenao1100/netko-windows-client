@@ -11,7 +11,7 @@ namespace Netko;
 
 public partial class NetdiskPathDir : UserControl
 {
-    public BDDir selfDir {  get; set; }
+    public NetDir selfDir {  get; set; }
     public IFileList baiduFileList { get; set; }
     //public List<NetdiskPathDir> netdiskPathDirs { get; set; }
     public Button ExpandButton { get; set; }
@@ -54,8 +54,8 @@ public partial class NetdiskPathDir : UserControl
     private async void GetChildContent(string go_path)
     {
         
-        BDFileList list_ = await baiduFileList.GetFileList(1, path: go_path, clear_select_list:false);
-        foreach (BDDir dir_b in list_.Dir)
+        FileList list_ = await baiduFileList.GetFileList(1, path: go_path, clearSelectList:false);
+        foreach (NetDir dir_b in list_.Dir)
         {
             NetdiskPathDir netdiskPathDir = new NetdiskPathDir();
             netdiskPathDir.selfDir = dir_b;

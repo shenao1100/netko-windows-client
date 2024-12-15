@@ -42,13 +42,13 @@ public partial class TaskView : UserControl
                     switch (status.Status)
                     {
                         case TaskStatusIndicate.InQueue:
-                            secondary_content += "ÒÑÔÚ¶ÓÁÐÖÐ";
+                            secondary_content += "ï¿½ï¿½ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½";
                             break;
                         case TaskStatusIndicate.Working:
-                            secondary_content += "ÕýÔÚ´¦Àí";
+                            secondary_content += "ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½";
                             break;
                         case TaskStatusIndicate.Done:
-                            secondary_content += "ÒÑÍê³É";
+                            secondary_content += "ï¿½ï¿½ï¿½ï¿½ï¿½";
                             break;
                         default:
                             secondary_content += "Î´Öª";

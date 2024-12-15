@@ -30,7 +30,7 @@ namespace Netko
         private static FileStream ConfigFile { get; set; }
         static MeowSetting()
         {
-            ConfigFile = new FileStream("config.json", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            //ConfigFile = new FileStream("config.json", FileMode.OpenOrCreate, FileAccess.ReadWrite);
         }
 
         public static SettingJsonStruct NetkoConfig = new SettingJsonStruct();
@@ -40,12 +40,13 @@ namespace Netko
         
         public static void SaveConfig()
         {
+            ConfigFile = new FileStream("config.json", FileMode.OpenOrCreate, FileAccess.ReadWrite);
             // clear config file
             ConfigFile.SetLength(0);
             // set pointer
             ConfigFile.Position = 0;
             string jsonString = JsonConvert.SerializeObject(NetkoConfig, Formatting.Indented);
-            using (StreamWriter writer = new StreamWriter(ConfigFile, Encoding.UTF8, leaveOpen:true))
+            using (StreamWriter writer = new StreamWriter(ConfigFile, Encoding.UTF8))
             {
                 writer.Write(jsonString);
             }
@@ -66,8 +67,9 @@ namespace Netko
         }
         public static void LoadConfig()
         {
+            ConfigFile = new FileStream("config.json", FileMode.OpenOrCreate, FileAccess.ReadWrite);
             string string_conttent;
-            using (StreamReader reader = new StreamReader(ConfigFile, Encoding.UTF8, leaveOpen:true))
+            using (StreamReader reader = new StreamReader(ConfigFile, Encoding.UTF8))
             {
                 string_conttent = reader.ReadToEnd();
             }

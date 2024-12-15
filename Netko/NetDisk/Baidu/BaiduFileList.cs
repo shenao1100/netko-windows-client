@@ -1,7 +1,4 @@
-﻿using Avalonia.Controls;
-using Avalonia.Controls.Documents;
-using Avalonia.Media;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -9,14 +6,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Json;
-using System.Runtime.Serialization;
-using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
-using DynamicData;
-using System.Xml.Linq;
 using Netko.Download;
 
 namespace Netko.NetDisk.Baidu
@@ -30,7 +22,7 @@ namespace Netko.NetDisk.Baidu
     public class RenameItem
     {
         public string? path { get; set; }
-        public string? newname { get; set; }
+        public string? newName { get; set; }
     }
     /// <summary>
     /// For use in serial json obj in move data
@@ -39,44 +31,45 @@ namespace Netko.NetDisk.Baidu
     {
         public string? path { set; get; }
         public string? dest { set; get; }
-        public string? newname { get; set; }
+        public string? newName { get; set; }
     }
     
-    public class BaiduFileList(INetdisk Account): IFileList
+    public class BaiduFileList(INetdisk account): IFileList
     {
 
-        public Baidu BaiduAccount = (Baidu)Account;
-        public Dictionary<string, BDFileList> FileListTemp = new Dictionary<string, BDFileList>();
+        private readonly Baidu _baiduAccount = (Baidu)account;
+        public Dictionary<string, FileList> FileListTemp = new Dictionary<string, FileList>();
 
-        private List<BDDir> selectDirList = new List<BDDir>();
-        private List<BDFile> selectFileList = new List<BDFile>();
+        private readonly List<NetDir> _selectDirList = new List<NetDir>();
+        private readonly List<NetFile> _selectFileList = new List<NetFile>();
+        private Dictionary<string, TaskStatus> _localTaskStatus = new Dictionary<string, TaskStatus>();
         
-        const string channel = "00000000000000000000000040000001";
-        const string channel_short = "chunlei";
-        const string version = "7.46.5.113";
-        string devuid = WebUtility.UrlEncode("BDIMXV2-O_" + GenerateSHA1Hash(DateTimeOffset.Now.ToUnixTimeSeconds().ToString()).ToUpper() + "-C_0-D_EF93_EFA6_BE93_0001_001B_448B_4A73_736B.-M_088FC3E93899-V_3FFFE1E0");
-        string rand = GenerateSHA1Hash(DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + "meow_rand1");
-        string time = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
-        string rand2 = GenerateSHA1Hash(DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + "meow");
+        const string Channel = "00000000000000000000000040000001";
+        const string ChannelShortS = "chunlei";
+        const string Version = "7.46.5.113";
+        readonly string _devuid = WebUtility.UrlEncode("BDIMXV2-O_" + GenerateSha1Hash(DateTimeOffset.Now.ToUnixTimeSeconds().ToString()).ToUpper() + "-C_0-D_EF93_EFA6_BE93_0001_001B_448B_4A73_736B.-M_088FC3E93899-V_3FFFE1E0");
+        readonly string _rand = GenerateSha1Hash(DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + "meow_rand1");
+        readonly string _time = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+        readonly string _rand2 = GenerateSha1Hash(DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + "meow");
 
-        public const string app_id = "250528";
-        public const string clienttype = "0";
-        public const string netdisk_user_agent = "netdisk";
-        public const string broswer_user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.52";
+        public const string AppId = "250528";
+        private const string Clienttype = "0";
+        private const string NetdiskUserAgent = "netdisk";
+        public const string BrowserUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.52";
 
         public AccountInfo GetAccountInfo()
         {
             return new AccountInfo
             {
-                InitCookie = BaiduAccount.init_cookie_string,
-                Name = BaiduAccount.name,
-                Token = BaiduAccount.bdstoken,
-                storage_used = BaiduAccount.storage_used,
-                storage_total = BaiduAccount.storage_total,
-                storage_free = BaiduAccount.storage_free,
+                InitCookie = _baiduAccount.init_cookie_string,
+                Name = _baiduAccount.name,
+                Token = _baiduAccount.bdstoken,
+                StorageUsed = _baiduAccount.storage_used,
+                StorageTotal = _baiduAccount.storage_total,
+                StorageFree = _baiduAccount.storage_free,
             };
         }
-        static string GenerateSHA1Hash(string input)
+        static string GenerateSha1Hash(string input)
         {
             using (SHA1 sha1 = SHA1.Create())  // 创建 SHA-1 实例
             {
@@ -96,9 +89,9 @@ namespace Netko.NetDisk.Baidu
                 return sb.ToString();
             }
         }
-        private BDDir ParseDir(JObject item)
+        private NetDir ParseDir(JObject item)
         {
-            BDDir dir = new BDDir();
+            NetDir dir = new NetDir();
             dir.Category = (long)(item["category"] ?? 0);
             dir.ExtentTinyint7 = (long)(item["extent_tinyint7"] ?? 0);
             dir.FromType = (long)(item["from_type"] ?? 0);
@@ -123,9 +116,9 @@ namespace Netko.NetDisk.Baidu
             dir.WpFile = (long)(item["wpfile"] ?? 0);
             return dir;
         }
-        private BDFile ParseFile(JObject item)
+        private NetFile ParseFile(JObject item)
         {
-            BDFile file = new BDFile();
+            NetFile file = new NetFile();
             file.Category = (long)(item["category"] ?? 0);
             file.ExtentTinyint7 = (long)(item["extent_tinyint7"] ?? 0);
             file.FromType = (long)(item["from_type"] ?? 0);
@@ -151,78 +144,78 @@ namespace Netko.NetDisk.Baidu
             file.MD5 = item["md5"]?.ToString() ?? "0";
             return file;
         }
-        private BDFileList ParseFileList(JArray FileList)
+        private FileList ParseFileList(JArray jArrayFileList)
         {
-            BDFileList fileList = new BDFileList();
-            int totalFiles = FileList.Count(item => (int?)item["isdir"] == 0);
-            int totalDirs = FileList.Count(item => (int?)item["isdir"] == 1);
-            fileList.File = new BDFile[totalFiles];
-            fileList.Dir = new BDDir[totalDirs];
-            int file_count = 0, dir_count = 0;
-            foreach (JObject item in FileList) {
+            FileList fileList = new FileList();
+            int totalFiles = jArrayFileList.Count(item => (int?)item["isdir"] == 0);
+            int totalDirs = jArrayFileList.Count(item => (int?)item["isdir"] == 1);
+            fileList.File = new List<NetFile>();
+            fileList.Dir = new List<NetDir>();
+            int fileCount = 0, dirCount = 0;
+            foreach (JObject item in jArrayFileList) {
                 if ((int?)item["isdir"] == 0)
                 {
                     // File
-                    fileList.File[file_count] = ParseFile(item);
-                    file_count++;
+                    fileList.File.Add(ParseFile(item));
+                    fileCount++;
                 }
-                else
+                else if ((int?)item["isdir"] == 1)
                 {
                     // Dir
-                    fileList.Dir[dir_count] = ParseDir(item);
-                    dir_count++;
+                    fileList.Dir.Add(ParseDir(item));
+                    dirCount++;
                 }
             }
             return fileList;
 
         }
 
-        public BDFileList GetSelectedItem()
+        public FileList GetSelectedItem()
         {
-            if(selectDirList.Count == 0 && selectFileList.Count == 0)
+            if(_selectDirList.Count == 0 && _selectFileList.Count == 0)
             {
-                return new BDFileList();
+                return new FileList();
             }
-            BDFileList fileList = new BDFileList();
-            fileList.File = selectFileList.ToArray();
-            fileList.Dir = selectDirList.ToArray();
+            FileList fileList = new FileList();
+            fileList.File = _selectFileList;
+            fileList.Dir = _selectDirList;
             return fileList;
         }
 
-        public bool ToggleSelectDir(BDDir Dir)
+        public bool ToggleSelectDir(NetDir dir)
         {
-            if (selectDirList.Contains(Dir))
+            if (_selectDirList.Contains(dir))
             {
-                selectDirList.Remove(Dir);
+                _selectDirList.Remove(dir);
                 return false;
             }
             else
             {
-                selectDirList.Add(Dir);
+                _selectDirList.Add(dir);
                 return true;
             }
         }
 
-        public bool DirIsSelected(BDDir Dir)
+        public bool DirIsSelected(NetDir dir)
         {
-            if (selectDirList.Contains(Dir)) { return true; } else { return false; }
+            if (_selectDirList.Contains(dir)) { return true; } else { return false; }
         }
 
-        public bool FileIsSelected(BDFile File)
+        public bool FileIsSelected(NetFile file)
         {
-            if (selectFileList.Contains(File)) { return true; } else { return false; }
+            if (_selectFileList.Contains(file)) { return true; } else { return false; }
         }
 
-        public bool ToggleSelectFile(BDFile file)
+        public bool ToggleSelectFile(NetFile file)
         {
-            if (selectFileList.Contains(file))
+            if (_selectFileList.Contains(file))
             {
-                selectFileList.Remove(file);
+                _selectFileList.Remove(file);
                 return false;
             }
             else
             {
-                selectFileList.Add(file);
+                _selectFileList.Add(file);
                 return true;
             }
         }
@@ -232,23 +225,23 @@ namespace Netko.NetDisk.Baidu
         /// <param name="files"></param>
         /// <param name="dirs"></param>
         /// <returns>like: "[\"/新建文件夹\"]"</returns>
-        public string IntegrateFilelist(BDFile[]? files, BDDir[]? dirs)
+        public string IntegrateFilelist(List<NetFile>? files, List<NetDir>? dirs)
         {
             string result = "[";
-            int count = 0, total_count = 0;
+            int count = 0, totalCount = 0;
             if (files != null)
             {
-                total_count += files.Count();
+                totalCount += files.Count();
             }
             if (dirs != null)
             {
-                total_count += dirs.Count();
+                totalCount += dirs.Count();
             }
             if (files != null) {
-                foreach (BDFile file in files)
+                foreach (NetFile file in files)
                 {
                     count++;
-                    if (count == total_count)
+                    if (count == totalCount)
                     {
                         result += $"\"{file.Path}\"";
                     }
@@ -260,10 +253,10 @@ namespace Netko.NetDisk.Baidu
             }
             if (dirs != null)
             {
-                foreach (BDDir dir in dirs)
+                foreach (NetDir dir in dirs)
                 {
                     count++;
-                    if (count == total_count)
+                    if (count == totalCount)
                     {
                         result += $"\"{dir.Path}\"";
                     }
@@ -283,25 +276,25 @@ namespace Netko.NetDisk.Baidu
         /// <param name="files"></param>
         /// <param name="dirs"></param>
         /// <returns>like: "[123, 456...]"</returns>
-        public string IntegrateIDlist(BDFile[]? files, BDDir[]? dirs)
+        public string IntegrateIDlist(List<NetFile>? files, List<NetDir>? dirs)
         {
             string result = "[";
-            int count = 0, total_count = 0;
+            int count = 0, totalCount = 0;
             if (files != null)
             {
-                total_count += files.Count();
+                totalCount += files.Count();
             }
             if (dirs != null)
             {
-                total_count += dirs.Count();
+                totalCount += dirs.Count();
             }
 
             if (files != null)
             {
-                foreach (BDFile file in files)
+                foreach (NetFile file in files)
                 {
                     count++;
-                    if (count == total_count)
+                    if (count == totalCount)
                     {
                         result += $"{file.ID}";
                     }
@@ -313,10 +306,10 @@ namespace Netko.NetDisk.Baidu
             }
             if (dirs != null)
             {
-                foreach (BDDir dir in dirs)
+                foreach (NetDir dir in dirs)
                 {
                     count++;
-                    if (count == total_count)
+                    if (count == totalCount)
                     {
                         result += $"{dir.ID}";
                     }
@@ -330,17 +323,32 @@ namespace Netko.NetDisk.Baidu
             return result;
         }
 
+        private void ChangeLocalTaskStatus(string taskId, 
+            string message,
+            int progress, 
+            bool isError, 
+            TaskStatusIndicate status)
+        {
+            _localTaskStatus[taskId] = new TaskStatus()
+            {
+                Message = message,
+                TaskId = taskId,
+                Progress = progress,
+                IsError = isError,
+                Status = status
+            };
+        }
         public async Task<NetdiskResult> CreateDir(string path)
         {
             
-            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string url = $"https://pan.baidu.com/api/create?clienttype={clienttype}&channel={channel}&version={version}&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}";
+            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string url = $"https://pan.baidu.com/api/create?clienttype={Clienttype}&channel={Channel}&version={Version}&devuid={_devuid}&rand={_rand}&time={_time}&rand2={_rand2}";
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", netdisk_user_agent);
+            client.DefaultRequestHeaders.Add("User-Agent", NetdiskUserAgent);
             client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
-            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            client.DefaultRequestHeaders.Add("Cookie", _baiduAccount.GetCookie());
             client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
             client.DefaultRequestHeaders.Add("Host", "pan.baidu.com");
             //path=//新建文件夹&size=0&isdir=1
@@ -351,23 +359,23 @@ namespace Netko.NetDisk.Baidu
                 new KeyValuePair<string, string>("isdir", "1")
             });
             HttpResponseMessage content = await client.PostAsync(url, formData);
-            BaiduAccount.UpdateCookie(content.Headers);
-            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
-            task_content.Wait();
+            _baiduAccount.UpdateCookie(content.Headers);
+            var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
+            taskContent.Wait();
             Dictionary<string, object>? body
-                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             NetdiskResult netdiskResult = new NetdiskResult();
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
                 netdiskResult.Success = true;
                 netdiskResult.Msg = null;
-                netdiskResult.ResultID = Convert.ToInt32(body["errno"]);
-                netdiskResult.TaskID = (body.ContainsKey("taskid")) ? Convert.ToString(body["taskid"]) : null;
+                netdiskResult.ResultId = Convert.ToInt32(body["errno"]);
+                netdiskResult.TaskId = (body.ContainsKey("taskid")) ? Convert.ToString(body["taskid"]) : null;
                 return netdiskResult;
             }
             else {
                 netdiskResult.Success = false;
-                netdiskResult.ResultID = (body != null) ? Convert.ToInt32(body["errno"]) : -1;
+                netdiskResult.ResultId = (body != null) ? Convert.ToInt32(body["errno"]) : -1;
                 netdiskResult.Msg = (body != null && body.ContainsKey("show_msg")) ? Convert.ToString("show_msg") : null;
                 return netdiskResult;
 
@@ -375,15 +383,15 @@ namespace Netko.NetDisk.Baidu
 
         }
 
-        public async Task<NetdiskResult> Rename(string[] file_list, string[] name_list, bool isAsync = false)
+        public async Task<NetdiskResult> Rename(string[] fileList, string[] nameList, bool isAsync = false)
         {
             // pack json data
             var data = new List<RenameItem>();
-            if (file_list.Length == name_list.Length)
+            if (fileList.Length == nameList.Length)
             {
-                for (int i = 0; i < name_list.Length; i++)
+                for (int i = 0; i < nameList.Length; i++)
                 {
-                    data.Add(new RenameItem { newname = name_list[i], path = file_list[i] });
+                    data.Add(new RenameItem { newName = nameList[i], path = fileList[i] });
                 }
             }
             else
@@ -392,7 +400,7 @@ namespace Netko.NetDisk.Baidu
                 {
                     Success = false,
                     Msg = "列表长度不一致",
-                    ResultID = -1
+                    ResultId = -1
                 };
             }
             // serialize json data
@@ -402,48 +410,48 @@ namespace Netko.NetDisk.Baidu
             {
                 new KeyValuePair<string, string>("filelist", jsonString)
             });
-            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string async_param = isAsync ? "2" : "1";
-            string url = $"https://pan.baidu.com/api/filemanager?opera=rename&async={async_param}&onnest=fail&channel={channel_short}&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string asyncParam = isAsync ? "2" : "1";
+            string url = $"https://pan.baidu.com/api/filemanager?opera=rename&async={asyncParam}&onnest=fail&channel={ChannelShortS}&web=1&app_id=250528&bdstoken={_baiduAccount.bdstoken}&logid={logId}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
-            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            client.DefaultRequestHeaders.Add("Cookie", _baiduAccount.GetCookie());
             HttpResponseMessage content = await client.PostAsync(url, formData);
-            BaiduAccount.UpdateCookie(content.Headers);
-            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
-            task_content.Wait();
-            Trace.WriteLine(task_content.Result);
+            _baiduAccount.UpdateCookie(content.Headers);
+            var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
+            taskContent.Wait();
+            Trace.WriteLine(taskContent.Result);
             Dictionary<string, object>? body
-                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             NetdiskResult netdiskResult = new NetdiskResult();
 
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
                 netdiskResult.Success = true;
                 netdiskResult.Msg = null;
-                netdiskResult.ResultID = Convert.ToInt32(body["errno"]);
-                netdiskResult.TaskID = (body.ContainsKey("taskid")) ? Convert.ToString(body["taskid"]) : null;
+                netdiskResult.ResultId = Convert.ToInt32(body["errno"]);
+                netdiskResult.TaskId = (body.ContainsKey("taskid")) ? Convert.ToString(body["taskid"]) : null;
                 return netdiskResult;
             }
             else
             {
                 netdiskResult.Success = false;
-                netdiskResult.ResultID = (body != null) ? Convert.ToInt32(body["errno"]) : -1;
+                netdiskResult.ResultId = (body != null) ? Convert.ToInt32(body["errno"]) : -1;
                 netdiskResult.Msg = (body != null && body.ContainsKey("show_msg")) ? Convert.ToString("show_msg") : null;
                 return netdiskResult;
 
             }
         }
-        public async Task<NetdiskResult> Copy(string[] file_list, string[] name_list, string[] target_path_list, bool isAsync=false)
+        public async Task<NetdiskResult> Copy(string[] fileList, string[] nameList, string[] targetPathList, bool isAsync=false)
         {
             // pack json data
             var data = new List<MoveItem>();
-            if (file_list.Length == name_list.Length && name_list.Length == target_path_list.Length)
+            if (fileList.Length == nameList.Length && nameList.Length == targetPathList.Length)
             {
-                for (int i = 0; i < name_list.Length; i++)
+                for (int i = 0; i < nameList.Length; i++)
                 {
-                    data.Add(new MoveItem { newname = name_list[i], path = file_list[i], dest = target_path_list[i] });
+                    data.Add(new MoveItem { newName = nameList[i], path = fileList[i], dest = targetPathList[i] });
                 }
             }
             else
@@ -452,7 +460,7 @@ namespace Netko.NetDisk.Baidu
                 {
                     Success = false,
                     Msg = "列表长度不一致",
-                    ResultID = -1
+                    ResultId = -1
                 };
             }
             // serialize json data
@@ -462,52 +470,52 @@ namespace Netko.NetDisk.Baidu
             {
                 new KeyValuePair<string, string>("filelist", jsonString)
             });
-            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string async_param = isAsync ? "2" : "1";
-            string url = $"https://pan.baidu.com/api/filemanager?opera=copy&async={async_param}&onnest=fail&channel={channel_short}&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string asyncParam = isAsync ? "2" : "1";
+            string url = $"https://pan.baidu.com/api/filemanager?opera=copy&async={asyncParam}&onnest=fail&channel={ChannelShortS}&web=1&app_id=250528&bdstoken={_baiduAccount.bdstoken}&logid={logId}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
-            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            client.DefaultRequestHeaders.Add("Cookie", _baiduAccount.GetCookie());
             HttpResponseMessage content = await client.PostAsync(url, formData);
-            BaiduAccount.UpdateCookie(content.Headers);
-            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
-            task_content.Wait();
-            Trace.WriteLine(task_content.Result);
+            _baiduAccount.UpdateCookie(content.Headers);
+            var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
+            taskContent.Wait();
+            Trace.WriteLine(taskContent.Result);
             Dictionary<string, object>? body
-                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             NetdiskResult netdiskResult = new NetdiskResult();
 
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
                 netdiskResult.Success = true;
                 netdiskResult.Msg = null;
-                netdiskResult.ResultID = Convert.ToInt32(body["errno"]);
-                netdiskResult.TaskID = (body.ContainsKey("taskid")) ? Convert.ToString(body["taskid"]) : null;
+                netdiskResult.ResultId = Convert.ToInt32(body["errno"]);
+                netdiskResult.TaskId = (body.ContainsKey("taskid")) ? Convert.ToString(body["taskid"]) : null;
                 return netdiskResult;
             }
             else
             {
                 netdiskResult.Success = false;
-                netdiskResult.ResultID = (body != null) ? Convert.ToInt32(body["errno"]) : -1;
+                netdiskResult.ResultId = (body != null) ? Convert.ToInt32(body["errno"]) : -1;
                 netdiskResult.Msg = (body != null && body.ContainsKey("show_msg")) ? Convert.ToString("show_msg") : null;
                 return netdiskResult;
 
             }
         }
 
-        public async Task<NetdiskResult> Move(string[] file_list, string[] name_list, string[] target_path_list, bool isAsync = false)
+        public async Task<NetdiskResult> Move(string[] fileList, string[] nameList, string[] targetPathList, bool isAsync = false)
         {
             // pack json data
             var data = new List<MoveItem>();
-            if (file_list.Length == name_list.Length && name_list.Length == target_path_list.Length)
+            if (fileList.Length == nameList.Length && nameList.Length == targetPathList.Length)
             {
-                for (int i = 0; i < name_list.Length; i++)
+                for (int i = 0; i < nameList.Length; i++)
                 {
-                    Trace.WriteLine(file_list[i]);
-                    Trace.WriteLine(name_list[i]);
+                    Trace.WriteLine(fileList[i]);
+                    Trace.WriteLine(nameList[i]);
 
-                    data.Add(new MoveItem { newname = name_list[i], path = file_list[i], dest = target_path_list[i] });
+                    data.Add(new MoveItem { newName = nameList[i], path = fileList[i], dest = targetPathList[i] });
                 }
             }
             else
@@ -516,7 +524,7 @@ namespace Netko.NetDisk.Baidu
                 {
                     Success = false,
                     Msg = "列表长度不一致",
-                    ResultID = -1
+                    ResultId = -1
                 };
             }
             // serialize json data
@@ -526,35 +534,35 @@ namespace Netko.NetDisk.Baidu
             {
                 new KeyValuePair<string, string>("filelist", jsonString)
             });
-            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string async_param = isAsync ? "2" : "1";
+            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string asyncParam = isAsync ? "2" : "1";
 
-            string url = $"https://pan.baidu.com/api/filemanager?opera=move&async={async_param}&onnest=fail&channel={channel_short}&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            string url = $"https://pan.baidu.com/api/filemanager?opera=move&async={asyncParam}&onnest=fail&channel={ChannelShortS}&web=1&app_id=250528&bdstoken={_baiduAccount.bdstoken}&logid={logId}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
-            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            client.DefaultRequestHeaders.Add("Cookie", _baiduAccount.GetCookie());
             HttpResponseMessage content = await client.PostAsync(url, formData);
-            BaiduAccount.UpdateCookie(content.Headers);
-            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
-            task_content.Wait();
-            Trace.WriteLine(task_content.Result);
+            _baiduAccount.UpdateCookie(content.Headers);
+            var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
+            taskContent.Wait();
+            Trace.WriteLine(taskContent.Result);
             Dictionary<string, object>? body
-                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             NetdiskResult netdiskResult = new NetdiskResult();
 
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
                 netdiskResult.Success = true;
                 netdiskResult.Msg = null;
-                netdiskResult.ResultID = Convert.ToInt32(body["errno"]);
-                netdiskResult.TaskID = (body.ContainsKey("taskid")) ? Convert.ToString(body["taskid"]) : null;
+                netdiskResult.ResultId = Convert.ToInt32(body["errno"]);
+                netdiskResult.TaskId = (body.ContainsKey("taskid")) ? Convert.ToString(body["taskid"]) : null;
                 return netdiskResult;
             }
             else
             {
                 netdiskResult.Success = false;
-                netdiskResult.ResultID = (body != null) ? Convert.ToInt32(body["errno"]) : -1;
+                netdiskResult.ResultId = (body != null) ? Convert.ToInt32(body["errno"]) : -1;
                 netdiskResult.Msg = (body != null && body.ContainsKey("show_msg")) ? Convert.ToString("show_msg") : null;
                 return netdiskResult;
             }
@@ -563,23 +571,23 @@ namespace Netko.NetDisk.Baidu
         /// <summary>
         /// Generate share url
         /// </summary>
-        /// <param name="file_id_list">[123, 456...]</param>
-        /// <param name="password">4 digs combation of munber and char</param>
+        /// <param name="fileIdList">[123, 456...]</param>
+        /// <param name="password">4 digs combination of number and char</param>
         /// <param name="period">0: forever, 1: one day, 365: 365days...</param>
         /// <returns></returns>
-        public async Task<string?> ShareFile(string file_id_list, string password, int period)
+        public async Task<string?> ShareFile(string fileIdList, string password, int period)
         {
-            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
+            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
 
-            string url = $"https://pan.baidu.com/share/set?channel={channel}&clienttype=0&web=1&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            string url = $"https://pan.baidu.com/share/set?channel={Channel}&clienttype=0&web=1&web=1&app_id=250528&bdstoken={_baiduAccount.bdstoken}&logid={logId}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
-            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
-            Trace.WriteLine(file_id_list);
+            client.DefaultRequestHeaders.Add("Cookie", _baiduAccount.GetCookie());
+            Trace.WriteLine(fileIdList);
             var formData = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>("fid_list", file_id_list),
+                new KeyValuePair<string, string>("fid_list", fileIdList),
                 new KeyValuePair<string, string>("channel_list", "[]"),
                 new KeyValuePair<string, string>("period", period.ToString()),
                 new KeyValuePair<string, string>("pwd", password),
@@ -588,12 +596,12 @@ namespace Netko.NetDisk.Baidu
             });
 
             HttpResponseMessage content = await client.PostAsync(url, formData);
-            BaiduAccount.UpdateCookie(content.Headers);
-            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
-            task_content.Wait();
-            Trace.WriteLine(task_content.Result);
+            _baiduAccount.UpdateCookie(content.Headers);
+            var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
+            taskContent.Wait();
+            Trace.WriteLine(taskContent.Result);
             Dictionary<string, object>? body
-                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
 
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
@@ -606,78 +614,79 @@ namespace Netko.NetDisk.Baidu
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="file_list">like "[\"/新建文件夹\"]"</param>
+        /// <param name="fileList">like "[\"/新建文件夹\"]"</param>
+        /// <param name="isAsync"></param>
         /// <returns></returns>
-        public async Task<NetdiskResult> DeleteFile(string file_list, bool isAsync = false)
+        public async Task<NetdiskResult> DeleteFile(string fileList, bool isAsync = false)
         {
             //long timestampSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             //string time_stamp = timestampSeconds.ToString();
-            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string async_param = isAsync ? "2" : "1";
+            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string asyncParam = isAsync ? "2" : "1";
 
-            string url = $"https://pan.baidu.com/api/filemanager?opera=delete&async={async_param}&onnest=fail&channel={channel_short}&web=1&app_id=250528&bdstoken={BaiduAccount.bdstoken}&logid={log_id}&clienttype=0";
+            string url = $"https://pan.baidu.com/api/filemanager?opera=delete&async={asyncParam}&onnest=fail&channel={ChannelShortS}&web=1&app_id=250528&bdstoken={_baiduAccount.bdstoken}&logid={logId}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
-            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            client.DefaultRequestHeaders.Add("Cookie", _baiduAccount.GetCookie());
             //client.DefaultRequestHeaders.Add("Host", "pan.baidu.com");
             var formData = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>("filelist", file_list)
+                new KeyValuePair<string, string>("filelist", fileList)
             });
             
             HttpResponseMessage content = await client.PostAsync(url, formData);
-            BaiduAccount.UpdateCookie(content.Headers);
-            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
-            task_content.Wait();
-            Trace.WriteLine(task_content.Result);
+            _baiduAccount.UpdateCookie(content.Headers);
+            var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
+            taskContent.Wait();
+            Trace.WriteLine(taskContent.Result);
             Dictionary<string, object>? body
-                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             NetdiskResult netdiskResult = new NetdiskResult();
 
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
                 netdiskResult.Success = true;
                 netdiskResult.Msg = null;
-                netdiskResult.ResultID = Convert.ToInt32(body["errno"]);
-                netdiskResult.TaskID = (body.ContainsKey("taskid")) ? Convert.ToString(body["taskid"]) : null;
+                netdiskResult.ResultId = Convert.ToInt32(body["errno"]);
+                netdiskResult.TaskId = (body.ContainsKey("taskid")) ? Convert.ToString(body["taskid"]) : null;
                 return netdiskResult;
             }
             else
             {
                 netdiskResult.Success = false;
-                netdiskResult.ResultID = (body != null) ? Convert.ToInt32(body["errno"]) : -1;
+                netdiskResult.ResultId = (body != null) ? Convert.ToInt32(body["errno"]) : -1;
                 netdiskResult.Msg = (body != null && body.ContainsKey("show_msg")) ? Convert.ToString("show_msg") : null;
                 return netdiskResult;
 
             }
 
         }
-        public async Task<BDFileList> GetFileList(int page, int num=1000, string path="/", bool clear_select_list=true)
+        public async Task<FileList> GetFileList(int page, int num=1000, string path="/", bool clearSelectList=true)
         {
-            if (clear_select_list)
+            if (clearSelectList)
             {
-                selectDirList.Clear();
-                selectFileList.Clear();
+                _selectDirList.Clear();
+                _selectFileList.Clear();
             }
             path = WebUtility.UrlEncode(path);
-            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string url = $"https://pan.baidu.com/api/list?dir={path}&page={page}&num={num}&clienttype=8&channel={channel}&version=7.45.0.109&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}&vip={BaiduAccount.vip}&logid={log_id}&desc=1&order=time";
+            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string url = $"https://pan.baidu.com/api/list?dir={path}&page={page}&num={num}&clienttype=8&channel={Channel}&version=7.45.0.109&devuid={_devuid}&rand={_rand}&time={_time}&rand2={_rand2}&vip={_baiduAccount.vip}&logid={logId}&desc=1&order=time";
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", netdisk_user_agent);
+            client.DefaultRequestHeaders.Add("User-Agent", NetdiskUserAgent);
             client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
-            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            client.DefaultRequestHeaders.Add("Cookie", _baiduAccount.GetCookie());
             client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
             client.DefaultRequestHeaders.Add("Host", "pan.baidu.com");
             HttpResponseMessage content = await client.GetAsync(url);
-            BaiduAccount.UpdateCookie(content.Headers);
-            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
-            task_content.Wait();
+            _baiduAccount.UpdateCookie(content.Headers);
+            var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
+            taskContent.Wait();
 
             Dictionary<string, object>? body
-                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
                 if (body.ContainsKey("list") && body["list"] is JArray result)
@@ -686,36 +695,36 @@ namespace Netko.NetDisk.Baidu
                 }
             }
 
-            BDFileList fileList = new BDFileList();
+            FileList fileList = new FileList();
             return fileList;
             
         }
 
-        public async Task<TaskStatus> GetProgress(string request_id)
+        public async Task<TaskStatus> GetProgress(string requestId)
         {
-            string url = $"https://pan.baidu.com/share/taskquery?taskid={request_id}&clienttype=0&app_id=250528&web=1";
+            string url = $"https://pan.baidu.com/share/taskquery?taskid={requestId}&clienttype=0&app_id=250528&web=1";
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", netdisk_user_agent);
+            client.DefaultRequestHeaders.Add("User-Agent", NetdiskUserAgent);
             client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
-            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            client.DefaultRequestHeaders.Add("Cookie", _baiduAccount.GetCookie());
             client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
             client.DefaultRequestHeaders.Add("Host", "pan.baidu.com");
             HttpResponseMessage content = await client.GetAsync(url);
-            BaiduAccount.UpdateCookie(content.Headers);
-            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
-            task_content.Wait();
+            _baiduAccount.UpdateCookie(content.Headers);
+            var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
+            taskContent.Wait();
 
             Dictionary<string, object>? body
-                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             TaskStatus status = new TaskStatus();
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
                 if (body.ContainsKey("status") && body.ContainsKey("task_errno"))
                 {
-                    string status_str = Convert.ToString(body["status"])!;
-                    switch (status_str.ToLower())
+                    string statusStr = Convert.ToString(body["status"])!;
+                    switch (statusStr.ToLower())
                     {
                         case "running":
                             status.Status = TaskStatusIndicate.Working;
@@ -734,12 +743,12 @@ namespace Netko.NetDisk.Baidu
                             break;
 
                     }
-                    status.isError = false;
+                    status.IsError = false;
                     return status;
                 }
             }
 
-            status.isError = true;
+            status.IsError = true;
             return status;
         }
         /// <summary>
@@ -748,26 +757,26 @@ namespace Netko.NetDisk.Baidu
         /// <param name="path"></param>
         private async void downloadPreProcess(string path)
         {
-            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string new_logid = WebUtility.UrlEncode($"=MTczMTQxMjU5NSw4Nw==&path{path}");
+            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string newLogid = WebUtility.UrlEncode($"=MTczMTQxMjU5NSw4Nw==&path{path}");
 
             path = WebUtility.UrlEncode(path);
-            string url = $"https://pan.baidu.com/api/checkapl/download?clienttype=8&channel={channel}&version=7.46.5.113&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}&vip=0&logid={new_logid}";
+            string url = $"https://pan.baidu.com/api/checkapl/download?clienttype=8&channel={Channel}&version=7.46.5.113&devuid={_devuid}&rand={_rand}&time={_time}&rand2={_rand2}&vip=0&logid={newLogid}";
             using var nclient = new HttpClient();
-            nclient.DefaultRequestHeaders.Add("User-Agent", netdisk_user_agent);
+            nclient.DefaultRequestHeaders.Add("User-Agent", NetdiskUserAgent);
             nclient.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
             nclient.DefaultRequestHeaders.Add("Accept", "*/*");
             nclient.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
-            nclient.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            nclient.DefaultRequestHeaders.Add("Cookie", _baiduAccount.GetCookie());
             nclient.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
             nclient.DefaultRequestHeaders.Add("Host", "pan.baidu.com");
             var ndata = new StringContent(" ", Encoding.UTF8, "application/x-www-form-urlencoded");
 
             HttpResponseMessage ncontent = await nclient.PostAsync(url, ndata);
-            BaiduAccount.UpdateCookie(ncontent.Headers);
-            var ntask_content = Task.Run(() => ncontent.Content.ReadAsStringAsync());
-            ntask_content.Wait();
-            Trace.WriteLine(ntask_content.Result);
+            _baiduAccount.UpdateCookie(ncontent.Headers);
+            var ntaskContent = Task.Run(() => ncontent.Content.ReadAsStringAsync());
+            ntaskContent.Wait();
+            Trace.WriteLine(ntaskContent.Result);
         }
         /// <summary>
         /// CMS check for p2s record, has been disabled
@@ -776,28 +785,28 @@ namespace Netko.NetDisk.Baidu
         /// <returns></returns>
         private async Task<string> CMS(string path)
         {
-            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string new_logid = WebUtility.UrlEncode($"=MTczMTQxMjU5NSw4Nw==&path{path}");
+            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string newLogid = WebUtility.UrlEncode($"=MTczMTQxMjU5NSw4Nw==&path{path}");
 
             path = WebUtility.UrlEncode(path);
-            string url = $"https://pan.baidu.com/cms/fgid?method=query&clienttype=9&version=3.0.20.63&time=1731441395&rand=6f0e1e64572533db2cd6b44a731f5ee58244ffba&devuid=BDIMXV2-O_9432D545AA3849D19EFD762333A53888-C_0-D_E823_8FA6_BF53_0001_001B_448B_4A73_734B.-M_088FC3E23825-V_3EBDE1E0&channel=0&version_app=7.46.5.113&path={path}&uk={BaiduAccount.uk}&vip=0";
+            string url = $"https://pan.baidu.com/cms/fgid?method=query&clienttype=9&version=3.0.20.63&time=1731441395&rand=6f0e1e64572533db2cd6b44a731f5ee58244ffba&devuid=BDIMXV2-O_9432D545AA3849D19EFD762333A53888-C_0-D_E823_8FA6_BF53_0001_001B_448B_4A73_734B.-M_088FC3E23825-V_3EBDE1E0&channel=0&version_app=7.46.5.113&path={path}&uk={_baiduAccount.uk}&vip=0";
 
             //string url = $"https://pan.baidu.com/api/checkapl/download?clienttype=8&channel=00000000000000000000000040000001&version=7.46.5.113&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}&vip=0&logid={new_logid}";
             using var nclient = new HttpClient();
-            nclient.DefaultRequestHeaders.Add("User-Agent", netdisk_user_agent);
+            nclient.DefaultRequestHeaders.Add("User-Agent", NetdiskUserAgent);
             nclient.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
             nclient.DefaultRequestHeaders.Add("Accept", "*/*");
             nclient.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
-            nclient.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            nclient.DefaultRequestHeaders.Add("Cookie", _baiduAccount.GetCookie());
             nclient.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
             nclient.DefaultRequestHeaders.Add("Host", "pan.baidu.com");
 
             HttpResponseMessage ncontent = await nclient.GetAsync(url);
-            BaiduAccount.UpdateCookie(ncontent.Headers);
-            var ntask_content = Task.Run(() => ncontent.Content.ReadAsStringAsync());
-            ntask_content.Wait();
-            Trace.WriteLine(ntask_content.Result);
-            return ntask_content.Result;
+            _baiduAccount.UpdateCookie(ncontent.Headers);
+            var ntaskContent = Task.Run(() => ncontent.Content.ReadAsStringAsync());
+            ntaskContent.Wait();
+            Trace.WriteLine(ntaskContent.Result);
+            return ntaskContent.Result;
         }
         /// <summary>
         /// Get download link from local netdisk
@@ -805,8 +814,8 @@ namespace Netko.NetDisk.Baidu
         /// <param name="path"></param>
         public async Task<List<string>> GetFileDownloadLink(string path)
         {
-            string log_id = WebUtility.UrlEncode(BaiduAccount.log_id);
-            string orig_path = path;
+            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string origPath = path;
             path = WebUtility.UrlEncode(path);
 
             //await CMS(orig_path);
@@ -822,17 +831,17 @@ namespace Netko.NetDisk.Baidu
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Connection", "keep-alive");
             //client.DefaultRequestHeaders.Add("Accept-Encoding", "");
-            client.DefaultRequestHeaders.Add("Cookie", BaiduAccount.GetCookie());
+            client.DefaultRequestHeaders.Add("Cookie", _baiduAccount.GetCookie());
             client.DefaultRequestHeaders.Add("Host", "d.pcs.baidu.com");
             var data = new StringContent(" ", Encoding.UTF8, "application/x-www-form-urlencoded");
             HttpResponseMessage content = await client.PostAsync(url, data);
-            BaiduAccount.UpdateCookie(content.Headers);
-            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
-            task_content.Wait();
+            _baiduAccount.UpdateCookie(content.Headers);
+            var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
+            taskContent.Wait();
             //Trace.WriteLine(task_content.Result);
             List<string> link = new List<string>();
             Dictionary<string, object>? body
-                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             if (body != null && body["urls"] is JArray urls)
             {
                 foreach (JObject keyValuePairs in urls)
@@ -848,7 +857,7 @@ namespace Netko.NetDisk.Baidu
         {
             // PC: netdisk;P2SP;3.0.20.63;netdisk;7.46.5.113;PC;PC-Windows;10.0.22631;WindowsBaiduYunGuanJia
 
-            if (BaiduAccount.is_svip || BaiduAccount.is_vip)
+            if (_baiduAccount.is_svip || _baiduAccount.is_vip)
             {
                 return new DownloadConfig
                 {
@@ -870,6 +879,41 @@ namespace Netko.NetDisk.Baidu
                 };
                  
             }
+        }
+
+        public string MapFileList(string path)
+        {
+            
+            return string.Empty;
+        }
+        public async Task<FileList> MapFileListThread(string path, FileList fileList = new FileList())
+        {
+            if (fileList.Dir == null && fileList.File == null)
+            {
+                
+            }
+            int page = 0;
+            FileList tempFileList;
+            while (true)
+            {
+                page++;
+                tempFileList = await GetFileList(page, path:path);
+                if (tempFileList.Dir.Count + tempFileList.File.Count < 1000)
+                {
+                    break;
+                }
+            }
+            foreach (NetFile file in tempFileList.File)
+            {
+                fileList.File!.Add(file);
+            }
+            foreach (NetDir dir in tempFileList.Dir)
+            {
+                fileList = await MapFileListThread(path:dir.Path, fileList:fileList);
+                fileList.Dir.Add(dir);
+            }
+            
+            return fileList;
         }
     }
 }

@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Diagnostics;
-using Avalonia.Animation.Easings;
 using System.Net.Http.Headers;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using System.Net;
 using Newtonsoft.Json.Linq;
 
 namespace Netko.NetDisk.Baidu
@@ -45,20 +40,20 @@ namespace Netko.NetDisk.Baidu
         public const string netdisk_user_agent = "netdisk";
         public const string broswer_user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.52";
 
-        public string GetParticalCookie(string[] partical_keys)
+        public string GetParticalCookie(string[] particalKeys)
         {
-            string cookie_val = "";
-            foreach (string key in partical_keys)
+            string cookieVal = "";
+            foreach (string key in particalKeys)
             {
                 if (cookie.ContainsKey(key))
                 {
                     if (cookie[key] != null)
                     {
-                        cookie_val = key + "=" + cookie[key] + "; ";
+                        cookieVal = key + "=" + cookie[key] + "; ";
                     }
                     else
                     {
-                        cookie_val += key + "; ";
+                        cookieVal += key + "; ";
                     }
                 }
                 else
@@ -66,51 +61,51 @@ namespace Netko.NetDisk.Baidu
                     Trace.WriteLine(key + "doesnt exist");
                 }
             }
-            return cookie_val;
+            return cookieVal;
         }
         public string GetCookie()
         {
             /*
              * turn cookie dict into cookie header
              */
-            string cookie_val = "";
+            string cookieVal = "";
             foreach (var key in cookie.Keys)
             {
                 if (cookie[key] != null)
                 {
-                    cookie_val += key + "=" + cookie[key] + "; ";
+                    cookieVal += key + "=" + cookie[key] + "; ";
                 }
                 else
                 {
                     if (key != "" && key != string.Empty)
                     {
-                        cookie_val += key + "; ";
+                        cookieVal += key + "; ";
 
                     }
 
                 }
             }
-            return cookie_val;
+            return cookieVal;
         }
 
-        public void ProcessSubCookie(string cookie_)
+        public void ProcessSubCookie(string subCookie)
         {
             /*
              * 听说有人晕多层嵌套
              * update cookie value
              */
-            string[] sub_cookie = cookie_.Split(';');
-            foreach (var sub_cookie_ in sub_cookie)
+            string[] subCookieS = subCookie.Split(';');
+            foreach (var subCookiePart in subCookieS)
             {
                 string? key, value;
-                if (sub_cookie_.Contains("="))
+                if (subCookiePart.Contains("="))
                 {
-                    key = sub_cookie_.Split("=")[0].Trim();
-                    value = sub_cookie_.Split("=")[1].Trim();
+                    key = subCookiePart.Split("=")[0].Trim();
+                    value = subCookiePart.Split("=")[1].Trim();
                 }
                 else
                 {
-                    key = sub_cookie_;
+                    key = subCookiePart;
                     value = null;
                 }
 
@@ -128,18 +123,18 @@ namespace Netko.NetDisk.Baidu
 
             if (headers.Contains("Set-Cookie"))
             {
-                foreach (var cookie_ in headers.GetValues("Set-Cookie"))
+                foreach (var cookiePart in headers.GetValues("Set-Cookie"))
                 {
-                    if (cookie_.Contains(";"))
+                    if (cookiePart.Contains(";"))
                     {
-                        ProcessSubCookie(cookie_);
+                        ProcessSubCookie(cookiePart);
                     }
                     else
                     {
-                        ProcessSubCookie(cookie_ + ";");
+                        ProcessSubCookie(cookiePart + ";");
 
                     }
-                    Console.WriteLine(cookie_);
+                    Console.WriteLine(cookiePart);
                 }
             }
         }
@@ -169,9 +164,9 @@ namespace Netko.NetDisk.Baidu
                 InitCookie = init_cookie_string,
                 Name = name,
                 Token = bdstoken,
-                storage_used = storage_used,
-                storage_total = storage_total,
-                storage_free = storage_free,
+                StorageUsed = storage_used,
+                StorageTotal = storage_total,
+                StorageFree = storage_free,
             };
         }
         public async Task<string> refresh_logid()
@@ -192,7 +187,7 @@ namespace Netko.NetDisk.Baidu
             return log_id;
         }
         //https://passport.baidu.com/v2/api/getqrcode?lp=pc&qrloginfrom=pc&gid=D37084C-AEB7-493A-992C-9ED15CD1CEEC&callback=tangram_guid_1729166374201&apiver=v3&tt=1729166374830&tpl=netdisk&logPage=traceId%3Apc_loginv5_1729166375%2ClogPage%3Aloginv5&_=1729166374832
-        public async Task<bool> GetStorageUsage()
+        private async Task<bool> GetStorageUsage()
         {
             string url = $"https://pan.baidu.com/api/quota";
             using var client = new HttpClient();
@@ -207,12 +202,12 @@ namespace Netko.NetDisk.Baidu
             HttpResponseMessage content = await client.GetAsync(url);
 
             UpdateCookie(content.Headers);
-            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
-            task_content.Wait();
-            Trace.WriteLine(task_content.Result);
+            var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
+            taskContent.Wait();
+            Trace.WriteLine(taskContent.Result);
 
             Dictionary<string, object>? body
-                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
                 if (body.TryGetValue("result", out object? resultObj) && resultObj != null)
@@ -256,12 +251,12 @@ namespace Netko.NetDisk.Baidu
             HttpResponseMessage content = await client.GetAsync(url);
 
             UpdateCookie(content.Headers);
-            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
-            task_content.Wait();
-            Trace.WriteLine(task_content.Result);
+            var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
+            taskContent.Wait();
+            Trace.WriteLine(taskContent.Result);
 
             Dictionary<string, object>? body
-                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
                 if (body.TryGetValue("result", out object? resultObj) && resultObj != null)
@@ -315,21 +310,21 @@ namespace Netko.NetDisk.Baidu
             //Console.WriteLine("GETCOOKIE" + GetCookie());
 
             // get body
-            var task_content = Task.Run(() => content.Content.ReadAsStringAsync());
-            task_content.Wait();
-            Trace.WriteLine(task_content.Result);
+            var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
+            taskContent.Wait();
+            Trace.WriteLine(taskContent.Result);
 
             Dictionary<string, object>? body
-                = JsonConvert.DeserializeObject<Dictionary<string, object>>(task_content.Result);
+                = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
                 // Trace.WriteLine("body.ContainsKey(\"login_info\")" + body.ContainsKey("login_info").ToString());
                 if (body.TryGetValue("login_info", out object? logininfoObj) && logininfoObj != null)
                 {
-                    JObject login_info = JObject.Parse(logininfoObj?.ToString() ?? "{}");
-                    bdstoken = login_info["bdstoken"]?.ToString() ?? "";
-                    uk = login_info["uk"]?.ToString() ?? "";
-                    name = login_info["username"]?.ToString() ?? "";
+                    JObject loginInfo = JObject.Parse(logininfoObj?.ToString() ?? "{}");
+                    bdstoken = loginInfo["bdstoken"]?.ToString() ?? "";
+                    uk = loginInfo["uk"]?.ToString() ?? "";
+                    name = loginInfo["username"]?.ToString() ?? "";
                 }
                 debug_info();
                 return true;
@@ -355,11 +350,11 @@ namespace Netko.NetDisk.Baidu
                 vip = 0;
             }
         } 
-        public async Task init()
+        public async Task Init()
         {
             // Update info from server, this may take some time
-            string log_id = await refresh_logid();
-            if (log_id == string.Empty)
+            string logId = await refresh_logid();
+            if (logId == string.Empty)
             {
                 throw new Exception("Refresh logid failed.");
             }

@@ -6,7 +6,7 @@
              x:Class="Netko.FlyNoticeOverlay">
 	
 	<Grid Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="7 7 -200 7" x:Name="OutShell" Width="300">
-		<Border BorderBrush="Aqua" BorderThickness="0.7" Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
+		<Border BorderBrush="{DynamicResource AccentButtonBackground}" BorderThickness="0.7" Background="{DynamicResource CatalogChromeMediumColor}" x:Name="BorderBackground" CornerRadius="7" Padding="0" Margin="0" Opacity="1" BoxShadow="0 0 3 1 #20000000"/>
 
 		<TextBlock x:Name="ContentLabel" TextWrapping="Wrap" Margin="10"/>
 	</Grid>

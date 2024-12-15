@@ -9,14 +9,15 @@ using TextCopy;
 using System;
 using Avalonia.Media;
 using Netko.NetDisk;
+using System.Collections.Generic;
 
 namespace Netko;
 
 public partial class ShareLinkOverlay : UserControl
 {
     public IFileList baiduFileList {  get; set; }
-    public BDFile[] FileList { get; set; }
-    public BDDir[] DirList { get; set; }
+    public List<NetFile> FileList { get; set; }
+    public List<NetDir> DirList { get; set; }
 
     private string ShareURL { get; set; }
     private string Password { get; set; }
