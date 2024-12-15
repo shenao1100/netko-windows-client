@@ -42,13 +42,13 @@ public partial class TaskView : UserControl
                     switch (status.Status)
                     {
                         case TaskStatusIndicate.InQueue:
-                            secondary_content += "���ڶ�����";
+                            secondary_content += "已在队列中";
                             break;
                         case TaskStatusIndicate.Working:
-                            secondary_content += "���ڴ���";
+                            secondary_content += "正在处理";
                             break;
                         case TaskStatusIndicate.Done:
-                            secondary_content += "�����";
+                            secondary_content += "已完成";
                             break;
                         default:
                             secondary_content += "δ֪";
