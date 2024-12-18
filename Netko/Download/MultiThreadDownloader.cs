@@ -113,16 +113,16 @@ namespace Netko.Download
                     {
                         range.Add(new Range
                         {
-                            from = start,
-                            to = totalSize
+                            From = start,
+                            To = totalSize
                         });
                     }
                     else
                     {
                         range.Add(new Range
                         {
-                            from = start,
-                            to = start + average_size
+                            From = start,
+                            To = start + average_size
                         });
                         start += average_size;
                     }
@@ -182,7 +182,7 @@ namespace Netko.Download
         public async Task DownloadThread(Range range, string url)
         {
 
-            long pointer = range.from;
+            long pointer = range.From;
             try
             {
                 using (HttpClient client = new HttpClient())
@@ -196,7 +196,7 @@ namespace Netko.Download
                     {
                         client.DefaultRequestHeaders.TryAddWithoutValidation("Cookie", Cookie);
                     }
-                    client.DefaultRequestHeaders.Add("Range", $"bytes={range.from}-{range.to}");
+                    client.DefaultRequestHeaders.Add("Range", $"bytes={range.From}-{range.To}");
                     client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
 
                     client.Timeout = TimeSpan.FromSeconds(10);

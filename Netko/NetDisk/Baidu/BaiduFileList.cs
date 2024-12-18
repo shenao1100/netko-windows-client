@@ -18,17 +18,17 @@ namespace Netko.NetDisk.Baidu
     /// </summary>
     public class RenameItem
     {
-        public string? path { get; set; }
-        public string? newName { get; set; }
+        public string? Path { get; set; }
+        public string? NewName { get; set; }
     }
     /// <summary>
     /// For use in serial json obj in move data
     /// </summary>
     public class MoveItem
     {
-        public string? path { set; get; }
-        public string? dest { set; get; }
-        public string? newName { get; set; }
+        public string? Path { set; get; }
+        public string? Dest { set; get; }
+        public string? NewName { get; set; }
     }
     
     public class BaiduFileList(INetdisk account): IFileList
@@ -37,8 +37,8 @@ namespace Netko.NetDisk.Baidu
         private readonly Baidu _baiduAccount = (Baidu)account;
         public Dictionary<string, FileList> FileListTemp = new Dictionary<string, FileList>();
 
-        public List<NetDir> _selectDirList = new List<NetDir>();
-        public List<NetFile> _selectFileList = new List<NetFile>();
+        private List<NetDir> _selectDirList = new List<NetDir>();
+        private List<NetFile> _selectFileList = new List<NetFile>();
         private Dictionary<string, TaskStatus> _localTaskStatus = new Dictionary<string, TaskStatus>();
         
         const string Channel = "00000000000000000000000040000001";
@@ -92,15 +92,15 @@ namespace Netko.NetDisk.Baidu
             dir.Category = (long)(item["category"] ?? 0);
             dir.ExtentTinyint7 = (long)(item["extent_tinyint7"] ?? 0);
             dir.FromType = (long)(item["from_type"] ?? 0);
-            dir.ID = (long)(item["fs_id"] ?? 0);
+            dir.Id = (long)(item["fs_id"] ?? 0);
             dir.IsScene = (long)(item["is_scene"] ?? 0);
             dir.LocalCtime = (long)(item["local_ctime"] ?? 0);
             dir.LocalMtime = (long)(item["local_mtime"] ?? 0);
-            dir.OperID = (long)(item["oper_id"] ?? 0);
-            dir.OwnerID = (long)(item["owner_id"] ?? 0);
+            dir.OperId = (long)(item["oper_id"] ?? 0);
+            dir.OwnerId = (long)(item["owner_id"] ?? 0);
             dir.OwnerType = (long)(item["owner_type"] ?? 0);
             dir.Path = item["path"]?.ToString() ?? "/";
-            dir.pl = (long)(item["pl"] ?? 0);
+            dir.Pl = (long)(item["pl"] ?? 0);
             dir.RealCategory = item["real_category"]?.ToString() ?? "";
             dir.ServerAtime = (long)(item["server_atime"] ?? 0);
             dir.ServerCtime = (long)(item["server_ctime"] ?? 0);
@@ -108,7 +108,7 @@ namespace Netko.NetDisk.Baidu
             dir.Name = item["server_filename"]?.ToString() ?? "";
             dir.Share = (long)(item["share"] ?? 0);
             dir.Size = (long)(item["size"] ?? -1);
-            dir.TkBindID = (long)(item["tkbind_id"] ?? 0);
+            dir.TkBindId = (long)(item["tkbind_id"] ?? 0);
             dir.UnList = (long)(item["unlist"] ?? 0);
             dir.WpFile = (long)(item["wpfile"] ?? 0);
             return dir;
@@ -119,15 +119,15 @@ namespace Netko.NetDisk.Baidu
             file.Category = (long)(item["category"] ?? 0);
             file.ExtentTinyint7 = (long)(item["extent_tinyint7"] ?? 0);
             file.FromType = (long)(item["from_type"] ?? 0);
-            file.ID = (long)(item["fs_id"] ?? 0);
+            file.Id = (long)(item["fs_id"] ?? 0);
             file.IsScene = (long)(item["is_scene"] ?? 0);
             file.LocalCtime = (long)(item["local_ctime"] ?? 0);
             file.LocalMtime = (long)(item["local_mtime"] ?? 0);
-            file.OperID = (long)(item["oper_id"] ?? 0);
-            file.OwnerID = (long)(item["owner_id"] ?? 0);
+            file.OperId = (long)(item["oper_id"] ?? 0);
+            file.OwnerId = (long)(item["owner_id"] ?? 0);
             file.OwnerType = (long)(item["owner_type"] ?? 0);
             file.Path = item["path"]?.ToString() ?? "/";
-            file.pl = (long)(item["pl"] ?? 0);
+            file.Pl = (long)(item["pl"] ?? 0);
             file.RealCategory = item["real_category"]?.ToString() ?? "";
             file.ServerAtime = (long)(item["server_atime"] ?? 0);
             file.ServerCtime = (long)(item["server_ctime"] ?? 0);
@@ -135,17 +135,17 @@ namespace Netko.NetDisk.Baidu
             file.Name = item["server_filename"]?.ToString() ?? "";
             file.Share = (long)(item["share"] ?? 0);
             file.Size = (long)(item["size"] ?? -1);
-            file.TkBindID = (long)(item["tkbind_id"] ?? 0);
+            file.TkBindId = (long)(item["tkbind_id"] ?? 0);
             file.UnList = (long)(item["unlist"] ?? 0);
             file.WpFile = (long)(item["wpfile"] ?? 0);
-            file.MD5 = item["md5"]?.ToString() ?? "0";
+            file.Md5 = item["md5"]?.ToString() ?? "0";
             return file;
         }
         private FileList ParseFileList(JArray jArrayFileList)
         {
             FileList fileList = new FileList();
-            int totalFiles = jArrayFileList.Count(item => (int?)item["isdir"] == 0);
-            int totalDirs = jArrayFileList.Count(item => (int?)item["isdir"] == 1);
+            //int totalFiles = jArrayFileList.Count(item => (int?)item["isdir"] == 0);
+            //int totalDirs = jArrayFileList.Count(item => (int?)item["isdir"] == 1);
             fileList.File = new List<NetFile>();
             fileList.Dir = new List<NetDir>();
             //int fileCount = 0, dirCount = 0;
@@ -297,11 +297,11 @@ namespace Netko.NetDisk.Baidu
                     count++;
                     if (count == totalCount)
                     {
-                        result += $"{file.ID}";
+                        result += $"{file.Id}";
                     }
                     else
                     {
-                        result += $"{file.ID},";
+                        result += $"{file.Id},";
                     }
                 }
             }
@@ -312,11 +312,11 @@ namespace Netko.NetDisk.Baidu
                     count++;
                     if (count == totalCount)
                     {
-                        result += $"{dir.ID}";
+                        result += $"{dir.Id}";
                     }
                     else
                     {
-                        result += $"{dir.ID},";
+                        result += $"{dir.Id},";
                     }
                 }
             }
@@ -392,7 +392,7 @@ namespace Netko.NetDisk.Baidu
             {
                 for (int i = 0; i < nameList.Length; i++)
                 {
-                    data.Add(new RenameItem { newName = nameList[i], path = fileList[i] });
+                    data.Add(new RenameItem { NewName = nameList[i], Path = fileList[i] });
                 }
             }
             else
@@ -452,7 +452,7 @@ namespace Netko.NetDisk.Baidu
             {
                 for (int i = 0; i < nameList.Length; i++)
                 {
-                    data.Add(new MoveItem { newName = nameList[i], path = fileList[i], dest = targetPathList[i] });
+                    data.Add(new MoveItem { NewName = nameList[i], Path = fileList[i], Dest = targetPathList[i] });
                 }
             }
             else
@@ -513,7 +513,7 @@ namespace Netko.NetDisk.Baidu
             {
                 for (int i = 0; i < nameList.Length; i++)
                 {
-                    data.Add(new MoveItem { newName = nameList[i], path = fileList[i], dest = targetPathList[i] });
+                    data.Add(new MoveItem { NewName = nameList[i], Path = fileList[i], Dest = targetPathList[i] });
                 }
             }
             else
@@ -693,7 +693,12 @@ namespace Netko.NetDisk.Baidu
                 }
             }
 
-            FileList fileList = new FileList();
+            FileList fileList = new FileList()
+            {
+                File = new List<NetFile>(),
+                Dir = new List<NetDir>(),
+            };
+            
             return fileList;
             
         }

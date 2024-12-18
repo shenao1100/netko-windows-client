@@ -26,7 +26,7 @@ namespace Netko.Download
         private int CurrentThread { get; set; }
         private string? Url { get; set; }
         private string UserAgent { get; set; }
-        private string filePath { get; set; }
+        private string FilePath { get; set; }
 
         public Action? CallBack { get; set; }
 
@@ -64,10 +64,10 @@ namespace Netko.Download
             getUrlFunc = config.GetUrlFunc;
             UserAgent = config.UserAgent;
             _totalSize = config.FileSize;
-            filePath = config.FilePath;
+            FilePath = config.FilePath;
             _cookie = config.Cookie;    
 
-            FileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            FileStream = new FileStream(FilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             FileStream.SetLength(_totalSize);
         }
         public void AddUrl(string url)
@@ -113,8 +113,8 @@ namespace Netko.Download
                 {
                     ranges.Add(new Range
                     {
-                        from = calcedSize,
-                        to = _totalSize
+                        From = calcedSize,
+                        To = _totalSize
                     });
                     break;
 
@@ -123,8 +123,8 @@ namespace Netko.Download
                 {
                     ranges.Add(new Range
                     {
-                        from = calcedSize,
-                        to = calcedSize + _downloadBlockSize,
+                        From = calcedSize,
+                        To = calcedSize + _downloadBlockSize,
                     });
                 }
                 calcedSize += _downloadBlockSize + 1;
@@ -204,7 +204,7 @@ namespace Netko.Download
         public async Task DownloadThread(Range range, string url)
         {
             bool isCounted = false;
-            long pointer = range.from;
+            long pointer = range.From;
             try
             {
                 using (HttpClient client = new HttpClient())
@@ -218,7 +218,7 @@ namespace Netko.Download
                     {
                         client.DefaultRequestHeaders.TryAddWithoutValidation("Cookie", _cookie);
                     }
-                    client.DefaultRequestHeaders.Add("Range", $"bytes={range.from}-{range.to}");
+                    client.DefaultRequestHeaders.Add("Range", $"bytes={range.From}-{range.To}");
                     client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
 
                     //client.Timeout = TimeSpan.FromSeconds(10);
@@ -289,7 +289,7 @@ namespace Netko.Download
                 if (isCounted)
                 {
                     _downloadingThread--;
-                    isCounted = false;
+                    //isCounted = false;
 
                 }
                 await Task.Delay(500);
@@ -320,9 +320,9 @@ namespace Netko.Download
             }
             if (_cts.IsCancellationRequested)
             {
-                if (File.Exists(filePath))
+                if (File.Exists(FilePath))
                 {
-                    File.Delete(filePath);
+                    File.Delete(FilePath);
                 }
             }
             _isDownloading = false;

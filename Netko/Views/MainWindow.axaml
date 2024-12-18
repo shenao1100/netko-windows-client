@@ -35,7 +35,7 @@
 			<DockPanel Margin="0" DockPanel.Dock="Top">
 				
 			
-			<Button Background="Transparent" Height="35" Width="40" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10 10 0 0" DockPanel.Dock="Left" Click="switchShrink">
+			<Button Background="Transparent" Height="35" Width="40" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10 10 0 0" DockPanel.Dock="Left" Click="SwitchShrink">
 				<PathIcon Classes="audio-on" Data="{StaticResource Navigation}" />
 			</Button>
 			<Panel Margin="0" DockPanel.Dock="Top" x:Name="DragBar" PointerPressed="DragBar_OnDrag" DoubleTapped="DragBar_MaxWin">

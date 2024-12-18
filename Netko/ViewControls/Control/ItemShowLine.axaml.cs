@@ -663,7 +663,11 @@ public partial class ItemShowLine : UserControl
         OverlayReservedGrid.Children.Add(propertiesOverlay);
         propertiesOverlay.Show();
     }
-
+    /// <summary>
+    /// Menu function: download
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void DownloadOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         FlyNoticeOverlay flyNoticeOverlay = new FlyNoticeOverlay();
@@ -820,7 +824,7 @@ public partial class ItemShowLine : UserControl
         netdiskPathOverlay.ShowInitDir();
         OverlayReservedGrid.Children.Add(netdiskPathOverlay);
         string targetPath = await netdiskPathOverlay.ShowDialog("请选择目标文件夹", "移动");
-
+        // fill file list
         List<string> selfPath = new List<string>();
         List<string> selfName = new List<string>();
         List<string> targetPathList = new List<string>();
@@ -831,10 +835,6 @@ public partial class ItemShowLine : UserControl
                 selfName.Add(file.Name);
                 selfPath.Add(file.Path);
             }
-        }
-        else
-        {
-            return;
         }
 
         if (baiduFileList.GetSelectedItem().Dir.Any())
@@ -850,7 +850,7 @@ public partial class ItemShowLine : UserControl
         {
             targetPathList.Add(targetPath);
         }
-
+        // move
         try
         {
             if (!string.IsNullOrEmpty(targetPath))

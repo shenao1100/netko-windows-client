@@ -1,11 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Security.Cryptography.X509Certificates;
+
 
 namespace Netko.Views;
 
@@ -27,9 +23,9 @@ public partial class MainWindow : Window
             this.BeginMoveDrag(e);
         }
     }
-    public void switchShrink(object sender, RoutedEventArgs e)
+    public void SwitchShrink(object sender, RoutedEventArgs e)
     {
-        this.FindControl<MainView>("MainviewPanel").switchShrink();
+        this.FindControl<MainView>("MainviewPanel").SwitchShrink();
     }
     private void DragBar_MaxWin(object? sender, Avalonia.Input.TappedEventArgs e)
     {

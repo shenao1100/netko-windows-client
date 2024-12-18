@@ -10,6 +10,7 @@ using Netko.NetDisk.Baidu;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -22,25 +23,25 @@ public partial class NetdiskFilePage : UserControl
     public Action<string>? UpdateUserSectionName;
 
     // for history use
-    private List<string> backHistory = new List<string>();
-    private List<string> forwardHistory = new List<string>();
+    private List<string> _backHistory = new List<string>();
+    private List<string> _forwardHistory = new List<string>();
     private string? currentPath {  get; set; }
     private IFileList? baiduFileList {  get; set; }
 
     // for file action use
-    private List<NetDir> selectDirList = new List<NetDir>();
-    private List<NetFile> selectFileList = new List<NetFile>();
+    private List<NetDir> _selectDirList = new List<NetDir>();
+    private List<NetFile> _selectFileList = new List<NetFile>();
     // for color changing use
-    private Color selectedColor;
-    private Color unselectedColor;
+    private Color _selectedColor;
+    private Color _unselectedColor;
     // for toogle select
     public Dictionary<NetDir, ItemShowLine> DirDict = new Dictionary<NetDir, ItemShowLine>();
     public Dictionary<NetFile, ItemShowLine> FileDict = new Dictionary<NetFile, ItemShowLine>();
     public Grid OverlayReservedGrid { get; set; }
     public StackPanel OverlayNotification {  get; set; }
     public TransferPage? TransferPage { get; set; }
-    private int CurrentPageIndex = 1;
-    private bool CanLoadMore = false;
+    private int _currentPageIndex = 1;
+    private bool _canLoadMore = false;
     public NetdiskFilePage()
     {
         InitializeComponent();
@@ -52,7 +53,7 @@ public partial class NetdiskFilePage : UserControl
 
     private async void FadeOut()
     {
-        var DropAnimation = new Animation
+        var dropAnimation = new Animation
         {
             Duration = TimeSpan.FromSeconds(0.15),
             Easing = new ExponentialEaseOut(),
@@ -77,14 +78,14 @@ public partial class NetdiskFilePage : UserControl
         }
     }
         };
-        await DropAnimation.RunAsync(FileListViewer);
+        await dropAnimation.RunAsync(FileListViewer);
         FileListViewer.Opacity = 0;
 
         //await Task.Delay(150);
     }
     private async void FadeIn()
     {
-        var DropAnimation = new Animation
+        var dropAnimation = new Animation
         {
             Duration = TimeSpan.FromSeconds(0.15),
             Easing = new ExponentialEaseOut(),
@@ -110,65 +111,65 @@ public partial class NetdiskFilePage : UserControl
     }
         };
 
-        await DropAnimation.RunAsync(FileListViewer);
+        await dropAnimation.RunAsync(FileListViewer);
         FileListViewer.Opacity = 1;
         //await Task.Delay(150);
     }
     public void GetColor()
     {
-        var CBH_backgound = Application.Current!.Resources.TryGetResource("CatalogBaseHighColor", null, out var Hresource);
-        if (CBH_backgound && Hresource is Color Backgound)
+        var cbhBackgound = Application.Current!.Resources.TryGetResource("CatalogBaseHighColor", null, out var Hresource);
+        if (cbhBackgound && Hresource is Color backgound)
         {
-            selectedColor = Backgound;
+            _selectedColor = backgound;
         }
-        var CBL_background = Application.Current!.Resources.TryGetResource("CatalogBaseHighColor", null, out var Lresource);
-        if (CBL_background && Lresource is Color Background)
+        var cblBackground = Application.Current!.Resources.TryGetResource("CatalogBaseHighColor", null, out var Lresource);
+        if (cblBackground && Lresource is Color background)
         {
-            unselectedColor = Background;
+            _unselectedColor = background;
         }
     }
     private void UpdateMenu()
     {
-        if (selectFileList.Count + selectDirList.Count == 0)
+        if (_selectFileList.Count + _selectDirList.Count == 0)
         {
             //ActionMenu
         }
     }
     public void ToggleSelectedFile(NetFile file, UserControl userControl)
     {
-        if (selectFileList.Contains(file))
+        if (_selectFileList.Contains(file))
         {
-            userControl.Background = new SolidColorBrush(unselectedColor);
-            selectFileList.Remove(file);
+            userControl.Background = new SolidColorBrush(_unselectedColor);
+            _selectFileList.Remove(file);
         }
         else
         {
-            userControl.Background = new SolidColorBrush(selectedColor);
-            selectFileList.Add(file);
+            userControl.Background = new SolidColorBrush(_selectedColor);
+            _selectFileList.Add(file);
         }
 
     }
 
     public void ToogleSelectedFolder(NetDir dir, UserControl userControl)
     {
-        if (selectDirList.Contains(dir))
+        if (_selectDirList.Contains(dir))
         {
-            userControl.Background = new SolidColorBrush(unselectedColor);
-            selectDirList.Remove(dir);
+            userControl.Background = new SolidColorBrush(_unselectedColor);
+            _selectDirList.Remove(dir);
         }
         else
         {
-            userControl.Background = new SolidColorBrush(selectedColor);
-            selectDirList.Add(dir);
+            userControl.Background = new SolidColorBrush(_selectedColor);
+            _selectDirList.Add(dir);
         }
     }
 
     private string GetForwardPath()
     {
-        if (forwardHistory.Count > 0)
+        if (_forwardHistory.Count > 0)
         {
-            string result = forwardHistory[forwardHistory.Count - 1];
-            forwardHistory.RemoveAt(forwardHistory.Count - 1);
+            string result = _forwardHistory[-1];
+            _forwardHistory.RemoveAt(_forwardHistory.Count - 1);
             return result;
         }
         else
@@ -182,18 +183,18 @@ public partial class NetdiskFilePage : UserControl
         {
             return "/";
         }
-        forwardHistory.Add(currentPath);
+        _forwardHistory.Add(currentPath);
 
-        if (backHistory[backHistory.Count - 1] == currentPath)
+        if (_backHistory[-1] == currentPath)
         {
 
-            backHistory.RemoveAt(backHistory.Count - 1);
+            _backHistory.RemoveAt(_backHistory.Count - 1);
         }
 
-        if (backHistory.Count != 0)
+        if (_backHistory.Count != 0)
         {
-            string result = backHistory[backHistory.Count - 1];
-            backHistory.RemoveAt(backHistory.Count - 1);
+            string result = _backHistory[-1];
+            _backHistory.RemoveAt(_backHistory.Count - 1);
             
             return result;
         }
@@ -205,7 +206,7 @@ public partial class NetdiskFilePage : UserControl
     private void GotoDir(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (baiduFileList == null || PathTextBox.Text == null) { return; }
-        ChangePage(baiduFileList, PathTextBox.Text, 1, insert_back_history: false);
+        ChangePage(baiduFileList, PathTextBox.Text, 1, insertBackHistory: false);
 
     }
 
@@ -213,24 +214,24 @@ public partial class NetdiskFilePage : UserControl
     private void Back(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (baiduFileList == null) { return; }
-        ChangePage(baiduFileList, GetBackPath(), 1, reserve_forward_history:true);
+        ChangePage(baiduFileList, GetBackPath(), 1, reserveForwardHistory:true);
     }
     private void Forward(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (baiduFileList == null) { return; }
-        ChangePage(baiduFileList, GetForwardPath(), 1, insert_back_history: true, reserve_forward_history:true);
+        ChangePage(baiduFileList, GetForwardPath(), 1, insertBackHistory: true, reserveForwardHistory:true);
 
     }
 
     private void Home(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (baiduFileList == null) { return; }
-        ChangePage(baiduFileList, "/", 1, insert_back_history: false, reserve_forward_history: false, reserve_back_history: false);
+        ChangePage(baiduFileList, "/", 1, insertBackHistory: false, reserveForwardHistory: false, reserveBackHistory: false);
     }
     private void Refresh(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (baiduFileList == null || currentPath == null) { return; }
-        ChangePage(baiduFileList, currentPath, 1, insert_back_history:false);
+        ChangePage(baiduFileList, currentPath, 1, insertBackHistory:false);
     }
     private void ExpandTaskProber(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
@@ -242,9 +243,9 @@ public partial class NetdiskFilePage : UserControl
         {
             var isAtBottom = scrollViewer.Offset.Y >= scrollViewer.Extent.Height - scrollViewer.Viewport.Height;
 
-            if (isAtBottom && (baiduFileList != null && currentPath != null) && CanLoadMore)
+            if (isAtBottom && (baiduFileList != null && currentPath != null) && _canLoadMore)
             {
-                ChangePage(baiduFileList, currentPath, CurrentPageIndex + 1, false, true, true);
+                ChangePage(baiduFileList, currentPath, _currentPageIndex + 1, false, true, true);
             }
         }
     }
@@ -252,28 +253,32 @@ public partial class NetdiskFilePage : UserControl
     /// To get and show file list in UI, items count 1000 at max
     /// </summary>
     /// <param name="user">This function will use BaiduFileList to parse file list</param>
-    /// <param name="go_path">Path need to parse, for ep. "/"</param>
+    /// <param name="goPath">Path need to parse, for ep. "/"</param>
     /// <param name="page">1: 1-1000 items, 2: 1001-2000 items...</param>
-    private async void ChangePage(IFileList user, 
-        string go_path, 
-        int page, 
-        bool insert_back_history=true, 
-        bool reserve_forward_history=false,
-        bool reserve_back_history=true)
-    {
-        if (!reserve_forward_history) { forwardHistory.Clear(); }
-        if (!reserve_back_history) { backHistory.Clear(); }
-        if (insert_back_history) { backHistory.Add(go_path); }
-        ForwardButton.IsEnabled = (forwardHistory.Count == 0) ? false : true;
-        BackButton.IsEnabled = ((backHistory.Count == 1 && go_path == "/" && backHistory[0] == "/") || backHistory.Count == 0) ? false : true;
+    /// <param name="insertBackHistory">Whether to add the path to the back history</param>
+    /// <param name="reserveForwardHistory">Whether to reserve forward history</param>
+    /// <param name="reserveBackHistory">Whether to reserve back history</param>
 
-        PathTextBox.Text = go_path;
-        currentPath = go_path;
-        CurrentPageIndex = page;
+    private async void ChangePage(IFileList user, 
+        string goPath, 
+        int page, 
+        bool insertBackHistory=true, 
+        bool reserveForwardHistory=false,
+        bool reserveBackHistory=true)
+    {
+        if (!reserveForwardHistory) { _forwardHistory.Clear(); }
+        if (!reserveBackHistory) { _backHistory.Clear(); }
+        if (insertBackHistory) { _backHistory.Add(goPath); }
+        ForwardButton.IsEnabled = (_forwardHistory.Count == 0) ? false : true;
+        BackButton.IsEnabled = ((_backHistory.Count == 1 && goPath == "/" && _backHistory[0] == "/") || _backHistory.Count == 0) ? false : true;
+
+        PathTextBox.Text = goPath;
+        currentPath = goPath;
+        _currentPageIndex = page;
 
         if (page == 1) { FileListViewer.Opacity = 0; }
 
-        FileList list_ = await user.GetFileList(page, path: go_path);
+        FileList list_ = await user.GetFileList(page, path: goPath);
         if (page == 1)
         {
             // clear pervious
@@ -291,80 +296,80 @@ public partial class NetdiskFilePage : UserControl
         selectAllButton.FileDict = FileDict;
 
         long itemCount = 0;
-        if (list_.Dir == null || list_.File == null)
+        if (!list_.Dir.Any() && !list_.File.Any())
         {
             FileListViewer.Opacity = 1;
             SelectAllOverlay.Children.Remove(selectAllButton);
-            EmptyRemind empty_label = new EmptyRemind();
-            empty_label.ShowError("不存在的文件夹\\n你来到了没有文件的荒原");
-            FileListViewer.Children.Add(empty_label);
+            EmptyRemind emptyLabel = new EmptyRemind();
+            emptyLabel.ShowError("不存在的文件夹\\n你来到了没有文件的荒原");
+            FileListViewer.Children.Add(emptyLabel);
             return;
         }
 
-        foreach (NetDir dir_b in list_.Dir)
+        foreach (NetDir dirObj in list_.Dir)
         {
             itemCount++;
-            ItemShowLine DirBlock = new ItemShowLine();
-            DirDict.Add(dir_b, DirBlock);
+            ItemShowLine dirBlock = new ItemShowLine();
+            DirDict.Add(dirObj, dirBlock);
             // set enter, refresh command
-            DirBlock.Func = () => ChangePage(user, dir_b.Path, 1);
-            DirBlock.Refresh = () => ChangePage(baiduFileList!, currentPath, 1, insert_back_history: false);
+            dirBlock.Func = () => ChangePage(user, dirObj.Path, 1);
+            dirBlock.Refresh = () => ChangePage(baiduFileList!, currentPath, 1, insertBackHistory: false);
             // set name, BDDir, user, OverelayGrid
-            DirBlock.SelfDir = dir_b;
+            dirBlock.SelfDir = dirObj;
 
-            DirBlock.Init(dir_b.Name, isDir: true);
-            DirBlock.baiduFileList = user;
+            dirBlock.Init(dirObj.Name, isDir: true);
+            dirBlock.baiduFileList = user;
             
-            DirBlock.TransferPage = TransferPage!;
-            DirBlock.OverlayReservedGrid = OverlayReservedGrid;
-            DirBlock.OverlayNotification = OverlayNotification;
-            DirBlock.taskProber = task_prober;
-            DirBlock.ParentPath = currentPath;
+            dirBlock.TransferPage = TransferPage!;
+            dirBlock.OverlayReservedGrid = OverlayReservedGrid;
+            dirBlock.OverlayNotification = OverlayNotification;
+            dirBlock.taskProber = task_prober;
+            dirBlock.ParentPath = currentPath;
 
             // append to viewer
-            FileListViewer.Children.Add(DirBlock);
+            FileListViewer.Children.Add(dirBlock);
 
         }
-        foreach (NetFile file_b in list_.File)
+        foreach (NetFile fileObj in list_.File)
         {
             itemCount++;
 
-            ItemShowLine FileBlock = new ItemShowLine();
-            FileDict.Add(file_b, FileBlock);
+            ItemShowLine fileBlock = new ItemShowLine();
+            FileDict.Add(fileObj, fileBlock);
 
-            FileBlock.TransferPage = TransferPage!;
+            fileBlock.TransferPage = TransferPage!;
             // set enter, refresh command
-            FileBlock.Func = () => ChangePage(user, file_b.Path, 1);
-            FileBlock.Refresh = () => ChangePage(baiduFileList!, currentPath, 1, insert_back_history: false);
+            fileBlock.Func = () => ChangePage(user, fileObj.Path, 1);
+            fileBlock.Refresh = () => ChangePage(baiduFileList!, currentPath, 1, insertBackHistory: false);
             // set name, BDDir, user, OverelayGrid
-            FileBlock.SelfFile = file_b;
+            fileBlock.SelfFile = fileObj;
 
-            FileBlock.Init(file_b.Name, isDir: false);
-            FileBlock.baiduFileList = user;
-            FileBlock.OverlayReservedGrid = OverlayReservedGrid;
-            FileBlock.OverlayNotification = OverlayNotification;
-            FileBlock.taskProber = task_prober;
+            fileBlock.Init(fileObj.Name, isDir: false);
+            fileBlock.baiduFileList = user;
+            fileBlock.OverlayReservedGrid = OverlayReservedGrid;
+            fileBlock.OverlayNotification = OverlayNotification;
+            fileBlock.taskProber = task_prober;
 
-            FileBlock.ParentPath = currentPath;
+            fileBlock.ParentPath = currentPath;
             // append to viewer
-            FileListViewer.Children.Add(FileBlock);
+            FileListViewer.Children.Add(fileBlock);
         }
         //FadeIn();
-        CanLoadMore = (itemCount == 1000) ? true : false;
+        _canLoadMore = (itemCount == 1000) ? true : false;
         FileListViewer.Opacity = 1;
         if (itemCount == 0)
         {
 
             SelectAllOverlay.Children.Remove(selectAllButton);
 
-            EmptyRemind empty_label = new EmptyRemind();
-            empty_label.OverlayReservedGrid = OverlayReservedGrid;
-            empty_label.ParentPath = currentPath;
-            empty_label.baiduFileList = user;
-            empty_label.ParentPath = currentPath;
-            empty_label.Refresh = () => ChangePage(baiduFileList!, currentPath, 1, insert_back_history: false);
+            EmptyRemind emptyLabel = new EmptyRemind();
+            emptyLabel.OverlayReservedGrid = OverlayReservedGrid;
+            emptyLabel.ParentPath = currentPath;
+            emptyLabel.baiduFileList = user;
+            emptyLabel.ParentPath = currentPath;
+            emptyLabel.Refresh = () => ChangePage(baiduFileList!, currentPath, 1, insertBackHistory: false);
 
-            FileListViewer.Children.Add(empty_label);
+            FileListViewer.Children.Add(emptyLabel);
         }
 
     }
@@ -372,19 +377,19 @@ public partial class NetdiskFilePage : UserControl
     /// To init user info, create and change to new page, update user name
     /// </summary>
     /// <param name="cookie">user cookie</param>
-    public async Task<string> initUser(string cookie)
+    public async Task<string> InitUser(string cookie)
     {
-        INetdisk test_user = new Baidu(cookie);
-        await test_user.Init();
+        INetdisk testUser = new Baidu(cookie);
+        await testUser.Init();
         if (UpdateUserSectionName != null) {
-            UpdateUserSectionName(test_user.GetAccountInfo().Name);
+            UpdateUserSectionName(testUser.GetAccountInfo().Name);
         }
 
-        IFileList Filelist = new BaiduFileList(test_user);
-        baiduFileList = Filelist;
-        MeowSetting.InsertAccount(cookie, test_user.GetAccountInfo().Token);
-        ChangePage(Filelist, "/", 1);
-        return test_user.GetAccountInfo().Token;
+        IFileList filelist = new BaiduFileList(testUser);
+        baiduFileList = filelist;
+        MeowSetting.InsertAccount(cookie, testUser.GetAccountInfo().Token);
+        ChangePage(filelist, "/", 1);
+        return testUser.GetAccountInfo().Token;
     }
     
 

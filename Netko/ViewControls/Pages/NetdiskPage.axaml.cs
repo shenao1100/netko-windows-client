@@ -14,25 +14,25 @@ namespace Netko;
 public partial class NetdiskPage : UserControl
 {
     private Dictionary<UserSection, UserControl> UserSectionPageDict = new Dictionary<UserSection, UserControl>();
-    private UserControl NowShowPage;
+    private UserControl _userControl;
 
-    private int CurrentPageIndex = 0;
-    private int PageIndex = 0;
+    private int _currentPageIndex = 0;
+    private int _pageIndex = 0;
     public TransferPage TransferPage { get; set; }
     public NetdiskPage()
     {
         InitializeComponent();
-        UserSection UserSectionObj = new UserSection();
+        UserSection userSectionObj = new UserSection();
         LoginMainPage loginPage = new LoginMainPage();
-        UserSectionObj.SetAvatar("avares://Netko/Assets/add.png", false);
-        UserSectionObj.SetName("µÇÈë");
-        PageIndex++;
-        int ThisPageIndex = PageIndex;
-        UserSectionObj.ChangeAction = () => ChangePage(loginPage, ThisPageIndex);
-        UserSectionObj.DeleteAction = () => RemovePage(loginPage, UserSectionObj);
+        userSectionObj.SetAvatar("avares://Netko/Assets/add.png", false);
+        userSectionObj.SetName("æ·»åŠ è´¦å·");
+        _pageIndex++;
+        int thisPageIndex = _pageIndex;
+        userSectionObj.ChangeAction = () => ChangePage(loginPage, thisPageIndex);
+        userSectionObj.DeleteAction = () => RemovePage(loginPage, userSectionObj);
         // UserSectionPageDict.Add(UserSectionObj, loginPage);
-        ChangePage(loginPage, ThisPageIndex);
-        UserSectionDockPanel.Children.Add(UserSectionObj);
+        ChangePage(loginPage, thisPageIndex);
+        UserSectionDockPanel.Children.Add(userSectionObj);
         
 
         // login server to receive cookie
@@ -43,7 +43,10 @@ public partial class NetdiskPage : UserControl
 
         
     }
-    public void init()
+    /// <summary>
+    /// init user from config file
+    /// </summary>
+    public void Init()
     {
         // init user from config file
         foreach (AccountStruct account in MeowSetting.GetAllAccount())
@@ -52,10 +55,16 @@ public partial class NetdiskPage : UserControl
             AddAccount(account.cookie);
         }
     }
-    private void RemoveAccount(UserControl FilePage,  UserControl UserSectionObj, string token)
+    /// <summary>
+    /// Remove account from both config file and page
+    /// </summary>
+    /// <param name="filePage"></param>
+    /// <param name="userSectionObj"></param>
+    /// <param name="token"></param>
+    private void RemoveAccount(UserControl filePage,  UserControl userSectionObj, string token)
     {
         MeowSetting.RemoveAccount(token);
-        RemovePage(FilePage, UserSectionObj);
+        RemovePage(filePage, userSectionObj);
     }
     /// <summary>
     /// Create a new file page and user section
@@ -63,39 +72,41 @@ public partial class NetdiskPage : UserControl
     /// <param name="cookie">user cookie</param>
     private async void AddAccount(string cookie)
     {
-        UserSection UserSectionObj = new UserSection();
-        NetdiskFilePage FilePage = new NetdiskFilePage();
-        PageIndex++;
-        int ThisPageIndex = PageIndex;
+        UserSection userSectionObj = new UserSection();
+        NetdiskFilePage filePage = new NetdiskFilePage();
+        _pageIndex++;
+        int thisPageIndex = _pageIndex;
         Trace.WriteLine(TransferPage.ToString());
-        FilePage.TransferPage = TransferPage;
-        UserSectionObj.ChangeAction = () => ChangePage(FilePage, ThisPageIndex);
+        filePage.TransferPage = TransferPage;
+        userSectionObj.ChangeAction = () => ChangePage(filePage, thisPageIndex);
         
-        FilePage.UpdateUserSectionName = (name) => UserSectionObj.SetName(name);
-        ChangePage(FilePage, ThisPageIndex);
-        UserSectionDockPanel.Children.Add(UserSectionObj);
-        string token = await FilePage.initUser(cookie);
+        filePage.UpdateUserSectionName = (name) => userSectionObj.SetName(name);
+        ChangePage(filePage, thisPageIndex);
+        UserSectionDockPanel.Children.Add(userSectionObj);
+        string token = await filePage.InitUser(cookie);
 
-        UserSectionObj.DeleteAction = () => RemoveAccount(FilePage, UserSectionObj, token);
+        userSectionObj.DeleteAction = () => RemoveAccount(filePage, userSectionObj, token);
     }
     /// <summary>
     /// Remove user section and file page
     /// </summary>
     /// <param name="page"></param>
-    /// <param name="user_section"></param>
-    public void RemovePage(UserControl page, UserControl user_section)
+    /// <param name="userSection"></param>
+    public void RemovePage(UserControl page, UserControl userSection)
     {
-        UserSectionDockPanel.Children.Remove(user_section);
+        UserSectionDockPanel.Children.Remove(userSection);
 
-        if (page == NowShowPage)
+        if (page == _userControl)
         {
             FileListGrid.Children.Remove(page);
         }
     }
-
+    /// <summary>
+    /// Page change animation
+    /// </summary>
     private async void FlyFromRight()
     {
-        var RaiseAnimation = new Animation
+        var raiseAnimation = new Animation
         {
             Duration = TimeSpan.FromSeconds(0.15),
             Easing = new QuadraticEaseInOut(),
@@ -123,11 +134,14 @@ public partial class NetdiskPage : UserControl
             },
 
         };
-        await RaiseAnimation.RunAsync(FileListGrid);
+        await raiseAnimation.RunAsync(FileListGrid);
     }
+    /// <summary>
+    /// Page change animation
+    /// </summary>
     private async void FlyFromLeft()
     {
-        var RaiseAnimation = new Animation
+        var raiseAnimation = new Animation
         {
             Duration = TimeSpan.FromSeconds(0.15),
             Easing = new QuadraticEaseInOut(),
@@ -155,28 +169,29 @@ public partial class NetdiskPage : UserControl
             },
 
         };
-        await RaiseAnimation.RunAsync(FileListGrid);
+        await raiseAnimation.RunAsync(FileListGrid);
     }
     /// <summary>
     /// change current page into Page
     /// </summary>
-    /// <param name="Page"></param>
-    public async void ChangePage(UserControl Page, int PageIndex)
+    /// <param name="page">Page you want to switch to</param>
+    /// <param name="pageIndex">Index of this page, control animation direction</param>
+    public async void ChangePage(UserControl page, int pageIndex)
     {
         
 
         FileListGrid.Children.Clear();
-        FileListGrid.Children.Add(Page);
-        NowShowPage = Page;
-        if (PageIndex < CurrentPageIndex)
+        FileListGrid.Children.Add(page);
+        _userControl = page;
+        if (pageIndex < _currentPageIndex)
         {
             FlyFromLeft();
         }
-        else if (PageIndex > CurrentPageIndex)
+        else if (pageIndex > _currentPageIndex)
         {
             FlyFromRight();
         }
-        CurrentPageIndex = PageIndex;
+        _currentPageIndex = pageIndex;
         //await RaiseAnimation.RunAsync(FileListGrid);
     }
     /// <summary>
@@ -186,17 +201,17 @@ public partial class NetdiskPage : UserControl
     /// <param name="e"></param>
     private void AddLoginPage(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        PageIndex++;
-        UserSection UserSectionObj = new UserSection();
+        _pageIndex++;
+        UserSection userSectionObj = new UserSection();
         LoginMainPage loginPage = new LoginMainPage();
-        UserSectionObj.SetAvatar("avares://Netko/Assets/add.png", false);
-        UserSectionObj.SetName("µÇÈë");
-        int ThisPageIndex = PageIndex;
-        UserSectionObj.ChangeAction = () => ChangePage(loginPage, ThisPageIndex);
-        UserSectionObj.DeleteAction = () => RemovePage(loginPage, UserSectionObj);
+        userSectionObj.SetAvatar("avares://Netko/Assets/add.png", false);
+        userSectionObj.SetName("æ·»åŠ è´¦å·");
+        int thisPageIndex = _pageIndex;
+        userSectionObj.ChangeAction = () => ChangePage(loginPage, thisPageIndex);
+        userSectionObj.DeleteAction = () => RemovePage(loginPage, userSectionObj);
         // UserSectionPageDict.Add(UserSectionObj, loginPage);
-        ChangePage(loginPage, ThisPageIndex);
-        UserSectionDockPanel.Children.Add(UserSectionObj);
+        ChangePage(loginPage, thisPageIndex);
+        UserSectionDockPanel.Children.Add(userSectionObj);
 
     }
 }

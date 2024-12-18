@@ -1,11 +1,7 @@
 ﻿using Netko.Download;
-using Netko.NetDisk.Baidu;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Netko.NetDisk
@@ -20,15 +16,15 @@ namespace Netko.NetDisk
         public long Category;
         public long ExtentTinyint7;
         public long FromType;
-        public long ID;
+        public long Id;
         public long IsScene;
         public long LocalCtime;
         public long LocalMtime;
-        public long OperID;
-        public long OwnerID;
+        public long OperId;
+        public long OwnerId;
         public long OwnerType;
         public string Path;
-        public long pl;
+        public long Pl;
         public string RealCategory;
         public long ServerAtime;
         public long ServerCtime;
@@ -36,13 +32,13 @@ namespace Netko.NetDisk
         public long ServerMtime;
         public long Share;
         public long Size;
-        public long TkBindID;
+        public long TkBindId;
         public long UnList;
         public long WpFile;
 
         public bool Equals(NetDir other)
         {
-            return ID == other.ID;
+            return Id == other.Id;
         }
 
         public override bool Equals(object obj)
@@ -52,7 +48,7 @@ namespace Netko.NetDisk
 
         public override int GetHashCode()
         {
-            return ID.GetHashCode();
+            return Id.GetHashCode();
         }
 
         public static bool operator ==(NetDir left, NetDir right)
@@ -71,16 +67,16 @@ namespace Netko.NetDisk
         public long Category;
         public long ExtentTinyint7;
         public long FromType;
-        public long ID;
+        public long Id;
         public long IsScene;
         public long LocalCtime;
         public long LocalMtime;
-        public long OperID;
-        public long OwnerID;
+        public long OperId;
+        public long OwnerId;
         public long OwnerType;
         public string Path;
-        public string MD5;
-        public long pl;
+        public string Md5;
+        public long Pl;
         public string RealCategory;
         public long ServerAtime;
         public long ServerCtime;
@@ -88,13 +84,13 @@ namespace Netko.NetDisk
         public long ServerMtime;
         public long Share;
         public long Size;
-        public long TkBindID;
+        public long TkBindId;
         public long UnList;
         public long WpFile;
 
         public bool Equals(NetFile other)
         {
-            return ID == other.ID;
+            return Id == other.Id;
         }
 
         public override bool Equals(object obj)
@@ -104,7 +100,7 @@ namespace Netko.NetDisk
 
         public override int GetHashCode()
         {
-            return ID.GetHashCode();
+            return Id.GetHashCode();
         }
 
         public static bool operator ==(NetFile left, NetFile right)

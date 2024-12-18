@@ -8,8 +8,8 @@ namespace Netko.Download
 {
     public class Range
     {
-        public long from { get; set; }
-        public long to { get; set; }
+        public long From { get; set; }
+        public long To { get; set; }
     }
     public class DownloadStatus
     {
@@ -52,7 +52,7 @@ namespace Netko.Download
         void Pause();
         void Continue();
         void Cancel();
-        Task DownloadThread(Range range, string url);
+        //Task DownloadThread(Range range, string url);
         void ReleaseFile();
         void Run();
     }
@@ -72,12 +72,9 @@ namespace Netko.Download
     {
         public static void CreatePrentPath(string path)
         {
-            if (Path.GetDirectoryName(path) != null)
+            if (Path.GetDirectoryName(path) != null && !Directory.Exists(path))
             {
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(path));
-                }
+                Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             }
             else
             {

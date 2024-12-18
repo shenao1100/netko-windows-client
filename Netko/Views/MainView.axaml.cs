@@ -20,14 +20,14 @@ namespace Netko.Views;
 
 public partial class MainView : UserControl
 {
-    NetdiskPage Page_Netdisk = new NetdiskPage();
-    HomePage Page_Home = new HomePage();
-    TransferPage Page_Transfer = new TransferPage();
+    NetdiskPage _netdiskPage = new NetdiskPage();
+    HomePage _homePage = new HomePage();
+    TransferPage _transferPage = new TransferPage();
 
-    SettingPage Page_Setting = new SettingPage();
-    UploadPage Page_Upload = new UploadPage();
-    HistoryPage Page_History = new HistoryPage();
-    TransmitPage Page_Transmit = new TransmitPage();
+    SettingPage _settingPage = new SettingPage();
+    UploadPage _uploadPage = new UploadPage();
+    HistoryPage _historyPage = new HistoryPage();
+    TransmitPage _transmitPage = new TransmitPage();
     UserControl CurrentPage {  get; set; }
 
 
@@ -36,20 +36,20 @@ public partial class MainView : UserControl
     {
         
         InitializeComponent();
-        ContentPanel1.Children.Add(Page_Home);
-        Page_Home.Opacity = 1;
+        ContentPanel1.Children.Add(_homePage);
+        _homePage.Opacity = 1;
 
         
         Home.Background = new SolidColorBrush(Color.Parse("#30FFFFFF"));
-        CurrentPage = Page_Home;
+        CurrentPage = _homePage;
 
-        Page_Netdisk.TransferPage = Page_Transfer;
-        Page_Netdisk.init();
+        _netdiskPage.TransferPage = _transferPage;
+        _netdiskPage.Init();
 
     }
     //Init all pages
 
-    public void unFold()
+    private void UnFold()
     {
         foreach (var button in SideButtonBar.Children)
         {
@@ -59,7 +59,7 @@ public partial class MainView : UserControl
             }
         }
     }
-    public void Shrink()
+    private void Shrink()
     {
         foreach (var button in SideButtonBar.Children)
         {
@@ -69,11 +69,11 @@ public partial class MainView : UserControl
             }
         }
     }
-    public void switchShrink()
+    public void SwitchShrink()
     {
         if (Home.Width == 50)
         {
-            unFold();
+            UnFold();
         }
         else
         {
@@ -82,10 +82,10 @@ public partial class MainView : UserControl
     }
     public async void Change(object sender, RoutedEventArgs e)
     {
-        UserControl FormerPage = CurrentPage;
+        UserControl formerPage = CurrentPage;
         //Change page
-        var clicked_button = sender as Button;
-        if (clicked_button == null || clicked_button.Name == null)
+        var clickedButton = sender as Button;
+        if (clickedButton == null || clickedButton.Name == null)
         {
             return;
         }
@@ -97,43 +97,43 @@ public partial class MainView : UserControl
                 button1.Background = new SolidColorBrush(Color.Parse("#00000000"));
             }
         }
-        clicked_button.Background = new SolidColorBrush(Color.Parse("#30FFFFFF"));
+        clickedButton.Background = new SolidColorBrush(Color.Parse("#30FFFFFF"));
 
 
-        switch (clicked_button.Name.ToString())
+        switch (clickedButton.Name.ToString())
         {
             case "Home":
-                CurrentPage = Page_Home;
+                CurrentPage = _homePage;
                 break;
             case "Manage":
-                CurrentPage = Page_Netdisk;
+                CurrentPage = _netdiskPage;
                 break;
             case "Transfer":
-                CurrentPage = Page_Transfer;
+                CurrentPage = _transferPage;
                 break;
             case "Setting":
-                CurrentPage = Page_Setting;
+                CurrentPage = _settingPage;
                 break;
             case "Upload":
-                CurrentPage = Page_Upload;
+                CurrentPage = _uploadPage;
                 break;
             case "History":
-                CurrentPage = Page_History;
+                CurrentPage = _historyPage;
                 break;
             case "Transmit":
 
-                CurrentPage = Page_Transmit;
+                CurrentPage = _transmitPage;
                 break;
 
         }
-        if (FormerPage == CurrentPage)
+        if (formerPage == CurrentPage)
         {
             return;
         }
         ContentPanel1.Children.Clear();
 
         ContentPanel1.Children.Add(CurrentPage);
-        var DropAnimation = new Animation
+        var dropAnimation = new Animation
         {
             Duration = TimeSpan.FromSeconds(0.25),
             Easing = new ExponentialEaseOut(),
@@ -160,7 +160,7 @@ public partial class MainView : UserControl
                 }
             }
         };
-        await DropAnimation.RunAsync(ContentPanel1);
+        await dropAnimation.RunAsync(ContentPanel1);
         CurrentPage.Margin = new Thickness(0);
         ContentPanel1.Margin = new Thickness(0);
         return;

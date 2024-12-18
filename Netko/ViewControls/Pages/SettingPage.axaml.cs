@@ -24,10 +24,10 @@ public partial class SettingPage : UserControl
         string AppVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Version not found";
         string AvaloniaVersion = typeof(Avalonia.Application).Assembly.GetName().Version?.ToString() ?? "Version not found";
 
-        // »ñÈ¡°æ±¾ĞÅÏ¢
+        // è·å–ç‰ˆæœ¬ä¿¡æ¯
 
-        VersionText.Text = "°æ±¾: " + AppVersion;
-        AvaloniaVersionText.Text = "°æ±¾: " + AvaloniaVersion;
+        VersionText.Text = "ç‰ˆæœ¬: " + AppVersion;
+        AvaloniaVersionText.Text = "ç‰ˆæœ¬: " + AvaloniaVersion;
 
         string theme_setting = MeowSetting.GetTheme();
         switch (theme_setting)
@@ -118,20 +118,20 @@ public partial class SettingPage : UserControl
         {
             var folder = await storageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
             {
-                Title = "Ñ¡ÔñÎÄ¼ş¼Ğ"
+                Title = "é€‰æ‹©æ–‡ä»¶å¤¹"
             });
 
             if (folder != null && folder.Count > 0)
             {
                 string folderPath = new Uri(folder[0].Path.ToString()).LocalPath;
-                Trace.WriteLine("Ñ¡ÔñµÄÎÄ¼ş¼ĞÂ·¾¶: " + folderPath);
+                Trace.WriteLine("é€‰æ‹©çš„æ–‡ä»¶å¤¹è·¯å¾„: " + folderPath);
                 DownloadPath.Content = folderPath;
                 MeowSetting.SetDownloadPath(folderPath);
             }
         }
         else
         {
-            Trace.WriteLine("µ±Ç°Æ½Ì¨²»Ö§³ÖÎÄ¼ş¼ĞÑ¡Ôñ¡£");
+            Trace.WriteLine("å½“å‰å¹³å°ä¸æ”¯æŒæ–‡ä»¶å¤¹é€‰æ‹©ã€‚");
         }
     
 }
