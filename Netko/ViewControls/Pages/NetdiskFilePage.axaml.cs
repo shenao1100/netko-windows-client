@@ -185,7 +185,7 @@ public partial class NetdiskFilePage : UserControl
         }
         _forwardHistory.Add(currentPath);
 
-        if (_backHistory[-1] == currentPath)
+        if (_backHistory[_backHistory.Count - 1] == currentPath)
         {
 
             _backHistory.RemoveAt(_backHistory.Count - 1);
@@ -193,7 +193,7 @@ public partial class NetdiskFilePage : UserControl
 
         if (_backHistory.Count != 0)
         {
-            string result = _backHistory[-1];
+            string result = _backHistory[_backHistory.Count - 1];
             _backHistory.RemoveAt(_backHistory.Count - 1);
             
             return result;
