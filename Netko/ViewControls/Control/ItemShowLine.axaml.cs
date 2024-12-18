@@ -97,7 +97,10 @@ public partial class ItemShowLine : UserControl
         DateTime dateTime = startTime.AddSeconds(timeStamp).ToLocalTime();
         return dateTime.ToString("yyyy/MM/dd HH:mm:ss");
     }
-
+    private void DockPanel_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+    {
+        return;
+    }
     /// <summary>
     /// Init item, set type and icon
     /// </summary>
@@ -122,19 +125,15 @@ public partial class ItemShowLine : UserControl
 
         ItemIcon.Source = ImageHelper.LoadFromResource(uri);
         FileName.Content = name;
-        if (isDir)
-        {
-            detail_label.Content = $"{FormatDate(SelfDir.ServerCtime)}";
-        }
-        else
-        {
-            detail_label.Content = $"{FormatDate(SelfFile.ServerCtime)}\t{DownloadProgress.FormatSize(SelfFile.Size)}";
-        }
+        detail_label.Content =
+            isDir
+                ? $"{FormatDate(SelfDir.ServerCtime)}"
+                : $"{FormatDate(SelfFile.ServerCtime)}\t{DownloadProgress.FormatSize(SelfFile.Size)}";
     }
 
-    public void RefreshCallback(string perviousPath)
+    private void RefreshCallback(string previousPath)
     {
-        if (perviousPath == ParentPath)
+        if (previousPath == ParentPath)
         {
             Refresh();
         }
@@ -152,11 +151,15 @@ public partial class ItemShowLine : UserControl
         DockpanelMove.Click -= MoveOnMenu;
         DockpanelDuplicate.Click -= CopyOnMenu;
         DockpanelShare.Click -= ShareOnMenu;
+        DockpanelDownload.Click -= DownloadOnMenu;
+
 
         DockpanelDelete.Click += MultiDeleteOnMenu;
         DockpanelMove.Click += MultiMoveOnMenu;
         DockpanelDuplicate.Click += MultiCopyOnMenu;
         DockpanelShare.Click += MultiShareOnMenu;
+        DockpanelDownload.Click += MultiDownloadOnMenu;
+
         _singleMenuOperation = false;
     }
 
@@ -171,11 +174,14 @@ public partial class ItemShowLine : UserControl
         DockpanelMove.Click -= MultiMoveOnMenu;
         DockpanelDuplicate.Click -= MultiCopyOnMenu;
         DockpanelShare.Click -= MultiShareOnMenu;
+        DockpanelDownload.Click -= MultiDownloadOnMenu;
+
 
         DockpanelDelete.Click += DeleteOnMenu;
         DockpanelMove.Click += MoveOnMenu;
         DockpanelDuplicate.Click += CopyOnMenu;
         DockpanelShare.Click += ShareOnMenu;
+        DockpanelDownload.Click += DownloadOnMenu;
         _singleMenuOperation = true;
     }
 
@@ -187,7 +193,7 @@ public partial class ItemShowLine : UserControl
     private void RightClick(object sender, PointerPressedEventArgs e)
     {
         var pointerPoint = e.GetCurrentPoint(this);
-        // ¼ì²éÄÄ¸ö°´¼ü±»°´ÏÂ
+        // æ£€æŸ¥å“ªä¸ªæŒ‰é”®è¢«æŒ‰ä¸‹
         if (!pointerPoint.Properties.IsRightButtonPressed)
         {
             return;
@@ -196,12 +202,12 @@ public partial class ItemShowLine : UserControl
         if (_isFile)
         {
             FileList filelist = baiduFileList.GetSelectedItem();
-            if (!filelist.File!.Contains(SelfFile))
+            if (!filelist.File.Contains(SelfFile))
             {
                 // single select
                 SetSingleOperationCommand();
             }
-            else if (filelist.File!.Contains(SelfFile) && filelist.File!.Count() == 1 && filelist.Dir.Count() == 0)
+            else if (filelist.File.Contains(SelfFile) && filelist.File.Count() == 1 && filelist.Dir.Any())
             {
                 //single select
                 SetSingleOperationCommand();
@@ -216,12 +222,12 @@ public partial class ItemShowLine : UserControl
         if (_isDir)
         {
             FileList filelist = baiduFileList.GetSelectedItem();
-            if (!filelist.Dir!.Contains(SelfDir))
+            if (!filelist.Dir.Contains(SelfDir))
             {
                 // single select
                 SetSingleOperationCommand();
             }
-            else if (filelist.Dir!.Contains(SelfDir) && filelist.Dir!.Count() == 1 && filelist.File!.Count() == 0)
+            else if (filelist.Dir.Contains(SelfDir) && filelist.Dir.Count() == 1 && filelist.File.Any())
             {
                 //single select
                 SetSingleOperationCommand();
@@ -234,17 +240,17 @@ public partial class ItemShowLine : UserControl
         }
     }
 
-    public void toogleSelect()
+    public void ToogleSelect()
     {
         if (_isDir)
         {
-            _isSelected = (!baiduFileList.DirIsSelected(SelfDir)) ? true : false;
+            _isSelected = (!baiduFileList.DirIsSelected(SelfDir));
             baiduFileList.ToggleSelectDir(SelfDir);
         }
 
         if (_isFile)
         {
-            _isSelected = (!baiduFileList.FileIsSelected(SelfFile)) ? true : false;
+            _isSelected = (!baiduFileList.FileIsSelected(SelfFile));
             baiduFileList.ToggleSelectFile(SelfFile);
         }
 
@@ -256,7 +262,7 @@ public partial class ItemShowLine : UserControl
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private async void LeftClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void LeftClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         var currentTime = DateTime.Now;
         var timeDiff = currentTime - _lastClickedTime;
@@ -273,7 +279,7 @@ public partial class ItemShowLine : UserControl
             {
                 /*FlyNoticeOverlay flyNoticeOverlay = new FlyNoticeOverlay();
                 OverlayNotification.Children.Add(flyNoticeOverlay);
-                flyNoticeOverlay.Run($"{SelfFile.Name} ÒÑÌí¼Ó½øÏÂÔØ¶ÓÁĞ");
+                flyNoticeOverlay.Run($"{SelfFile.Name} å·²æ·»åŠ è¿›ä¸‹è½½é˜Ÿåˆ—");
                 try
                 {
                     List<string> url_list = await baiduFileList.GetFileDownloadLink(SelfFile.Path);
@@ -286,14 +292,14 @@ public partial class ItemShowLine : UserControl
                 {
                     FlyNoticeOverlay err = new FlyNoticeOverlay();
 
-                    err.Run($"{SelfFile.Name}ÏÂÔØ³ö´í£º{ex}");
+                    err.Run($"{SelfFile.Name}ä¸‹è½½å‡ºé”™ï¼š{ex}");
 
                 }*/
             }
         }
         else
         {
-            toogleSelect();
+            ToogleSelect();
         }
     }
 
@@ -311,20 +317,18 @@ public partial class ItemShowLine : UserControl
     {
         DialogOverlay inputName = new DialogOverlay();
         OverlayReservedGrid.Children.Add(inputName);
-        string? filename = await inputName.ShowDialog("ÇëÊäÈëĞÂ½¨ÎÄ¼ş¼ĞµÄÃû³Æ", "´´½¨");
+        string filename = await inputName.ShowDialog("è¯·è¾“å…¥æ–°å»ºæ–‡ä»¶å¤¹çš„åç§°", "åˆ›å»º");
         try
         {
             if ((await baiduFileList.CreateDir(ParentPath + "/" + filename)).Success)
             {
                 Refresh();
-                return;
             }
             else
             {
                 MessageOverlay message = new MessageOverlay();
                 OverlayReservedGrid.Children.Add(message);
-                message.SetMessage("´´½¨Ê§°Ü", $"´´½¨{ParentPath + "/" + filename}Ê±Óöµ½´íÎó");
-                return;
+                message.SetMessage("åˆ›å»ºå¤±è´¥", $"åˆ›å»º{ParentPath + "/" + filename}æ—¶é‡åˆ°é”™è¯¯");
             }
         }
         catch (Exception ex)
@@ -345,7 +349,7 @@ public partial class ItemShowLine : UserControl
         netdiskPathOverlay.baiduFileList = baiduFileList;
         netdiskPathOverlay.ShowInitDir();
         OverlayReservedGrid.Children.Add(netdiskPathOverlay);
-        string? targetPath = await netdiskPathOverlay.ShowDialog("ÇëÑ¡ÔñÄ¿±êÎÄ¼ş¼Ğ", "¸´ÖÆ");
+        string targetPath = await netdiskPathOverlay.ShowDialog("è¯·é€‰æ‹©ç›®æ ‡æ–‡ä»¶å¤¹", "å¤åˆ¶");
         string selfPath, selfName;
         if (_isDir)
         {
@@ -373,7 +377,7 @@ public partial class ItemShowLine : UserControl
                     }
 
                     TaskView taskView = taskProber.AddTask();
-                    taskView.SetText("¸´ÖÆÎÄ¼ş", $"¸´ÖÆ{selfName}µ½{targetPath}", "ÇëÉÔºó\t0%");
+                    taskView.SetText("å¤åˆ¶æ–‡ä»¶", $"å¤åˆ¶{selfName}åˆ°{targetPath}", "è¯·ç¨å\t0%");
                     try
                     {
                         string currentPath = ParentPath;
@@ -390,9 +394,9 @@ public partial class ItemShowLine : UserControl
                     MessageOverlay message = new MessageOverlay();
                     OverlayReservedGrid.Children.Add(message);
                     string errMsg = string.Empty;
-                    errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "Î´Öª´íÎó";
-                    errMsg += $"\t ´íÎóÂë: {netdiskResult.ResultId.ToString()}";
-                    message.SetMessage("´´½¨Ê§°Ü", errMsg);
+                    errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "æœªçŸ¥é”™è¯¯";
+                    errMsg += $"\t é”™è¯¯ç : {netdiskResult.ResultId.ToString()}";
+                    message.SetMessage("åˆ›å»ºå¤±è´¥", errMsg);
                 }
 
             }
@@ -400,8 +404,7 @@ public partial class ItemShowLine : UserControl
             {
                 MessageOverlay message = new MessageOverlay();
                 OverlayReservedGrid.Children.Add(message);
-                message.SetMessage("´´½¨Ê§°Ü", $"ÒÆ¶¯ÎÄ¼ş{selfPath}Ê±Óöµ½´íÎó");
-                return;
+                message.SetMessage("åˆ›å»ºå¤±è´¥", $"ç§»åŠ¨æ–‡ä»¶{selfPath}æ—¶é‡åˆ°é”™è¯¯");
             }
         }
         catch (Exception ex)
@@ -422,7 +425,7 @@ public partial class ItemShowLine : UserControl
         netdiskPathOverlay.baiduFileList = baiduFileList;
         netdiskPathOverlay.ShowInitDir();
         OverlayReservedGrid.Children.Add(netdiskPathOverlay);
-        string? targetPath = await netdiskPathOverlay.ShowDialog("ÇëÑ¡ÔñÄ¿±êÎÄ¼ş¼Ğ", "ÒÆ¶¯");
+        string targetPath = await netdiskPathOverlay.ShowDialog("è¯·é€‰æ‹©ç›®æ ‡æ–‡ä»¶å¤¹", "ç§»åŠ¨");
         string selfPath, selfName;
         if (_isDir)
         {
@@ -453,8 +456,8 @@ public partial class ItemShowLine : UserControl
                     }
 
                     TaskView taskView = taskProber.AddTask();
-                    taskView.SetText("ÒÆ¶¯ÎÄ¼ş", 
-                        $"ÒÆ¶¯{selfName}µ½{targetPath}", "ÇëÉÔºó\t0%");
+                    taskView.SetText("ç§»åŠ¨æ–‡ä»¶", 
+                        $"ç§»åŠ¨{selfName}åˆ°{targetPath}", "è¯·ç¨å\t0%");
                     try
                     {
                         string currentPath = ParentPath;
@@ -471,17 +474,17 @@ public partial class ItemShowLine : UserControl
                     MessageOverlay message = new MessageOverlay();
                     OverlayReservedGrid.Children.Add(message);
                     string errMsg = string.Empty;
-                    errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "Î´Öª´íÎó";
-                    errMsg += $"\t ´íÎóÂë: {netdiskResult.ResultId.ToString()}";
-                    message.SetMessage("´´½¨Ê§°Ü", errMsg);
+                    errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "æœªçŸ¥é”™è¯¯";
+                    errMsg += $"\t é”™è¯¯ç : {netdiskResult.ResultId.ToString()}";
+                    message.SetMessage("åˆ›å»ºå¤±è´¥", errMsg);
                 }
             }
             else
             {
                 MessageOverlay message = new MessageOverlay();
                 OverlayReservedGrid.Children.Add(message);
-                message.SetMessage("´´½¨Ê§°Ü", $"ÒÆ¶¯ÎÄ¼ş{selfPath}Ê±Óöµ½´íÎó");
-                return;
+                message.SetMessage("åˆ›å»ºå¤±è´¥", $"ç§»åŠ¨æ–‡ä»¶{selfPath}æ—¶é‡åˆ°é”™è¯¯");
+
             }
         }
         catch (Exception ex)
@@ -500,7 +503,7 @@ public partial class ItemShowLine : UserControl
     {
         DialogOverlay inputName = new DialogOverlay();
         OverlayReservedGrid.Children.Add(inputName);
-        string? filename = await inputName.ShowDialog("ÇëÊäÈëÎÄ¼şµÄĞÂÃû³Æ", "ÖØÃüÃû", placeHolderS: SelfDir.Name);
+        string filename = await inputName.ShowDialog("è¯·è¾“å…¥æ–‡ä»¶çš„æ–°åç§°", "é‡å‘½å", placeHolderS: SelfDir.Name);
         string selfPath;
         if (_isDir)
         {
@@ -523,7 +526,7 @@ public partial class ItemShowLine : UserControl
                 }
 
                 TaskView taskView = taskProber.AddTask();
-                taskView.SetText("ÖØÃüÃûÎÄ¼ş", $"ÕıÔÚÖØÃüÃû{selfPath}", "ÇëÉÔºó\t0%");
+                taskView.SetText("é‡å‘½åæ–‡ä»¶", $"æ­£åœ¨é‡å‘½å{selfPath}", "è¯·ç¨å\t0%");
                 try
                 {
                     string currentPath = ParentPath;
@@ -540,9 +543,9 @@ public partial class ItemShowLine : UserControl
                 MessageOverlay message = new MessageOverlay();
                 OverlayReservedGrid.Children.Add(message);
                 string errMsg = string.Empty;
-                errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "Î´Öª´íÎó";
-                errMsg += $"\t ´íÎóÂë: {netdiskResult.ResultId.ToString()}";
-                message.SetMessage("´´½¨Ê§°Ü", errMsg);
+                errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "æœªçŸ¥é”™è¯¯";
+                errMsg += $"\t é”™è¯¯ç : {netdiskResult.ResultId.ToString()}";
+                message.SetMessage("åˆ›å»ºå¤±è´¥", errMsg);
             }
         }
         catch (Exception ex)
@@ -590,7 +593,7 @@ public partial class ItemShowLine : UserControl
 
                 TaskView taskView = taskProber.AddTask();
 
-                taskView.SetText("É¾³ıÎÄ¼ş", $"ÕıÔÚÉ¾³ı{count.ToString()}¸öÏîÄ¿", "ÇëÉÔºó\t0%");
+                taskView.SetText("åˆ é™¤æ–‡ä»¶", $"æ­£åœ¨åˆ é™¤{count.ToString()}ä¸ªé¡¹ç›®", "è¯·ç¨å\t0%");
                 try
                 {
                     string currentPath = ParentPath;
@@ -607,20 +610,15 @@ public partial class ItemShowLine : UserControl
                 MessageOverlay message = new MessageOverlay();
                 OverlayReservedGrid.Children.Add(message);
                 string errMsg = string.Empty;
-                errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "Î´Öª´íÎó";
-                errMsg += $"\t ´íÎóÂë: {netdiskResult.ResultId.ToString()}";
-                message.SetMessage("´´½¨Ê§°Ü", errMsg);
+                errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "æœªçŸ¥é”™è¯¯";
+                errMsg += $"\t é”™è¯¯ç : {netdiskResult.ResultId.ToString()}";
+                message.SetMessage("åˆ›å»ºå¤±è´¥", errMsg);
             }
         }
         catch (Exception ex)
         {
             ShowInfo(ex.Message);
         }
-    }
-
-    private void DockPanel_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
-    {
-        return;
     }
 
     /// <summary>
@@ -672,31 +670,69 @@ public partial class ItemShowLine : UserControl
         OverlayNotification.Children.Add(flyNoticeOverlay);
         if (_isFile)
         {
-            flyNoticeOverlay.Run($"{SelfFile.Name} ÒÑÌí¼Ó½øÏÂÔØ¶ÓÁĞ");
+            flyNoticeOverlay.Run($"{SelfFile.Name} å·²æ·»åŠ è¿›ä¸‹è½½é˜Ÿåˆ—");
+            try
+            {
+                Console.WriteLine((TransferPage == null) ? "NOT EXIST":"EXIST");
+
+                List<string> urlList = await baiduFileList.GetFileDownloadLink(SelfFile.Path);
+                DownloadConfig downloadConfig = baiduFileList.ChooseDownloadMethod();
+                downloadConfig.FileName = SelfFile.Name;
+                downloadConfig.FilePath = FilePathOperate.GetAvailablePath(subPath: null, fileName: SelfFile.Name);
+                downloadConfig.FileSize = SelfFile.Size;
+                downloadConfig.Url = urlList[0];
+                string tmpPath = SelfFile.Path;
+                downloadConfig.GetUrlFunc = () => { return baiduFileList.GetFileDownloadLink(tmpPath); };
+                urlList.Remove(urlList[0]);
+                TransferPage.addTask(urlList, downloadConfig);
+            }
+            catch (Exception ex)
+            {
+                FlyNoticeOverlay err = new FlyNoticeOverlay();
+
+                err.Run($"{SelfFile.Name}ä¸‹è½½å‡ºé”™ï¼š{ex}");
+            }
         }
         else
         {
-            flyNoticeOverlay.Run($"ÎÄ¼ş¼ĞÔİ²»Ö§³ÖÏÂÔØ");
-            return;
+            flyNoticeOverlay.Run($"æ­£åœ¨è§£ææ–‡ä»¶å¤¹");
+            try
+            {
+                TaskView taskView = taskProber.AddTask();
+                taskView.SetText("æ­£åœ¨è§£æéœ€è¦ä¸‹è½½çš„æ–‡ä»¶", $"æ­£åœ¨è§£æ: {SelfDir.Path}", "è¯·ç¨å...");   
+                FileList mappedFileList = await baiduFileList.MapFileList(SelfDir.Path);
+                taskView.SetText("æ­£åœ¨è§£æéœ€è¦ä¸‹è½½çš„æ–‡ä»¶", $"æ­£åœ¨è§£æ: {SelfDir.Path}", "å·²è·å–æ–‡ä»¶æ•°");   
+
+                foreach (NetFile file in mappedFileList.File)
+                {
+                    taskView.SetText(mainContent : $"æ­£åœ¨è§£æ: {SelfDir.Path}", secondaryContent : $"æ­£åœ¨è·å–ä¸‹è½½é“¾æ¥:{file.Name}");   
+
+                    List<string> urlList = await baiduFileList.GetFileDownloadLink(file.Path);
+                    DownloadConfig downloadConfig = baiduFileList.ChooseDownloadMethod();
+                    downloadConfig.FileName = file.Name;
+                    string tmpPath = FilePathOperate.NormalizePath(file.Path);
+                    string unusedPath = FilePathOperate.NormalizePath(ParentPath);
+                    downloadConfig.FilePath = FilePathOperate.GetAvailablePath(subPath: FilePathOperate.RemovePrefixPath(tmpPath, unusedPath));
+                    downloadConfig.FileSize = file.Size;
+                    Console.WriteLine(urlList[0]);
+                    downloadConfig.Url = urlList[0];
+                    urlList.Remove(urlList[0]);
+                    Console.WriteLine(TransferPage.ToString());
+
+                    TransferPage.addTask(urlList, downloadConfig);
+                }
+                taskView.SetText(secondaryContent:"å·²å®Œæˆ");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                FlyNoticeOverlay err = new FlyNoticeOverlay();
+
+                err.Run($"{SelfFile.Name}ä¸‹è½½å‡ºé”™ï¼š{ex}");
+            }
         }
 
-        try
-        {
-            List<string> urlList = await baiduFileList.GetFileDownloadLink(SelfFile.Path);
-            DownloadConfig downloadConfig = baiduFileList.ChooseDownloadMethod();
-            downloadConfig.FileName = SelfFile.Name;
-            downloadConfig.FilePath = FilePathOperate.GetAvailablePath(sub_path: null, file_name: SelfFile.Name);
-            downloadConfig.FileSize = SelfFile.Size;
-            downloadConfig.Url = urlList[0];
-            urlList.Remove(urlList[0]);
-            TransferPage.addTask(urlList, downloadConfig);
-        }
-        catch (Exception ex)
-        {
-            FlyNoticeOverlay err = new FlyNoticeOverlay();
-
-            err.Run($"{SelfFile.Name}ÏÂÔØ³ö´í£º{ex}");
-        }
+        
     }
     /*
      * ==========================
@@ -709,7 +745,7 @@ public partial class ItemShowLine : UserControl
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private async void MultiShareOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void MultiShareOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         ShareLinkOverlay shareLinkOverlay = new ShareLinkOverlay();
         shareLinkOverlay.baiduFileList = baiduFileList;
@@ -729,11 +765,9 @@ public partial class ItemShowLine : UserControl
     /// <param name="e"></param>
     private async void MultiDeleteOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        string deleteFilelist;
-
         List<NetDir> dirList = baiduFileList.GetSelectedItem().Dir;
         List<NetFile> fileList = baiduFileList.GetSelectedItem().File;
-        deleteFilelist = baiduFileList.IntegrateFilelist(fileList, dirList);
+        string deleteFilelist = baiduFileList.IntegrateFilelist(fileList, dirList);
         try
         {
             NetdiskResult netdiskResult = await baiduFileList.DeleteFile(deleteFilelist, isAsync: true);
@@ -746,7 +780,7 @@ public partial class ItemShowLine : UserControl
                 }
 
                 TaskView taskView = taskProber.AddTask();
-                taskView.SetText("É¾³ıÎÄ¼ş", $"ÉúÔÚÉ¾³ı{(dirList.Count() + fileList.Count()).ToString()}¸ö¶ÔÏó", "ÇëÉÔºó\t0%");
+                taskView.SetText("åˆ é™¤æ–‡ä»¶", $"ç”Ÿåœ¨åˆ é™¤{(dirList.Count() + fileList.Count()).ToString()}ä¸ªå¯¹è±¡", "è¯·ç¨å\t0%");
                 try
                 {
                     string currentPath = ParentPath;
@@ -763,9 +797,9 @@ public partial class ItemShowLine : UserControl
                 MessageOverlay message = new MessageOverlay();
                 OverlayReservedGrid.Children.Add(message);
                 string errMsg = string.Empty;
-                errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "Î´Öª´íÎó";
-                errMsg += $"\t ´íÎóÂë: {netdiskResult.ResultId.ToString()}";
-                message.SetMessage("´´½¨Ê§°Ü", errMsg);
+                errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "æœªçŸ¥é”™è¯¯";
+                errMsg += $"\t é”™è¯¯ç : {netdiskResult.ResultId.ToString()}";
+                message.SetMessage("åˆ›å»ºå¤±è´¥", errMsg);
             }
         }
         catch (Exception ex)
@@ -785,12 +819,12 @@ public partial class ItemShowLine : UserControl
         netdiskPathOverlay.baiduFileList = baiduFileList;
         netdiskPathOverlay.ShowInitDir();
         OverlayReservedGrid.Children.Add(netdiskPathOverlay);
-        string? targetPath = await netdiskPathOverlay.ShowDialog("ÇëÑ¡ÔñÄ¿±êÎÄ¼ş¼Ğ", "ÒÆ¶¯");
+        string targetPath = await netdiskPathOverlay.ShowDialog("è¯·é€‰æ‹©ç›®æ ‡æ–‡ä»¶å¤¹", "ç§»åŠ¨");
 
         List<string> selfPath = new List<string>();
         List<string> selfName = new List<string>();
         List<string> targetPathList = new List<string>();
-        if (baiduFileList.GetSelectedItem().File != null)
+        if (baiduFileList.GetSelectedItem().File.Any())
         {
             foreach (NetFile file in baiduFileList.GetSelectedItem().File)
             {
@@ -803,7 +837,7 @@ public partial class ItemShowLine : UserControl
             return;
         }
 
-        if (baiduFileList.GetSelectedItem().Dir != null)
+        if (baiduFileList.GetSelectedItem().Dir.Any())
         {
             foreach (NetDir dir in baiduFileList.GetSelectedItem().Dir)
             {
@@ -832,7 +866,7 @@ public partial class ItemShowLine : UserControl
                     }
 
                     TaskView taskView = taskProber.AddTask();
-                    taskView.SetText("ÒÆ¶¯ÎÄ¼ş", $"ÒÆ¶¯{targetPathList.Count.ToString()}¸ö¶ÔÏóµ½{targetPath}", "ÇëÉÔºó\t0%");
+                    taskView.SetText("ç§»åŠ¨æ–‡ä»¶", $"ç§»åŠ¨{targetPathList.Count.ToString()}ä¸ªå¯¹è±¡åˆ°{targetPath}", "è¯·ç¨å\t0%");
                     try
                     {
                         string currentPath = ParentPath;
@@ -849,20 +883,16 @@ public partial class ItemShowLine : UserControl
                     MessageOverlay message = new MessageOverlay();
                     OverlayReservedGrid.Children.Add(message);
                     string errMsg = string.Empty;
-                    errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "Î´Öª´íÎó";
-                    errMsg += $"\t ´íÎóÂë: {netdiskResult.ResultId.ToString()}";
-                    message.SetMessage("´´½¨Ê§°Ü", errMsg);
+                    errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "æœªçŸ¥é”™è¯¯";
+                    errMsg += $"\t é”™è¯¯ç : {netdiskResult.ResultId.ToString()}";
+                    message.SetMessage("åˆ›å»ºå¤±è´¥", errMsg);
                 }
-
-                //Refresh();
-                return;
             }
             else
             {
                 MessageOverlay message = new MessageOverlay();
                 OverlayReservedGrid.Children.Add(message);
-                message.SetMessage("´´½¨Ê§°Ü", $"ÒÆ¶¯ÎÄ¼şÊ±Óöµ½´íÎó");
-                return;
+                message.SetMessage("åˆ›å»ºå¤±è´¥", $"ç§»åŠ¨æ–‡ä»¶æ—¶é‡åˆ°é”™è¯¯");
             }
         }
         catch (Exception ex)
@@ -883,11 +913,11 @@ public partial class ItemShowLine : UserControl
         netdiskPathOverlay.baiduFileList = baiduFileList;
         netdiskPathOverlay.ShowInitDir();
         OverlayReservedGrid.Children.Add(netdiskPathOverlay);
-        string? targetPath = await netdiskPathOverlay.ShowDialog("ÇëÑ¡ÔñÄ¿±êÎÄ¼ş¼Ğ", "¸´ÖÆ");
+        string targetPath = await netdiskPathOverlay.ShowDialog("è¯·é€‰æ‹©ç›®æ ‡æ–‡ä»¶å¤¹", "å¤åˆ¶");
         List<string> selfPath = new List<string>();
         List<string> selfName = new List<string>();
         List<string> targetPathList = new List<string>();
-        if (baiduFileList.GetSelectedItem().File != null)
+        if (baiduFileList.GetSelectedItem().File.Any())
         {
             foreach (NetFile file in baiduFileList.GetSelectedItem().File)
             {
@@ -896,7 +926,7 @@ public partial class ItemShowLine : UserControl
             }
         }
 
-        if (baiduFileList.GetSelectedItem().Dir != null)
+        if (baiduFileList.GetSelectedItem().Dir.Any())
         {
             foreach (NetDir dir in baiduFileList.GetSelectedItem().Dir)
             {
@@ -926,7 +956,7 @@ public partial class ItemShowLine : UserControl
                     }
 
                     TaskView taskView = taskProber.AddTask();
-                    taskView.SetText("¸´ÖÆÎÄ¼ş", $"¸´ÖÆ{targetPathList.Count.ToString()}¸ö¶ÔÏóµ½{targetPath}", "");
+                    taskView.SetText("å¤åˆ¶æ–‡ä»¶", $"å¤åˆ¶{targetPathList.Count.ToString()}ä¸ªå¯¹è±¡åˆ°{targetPath}", "");
                     try
                     {
                         string currentPath = ParentPath;
@@ -943,13 +973,10 @@ public partial class ItemShowLine : UserControl
                     MessageOverlay message = new MessageOverlay();
                     OverlayReservedGrid.Children.Add(message);
                     string errMsg = string.Empty;
-                    errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "Î´Öª´íÎó";
-                    errMsg += $"\t ´íÎóÂë: {netdiskResult.ResultId.ToString()}";
-                    message.SetMessage("´´½¨Ê§°Ü", errMsg);
+                    errMsg += (netdiskResult.Msg != null) ? netdiskResult.Msg : "æœªçŸ¥é”™è¯¯";
+                    errMsg += $"\t é”™è¯¯ç : {netdiskResult.ResultId.ToString()}";
+                    message.SetMessage("åˆ›å»ºå¤±è´¥", errMsg);
                 }
-
-                //Refresh();
-                return;
             }
         }
         catch (Exception ex)
@@ -958,4 +985,45 @@ public partial class ItemShowLine : UserControl
         }
         
     }
+
+    private async void MultiDownloadOnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        //List<NetDir> dirList = 
+        //List<NetFile> fileList = 
+        TaskView taskView = taskProber.AddTask();
+        taskView.SetText("æ­£åœ¨è§£æéœ€è¦ä¸‹è½½çš„æ–‡ä»¶", "æ­£åœ¨å‡†å¤‡", "å·²è§£æ: 0");
+        FileList parsedFileList = new FileList();
+        parsedFileList.File = new List<NetFile>();
+        parsedFileList.Dir = new List<NetDir>();
+        foreach (NetFile file in baiduFileList.GetSelectedItem().File) { parsedFileList.File.Add(file); }
+        taskView.SetText(mainContent:"æ­£åœ¨è§£æ", secondaryContent : $"å·²è§£æ: {parsedFileList.File.Count()}");
+        foreach (NetDir dir in baiduFileList.GetSelectedItem().Dir)
+        {
+            parsedFileList.Dir.Add(dir);
+            FileList mappedFileList = await baiduFileList.MapFileList(dir.Path);
+            foreach (NetFile fileObj in mappedFileList.File) { parsedFileList.File.Add(fileObj); }
+            foreach (NetDir dirObj in mappedFileList.Dir) { parsedFileList.Dir.Add(dirObj); }
+            taskView.SetText( secondaryContent : $"å·²è§£æ: {parsedFileList.File.Count()}");
+        }
+
+        foreach (NetFile file in parsedFileList.File)
+        {
+            taskView.SetText( secondaryContent : $"æ­£åœ¨è·å–ä¸‹è½½é“¾æ¥: {file.Name}");
+            List<string> urlList = await baiduFileList.GetFileDownloadLink(file.Path);
+            DownloadConfig downloadConfig = baiduFileList.ChooseDownloadMethod();
+            downloadConfig.FileName = file.Name;
+            string tmpPath = FilePathOperate.NormalizePath(file.Path);
+            string unusedPath = FilePathOperate.NormalizePath(ParentPath);
+            downloadConfig.FilePath = FilePathOperate.GetAvailablePath(subPath: FilePathOperate.RemovePrefixPath(tmpPath, unusedPath));
+            downloadConfig.FileSize = file.Size;
+            downloadConfig.Url = urlList[0];
+            urlList.Remove(urlList[0]);
+            TransferPage.addTask(urlList, downloadConfig);
+        }
+        taskView.SetText(mainContent:"å·²å®Œæˆ", secondaryContent : $"å·²è§£æ: {parsedFileList.File.Count()}");
+        taskView.SetProgress(100);
+        
+
+    }
+
 }

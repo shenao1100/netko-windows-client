@@ -1,7 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using Netko.NetDisk.Baidu;
 using Netko.Download;
 using System;
 using System.Collections.Generic;
@@ -23,12 +21,12 @@ public partial class DownloadProgress : UserControl
     /// <summary>
     /// Get Geometry svg from resource xaml
     /// </summary>
-    /// <param name="resource_name">key for StreamGeometry you want</param>
+    /// <param name="resourceName">key for StreamGeometry you want</param>
     /// <returns></returns>
-    private Geometry? TryGetGeometry(string resource_name)
+    private Geometry? TryGetGeometry(string resourceName)
     {
-        var is_res_exist = Application.Current!.Resources.TryGetResource(resource_name, null, out var res);
-        if (is_res_exist && res is Geometry geom)
+        var isResExist = Application.Current!.Resources.TryGetResource(resourceName, null, out var res);
+        if (isResExist && res is Geometry geom)
         {
             return geom;
         }
@@ -41,11 +39,11 @@ public partial class DownloadProgress : UserControl
     {
         int times = 0;
         string unit = "bytes";
-        double _size = Convert.ToDouble(size);
-        while (_size > 1024)
+        double calcSize = Convert.ToDouble(size);
+        while (calcSize > 1024)
         {
             times++;
-            _size /= 1024;
+            calcSize /= 1024;
         }
         switch (times)
         {
@@ -64,38 +62,43 @@ public partial class DownloadProgress : UserControl
             case 6:
                 unit = "ZB"; break;
         }
-        _size = double.Round(_size, 2);
-        return _size.ToString() + unit;
+        calcSize = double.Round(calcSize, 2);
+        return calcSize.ToString() + unit;
     }
 
-    public void updateDownloadProgress(IDownload downloadInstance)
+    private void UpdateDownloadProgress(IDownload downloadInstance)
     {
-        progress_bar.Value = Convert.ToInt32(downloadInstance.Status().downloadProgress * 100);
-        description.Content = FormatSize(downloadInstance.Status().downloaded) + "/" + FormatSize(downloadInstance.Status().totalSize) + "\t" + float.Round(downloadInstance.Status().downloadProgress*100, 2).ToString() + "%";
-        if (downloadInstance.Status().isPaused)
+        progress_bar.Value = Convert.ToInt32(downloadInstance.Status().DownloadProgress * 100);
+        description.Content = FormatSize(downloadInstance.Status().Downloaded) + "/" + FormatSize(downloadInstance.Status().TotalSize) + "\t" + float.Round(downloadInstance.Status().DownloadProgress*100, 2).ToString() + "%";
+        if (downloadInstance.Status().IsParsing)
         {
-            description.Content += "\t“—‘›Õ£";
+            description.Content += "\tÊ≠£Âú®Ëß£Êûê";
+
+        }
+        else if (downloadInstance.Status().IsPaused)
+        {
+            description.Content += "\tÂ∑≤ÊöÇÂÅú";
+
         }
         else
         {
-
-            description.Content += $"\tœﬂ≥Ã ˝:{downloadInstance.Status().downloadingThread.ToString()}";
-            description.Content += "\t’˝‘⁄œ¬‘ÿ";
+            description.Content += $"\tÁ∫øÁ®ãÊï∞:{downloadInstance.Status().DownloadingThread.ToString()}";
+            description.Content += "\tÊ≠£Âú®‰∏ãËΩΩ";
 
         }
-        if (downloadInstance.Status().downloaded == downloadInstance.Status().totalSize || downloadInstance.Status().isComplete)
+        if (downloadInstance.Status().Downloaded == downloadInstance.Status().TotalSize || downloadInstance.Status().IsComplete)
         {
             ControlDestory();
         }
-        updatePauseStatus();
+        UpdatePauseStatus();
     }
     private void Delete(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         DownloadInstance.Cancel();
     }
-    private void updatePauseStatus()
+    private void UpdatePauseStatus()
     {
-        if (DownloadInstance.Status().isPaused)
+        if (DownloadInstance.Status().IsPaused)
         {
             toogle_pause.Data = (StreamGeometry)this.FindResource("continue");
         }
@@ -104,10 +107,10 @@ public partial class DownloadProgress : UserControl
             toogle_pause.Data = (StreamGeometry)this.FindResource("pause");
         }
     }
-    private void tooglePause(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void TooglePause(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         
-        if (DownloadInstance.Status().isPaused)
+        if (DownloadInstance.Status().IsPaused)
         { 
              toogle_pause.Data = (StreamGeometry)this.FindResource("pause");
              DownloadInstance.Continue();
@@ -119,16 +122,16 @@ public partial class DownloadProgress : UserControl
         }
         StatusUpdateCallback();
     }
-    public void init(List<string>? download_url, DownloadConfig downloadConfig)
+    public void Init(List<string>? downloadUrl, DownloadConfig downloadConfig)
     {
 
         DownloadInstance = DownloadFactory.Create(downloadConfig);// new Downloader(download_url[0], "netdisk;P2SP;2.2.101.200;netdisk;12.17.2;PGEM10;android-android;9;JSbridge4.4.0;jointBridge;1.1.0;", download_path, size, 5, cookie);
         Trace.WriteLine(downloadConfig.Url);
-        DownloadInstance.SetCallBack(() => { updateDownloadProgress(DownloadInstance); });
+        DownloadInstance.SetCallBack(() => { UpdateDownloadProgress(DownloadInstance); });
         filename.Content = downloadConfig.FileName;
-        if (download_url != null)
+        if (downloadUrl != null)
         {
-            foreach (var item in download_url)
+            foreach (var item in downloadUrl)
             {
                 DownloadInstance.AddUrl(item);
             }

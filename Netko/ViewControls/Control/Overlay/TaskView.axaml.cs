@@ -1,8 +1,5 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Netko.NetDisk;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -23,13 +20,13 @@ public partial class TaskView : UserControl
     {
         InitializeComponent();
     }
-    public void SetText(string? title = null, string? main_content = null, string? secondary_content = null)
+    public void SetText(string? title = null, string? mainContent = null, string? secondaryContent = null)
     {
         if (title != null) { Title.Text = title; }
-        if (main_content != null) { Content.Text = main_content; }
-        if (secondary_content != null) { SecondaryContent.Text = secondary_content; }
+        if (mainContent != null) { Content.Text = mainContent; }
+        if (secondaryContent != null) { SecondaryContent.Text = secondaryContent; }
     }
-    public void SetTask(Func<string, Task<Netko.NetDisk.TaskStatus>> GetStatusFunc, string TaskID, Action? Callback=null) {
+    public void SetTask(Func<string, Task<Netko.NetDisk.TaskStatus>> getStatusFunc, string taskId, Action? callback=null) {
         Task.Run(() =>
         {
             try
@@ -37,27 +34,27 @@ public partial class TaskView : UserControl
                 while (true)
                 {
                     Thread.Sleep(1000);
-                    Netko.NetDisk.TaskStatus status = GetStatusFunc(TaskID).Result;
-                    string secondary_content = $"";
+                    Netko.NetDisk.TaskStatus status = getStatusFunc(taskId).Result;
+                    string secondaryContent = $"";
                     switch (status.Status)
                     {
                         case TaskStatusIndicate.InQueue:
-                            secondary_content += "已在队列中";
+                            secondaryContent += "已在队列中";
                             break;
                         case TaskStatusIndicate.Working:
-                            secondary_content += "正在处理";
+                            secondaryContent += "正在处理";
                             break;
                         case TaskStatusIndicate.Done:
-                            secondary_content += "已完成";
+                            secondaryContent += "已完成";
                             break;
                         default:
-                            secondary_content += "δ֪";
+                            secondaryContent += "δ֪";
                             break;
                     }
-                    secondary_content += $"\t{status.Progress.ToString()}%";
+                    secondaryContent += $"\t{status.Progress.ToString()}%";
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        SetText(secondary_content: secondary_content);
+                        SetText(secondaryContent: secondaryContent);
                         progress_bar.Value = status.Progress;
 
                     });
@@ -65,15 +62,15 @@ public partial class TaskView : UserControl
                     {
                         break;
                     }
-                };
+                }
             }
             catch (Exception ex)
             {
                 Trace.WriteLine(ex);
             }
-            if (Callback != null)
+            if (callback != null)
             {
-                Dispatcher.UIThread.InvokeAsync(() => { Callback(); });
+                Dispatcher.UIThread.InvokeAsync(() => { callback(); });
             
             }
             

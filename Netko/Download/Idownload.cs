@@ -1,14 +1,6 @@
-using Avalonia.Threading;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -21,16 +13,17 @@ namespace Netko.Download
     }
     public class DownloadStatus
     {
-        public float downloadProgress;
-        public long downloaded;
-        public long totalSize;
-        public int linkCount;
-        public int downloadingThread;
-        public long downloadBlockSize;
+        public float DownloadProgress;
+        public long Downloaded;
+        public long TotalSize;
+        public int LinkCount;
+        public int DownloadingThread;
+        public long DownloadBlockSize;
 
-        public bool isPaused;
-        public bool isDownloading;
-        public bool isComplete;
+        public bool IsParsing;
+        public bool IsPaused;
+        public bool IsDownloading;
+        public bool IsComplete;
     }
     public enum DownloadMethod
     {
@@ -40,15 +33,16 @@ namespace Netko.Download
     public class DownloadConfig
     {
         public string FileName = string.Empty;
-        public string Url = string.Empty;
+        public string? Url = null;
         public string FilePath = string.Empty;
         public long FileSize = 0;
         public string? Cookie = null;
-        public DownloadMethod method;
-        public long BlockSize = 500087;
-        public int BufferSize = 1000;
+        public DownloadMethod Method;
+        public readonly long BlockSize = 500087;
+        public readonly int BufferSize = 1000;
         public int DownloadThread = 1;
         public string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0";
+        public Func<Task<List<string>>>? GetUrlFunc = null; 
     }
     public interface IDownload
     {
@@ -59,24 +53,65 @@ namespace Netko.Download
         void Continue();
         void Cancel();
         Task DownloadThread(Range range, string url);
-        void releaseFile();
+        void ReleaseFile();
         void Run();
     }
     public static class DownloadFactory
     {
-        public static IDownload Create(DownloadConfig downloadCondig)
+        public static IDownload Create(DownloadConfig downloadConfig)
         {
-            return downloadCondig.method switch
+            return downloadConfig.Method switch
             {
-                DownloadMethod.ParticalDownload => new Downloader(downloadCondig),
-                DownloadMethod.MultithreadDownload => new MultiThreadDownloader(downloadCondig),
-                _ => throw new ArgumentException("Method not found.", nameof(downloadCondig.method)),
+                DownloadMethod.ParticalDownload => new Downloader(downloadConfig),
+                DownloadMethod.MultithreadDownload => new MultiThreadDownloader(downloadConfig),
+                _ => throw new ArgumentException("Method not found.", nameof(downloadConfig.Method)),
             };
         }
     }
     public static class FilePathOperate
     {
-        public static string GetUniqueFileName(string folder, string fileName)
+        public static void CreatePrentPath(string path)
+        {
+            if (Path.GetDirectoryName(path) != null)
+            {
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(path));
+                }
+            }
+            else
+            {
+                Directory.CreateDirectory(path);
+            }
+            
+            
+        }
+        public static string NormalizePath(string path)
+        {
+            return path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        }
+        public static string RemovePrefixPath(string fullPath, string prefixToRemove)
+        {
+            // 标准化路径分隔符，确保跨平台一致性
+            fullPath = fullPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            prefixToRemove = prefixToRemove.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+
+            // 确保路径以分隔符结尾，避免错误匹配
+            if (!prefixToRemove.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                prefixToRemove += Path.DirectorySeparatorChar;
+            }
+
+            // 检查路径是否以指定前缀开头
+            if (fullPath.StartsWith(prefixToRemove))
+            {
+                return fullPath.Substring(prefixToRemove.Length);
+            }
+
+            // 如果不包含前缀，返回原路径
+            return fullPath;
+        }
+        private static string GetUniqueFileName(string folder, string fileName)
         {
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
             string extension = Path.GetExtension(fileName);
@@ -91,18 +126,18 @@ namespace Netko.Download
             }
             return uniqueFileName;
         }
-        public static string GetAvailablePath(string? sub_path = null, string? file_name = null)
+        public static string GetAvailablePath(string? subPath = null, string? fileName = null)
         {
-            string ResultPath = MeowSetting.GetDownloadPath();
-            if (sub_path != null)
+            string resultPath = MeowSetting.GetDownloadPath();
+            if (subPath != null)
             {
-                ResultPath = Path.Combine(ResultPath, sub_path);
+                resultPath = Path.Combine(resultPath, subPath);
             }
-            if (file_name != null)
+            if (fileName != null)
             {
-                ResultPath = Path.Combine(ResultPath, GetUniqueFileName(ResultPath, file_name));
+                resultPath = Path.Combine(resultPath, GetUniqueFileName(resultPath, fileName));
             }
-            return ResultPath;
+            return resultPath;
         }
     }
     

@@ -31,7 +31,7 @@
 						<Button Margin="3" Height="23" Width="23" Background="Transparent" VerticalAlignment="Center" IsVisible="False">
 							<PathIcon Data="{StaticResource open}" Height="15" Width="15"/>
 						</Button>
-						<Button Margin="3" Height="23" Width="23" Background="Transparent" VerticalAlignment="Center" Click="tooglePause">
+						<Button Margin="3" Height="23" Width="23" Background="Transparent" VerticalAlignment="Center" Click="TooglePause">
 							<PathIcon Data="{StaticResource pause}" Height="15" Width="15" x:Name="toogle_pause"/>
 						</Button>
 						<Button Margin="3" Height="23" Width="23" Background="Transparent" VerticalAlignment="Center" Click="Delete">

@@ -296,7 +296,7 @@ public partial class NetdiskFilePage : UserControl
             FileListViewer.Opacity = 1;
             SelectAllOverlay.Children.Remove(selectAllButton);
             EmptyRemind empty_label = new EmptyRemind();
-            empty_label.ShowError("�����ڵ��ļ���\n��������û���ļ��Ļ�ԭ");
+            empty_label.ShowError("不存在的文件夹\\n你来到了没有文件的荒原");
             FileListViewer.Children.Add(empty_label);
             return;
         }
@@ -314,6 +314,8 @@ public partial class NetdiskFilePage : UserControl
 
             DirBlock.Init(dir_b.Name, isDir: true);
             DirBlock.baiduFileList = user;
+            
+            DirBlock.TransferPage = TransferPage!;
             DirBlock.OverlayReservedGrid = OverlayReservedGrid;
             DirBlock.OverlayNotification = OverlayNotification;
             DirBlock.taskProber = task_prober;

@@ -14,7 +14,8 @@ namespace Netko.NetDisk
     {
 
     }
-    public struct NetDir
+
+    public struct NetDir : IEquatable<NetDir>
     {
         public long Category;
         public long ExtentTinyint7;
@@ -38,8 +39,34 @@ namespace Netko.NetDisk
         public long TkBindID;
         public long UnList;
         public long WpFile;
+
+        public bool Equals(NetDir other)
+        {
+            return ID == other.ID;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is NetDir other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return ID.GetHashCode();
+        }
+
+        public static bool operator ==(NetDir left, NetDir right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(NetDir left, NetDir right)
+        {
+            return !left.Equals(right);
+        }
     }
-    public struct NetFile
+
+    public struct NetFile : IEquatable<NetFile>
     {
         public long Category;
         public long ExtentTinyint7;
@@ -64,6 +91,30 @@ namespace Netko.NetDisk
         public long TkBindID;
         public long UnList;
         public long WpFile;
+
+        public bool Equals(NetFile other)
+        {
+            return ID == other.ID;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is NetFile && Equals((NetFile)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return ID.GetHashCode();
+        }
+
+        public static bool operator ==(NetFile left, NetFile right)
+        {
+            return left.Equals(right);
+        }
+        public static bool operator !=(NetFile left, NetFile right)
+        {
+            return !left.Equals(right);
+        }
     }
 
 
@@ -96,7 +147,9 @@ namespace Netko.NetDisk
         public TaskStatusIndicate Status;
         public string? TaskId = string.Empty;
         public string? Message = string.Empty;
+        public Action<TaskStatus>? Callback = null;
     }
+     
     public interface INetdisk
     {
         AccountInfo GetAccountInfo();
@@ -108,8 +161,8 @@ namespace Netko.NetDisk
         Task<string> refresh_logid();
         Task<bool> initial_info();
         Task Init();
-
     }
+
     public interface IFileList
     {
         AccountInfo GetAccountInfo();
@@ -131,6 +184,7 @@ namespace Netko.NetDisk
         Task<TaskStatus> GetProgress(string requestId);
         Task<List<string>> GetFileDownloadLink(string path);
         DownloadConfig ChooseDownloadMethod();
+        Task<FileList> MapFileList(string path, FileList fileList = new FileList());
     }
 
 }

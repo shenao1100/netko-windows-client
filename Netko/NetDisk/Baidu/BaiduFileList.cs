@@ -13,9 +13,6 @@ using Netko.Download;
 
 namespace Netko.NetDisk.Baidu
 {
-    
-    
-    
     /// <summary>
     /// For use in serialize json obj in Rename data
     /// </summary>
@@ -40,8 +37,8 @@ namespace Netko.NetDisk.Baidu
         private readonly Baidu _baiduAccount = (Baidu)account;
         public Dictionary<string, FileList> FileListTemp = new Dictionary<string, FileList>();
 
-        private readonly List<NetDir> _selectDirList = new List<NetDir>();
-        private readonly List<NetFile> _selectFileList = new List<NetFile>();
+        public List<NetDir> _selectDirList = new List<NetDir>();
+        public List<NetFile> _selectFileList = new List<NetFile>();
         private Dictionary<string, TaskStatus> _localTaskStatus = new Dictionary<string, TaskStatus>();
         
         const string Channel = "00000000000000000000000040000001";
@@ -61,12 +58,12 @@ namespace Netko.NetDisk.Baidu
         {
             return new AccountInfo
             {
-                InitCookie = _baiduAccount.init_cookie_string,
-                Name = _baiduAccount.name,
-                Token = _baiduAccount.bdstoken,
-                StorageUsed = _baiduAccount.storage_used,
-                StorageTotal = _baiduAccount.storage_total,
-                StorageFree = _baiduAccount.storage_free,
+                InitCookie = _baiduAccount.InitCookieString,
+                Name = _baiduAccount.Name,
+                Token = _baiduAccount.BdStoken,
+                StorageUsed = _baiduAccount.StorageUsed,
+                StorageTotal = _baiduAccount.StorageTotal,
+                StorageFree = _baiduAccount.StorageFree,
             };
         }
         static string GenerateSha1Hash(string input)
@@ -151,19 +148,19 @@ namespace Netko.NetDisk.Baidu
             int totalDirs = jArrayFileList.Count(item => (int?)item["isdir"] == 1);
             fileList.File = new List<NetFile>();
             fileList.Dir = new List<NetDir>();
-            int fileCount = 0, dirCount = 0;
+            //int fileCount = 0, dirCount = 0;
             foreach (JObject item in jArrayFileList) {
                 if ((int?)item["isdir"] == 0)
                 {
                     // File
                     fileList.File.Add(ParseFile(item));
-                    fileCount++;
+                    //fileCount++;
                 }
                 else if ((int?)item["isdir"] == 1)
                 {
                     // Dir
                     fileList.Dir.Add(ParseDir(item));
-                    dirCount++;
+                    //dirCount++;
                 }
             }
             return fileList;
@@ -174,7 +171,11 @@ namespace Netko.NetDisk.Baidu
         {
             if(_selectDirList.Count == 0 && _selectFileList.Count == 0)
             {
-                return new FileList();
+                return new FileList()
+                {
+                    File = new List<NetFile>(),
+                    Dir = new List<NetDir>()
+                };
             }
             FileList fileList = new FileList();
             fileList.File = _selectFileList;
@@ -341,7 +342,7 @@ namespace Netko.NetDisk.Baidu
         public async Task<NetdiskResult> CreateDir(string path)
         {
             
-            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string logId = WebUtility.UrlEncode(_baiduAccount.LogId);
             string url = $"https://pan.baidu.com/api/create?clienttype={Clienttype}&channel={Channel}&version={Version}&devuid={_devuid}&rand={_rand}&time={_time}&rand2={_rand2}";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", NetdiskUserAgent);
@@ -410,9 +411,9 @@ namespace Netko.NetDisk.Baidu
             {
                 new KeyValuePair<string, string>("filelist", jsonString)
             });
-            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string logId = WebUtility.UrlEncode(_baiduAccount.LogId);
             string asyncParam = isAsync ? "2" : "1";
-            string url = $"https://pan.baidu.com/api/filemanager?opera=rename&async={asyncParam}&onnest=fail&channel={ChannelShortS}&web=1&app_id=250528&bdstoken={_baiduAccount.bdstoken}&logid={logId}&clienttype=0";
+            string url = $"https://pan.baidu.com/api/filemanager?opera=rename&async={asyncParam}&onnest=fail&channel={ChannelShortS}&web=1&app_id=250528&bdstoken={_baiduAccount.BdStoken}&logid={logId}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
@@ -470,9 +471,9 @@ namespace Netko.NetDisk.Baidu
             {
                 new KeyValuePair<string, string>("filelist", jsonString)
             });
-            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string logId = WebUtility.UrlEncode(_baiduAccount.LogId);
             string asyncParam = isAsync ? "2" : "1";
-            string url = $"https://pan.baidu.com/api/filemanager?opera=copy&async={asyncParam}&onnest=fail&channel={ChannelShortS}&web=1&app_id=250528&bdstoken={_baiduAccount.bdstoken}&logid={logId}&clienttype=0";
+            string url = $"https://pan.baidu.com/api/filemanager?opera=copy&async={asyncParam}&onnest=fail&channel={ChannelShortS}&web=1&app_id=250528&bdstoken={_baiduAccount.BdStoken}&logid={logId}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
@@ -512,9 +513,6 @@ namespace Netko.NetDisk.Baidu
             {
                 for (int i = 0; i < nameList.Length; i++)
                 {
-                    Trace.WriteLine(fileList[i]);
-                    Trace.WriteLine(nameList[i]);
-
                     data.Add(new MoveItem { newName = nameList[i], path = fileList[i], dest = targetPathList[i] });
                 }
             }
@@ -534,10 +532,10 @@ namespace Netko.NetDisk.Baidu
             {
                 new KeyValuePair<string, string>("filelist", jsonString)
             });
-            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string logId = WebUtility.UrlEncode(_baiduAccount.LogId);
             string asyncParam = isAsync ? "2" : "1";
 
-            string url = $"https://pan.baidu.com/api/filemanager?opera=move&async={asyncParam}&onnest=fail&channel={ChannelShortS}&web=1&app_id=250528&bdstoken={_baiduAccount.bdstoken}&logid={logId}&clienttype=0";
+            string url = $"https://pan.baidu.com/api/filemanager?opera=move&async={asyncParam}&onnest=fail&channel={ChannelShortS}&web=1&app_id=250528&bdstoken={_baiduAccount.BdStoken}&logid={logId}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
@@ -577,9 +575,9 @@ namespace Netko.NetDisk.Baidu
         /// <returns></returns>
         public async Task<string?> ShareFile(string fileIdList, string password, int period)
         {
-            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string logId = WebUtility.UrlEncode(_baiduAccount.LogId);
 
-            string url = $"https://pan.baidu.com/share/set?channel={Channel}&clienttype=0&web=1&web=1&app_id=250528&bdstoken={_baiduAccount.bdstoken}&logid={logId}&clienttype=0";
+            string url = $"https://pan.baidu.com/share/set?channel={Channel}&clienttype=0&web=1&web=1&app_id=250528&bdstoken={_baiduAccount.BdStoken}&logid={logId}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
@@ -621,10 +619,10 @@ namespace Netko.NetDisk.Baidu
         {
             //long timestampSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             //string time_stamp = timestampSeconds.ToString();
-            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string logId = WebUtility.UrlEncode(_baiduAccount.LogId);
             string asyncParam = isAsync ? "2" : "1";
 
-            string url = $"https://pan.baidu.com/api/filemanager?opera=delete&async={asyncParam}&onnest=fail&channel={ChannelShortS}&web=1&app_id=250528&bdstoken={_baiduAccount.bdstoken}&logid={logId}&clienttype=0";
+            string url = $"https://pan.baidu.com/api/filemanager?opera=delete&async={asyncParam}&onnest=fail&channel={ChannelShortS}&web=1&app_id=250528&bdstoken={_baiduAccount.BdStoken}&logid={logId}&clienttype=0";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
@@ -670,8 +668,8 @@ namespace Netko.NetDisk.Baidu
                 _selectFileList.Clear();
             }
             path = WebUtility.UrlEncode(path);
-            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
-            string url = $"https://pan.baidu.com/api/list?dir={path}&page={page}&num={num}&clienttype=8&channel={Channel}&version=7.45.0.109&devuid={_devuid}&rand={_rand}&time={_time}&rand2={_rand2}&vip={_baiduAccount.vip}&logid={logId}&desc=1&order=time";
+            string logId = WebUtility.UrlEncode(_baiduAccount.LogId);
+            string url = $"https://pan.baidu.com/api/list?dir={path}&page={page}&num={num}&clienttype=8&channel={Channel}&version=7.45.0.109&devuid={_devuid}&rand={_rand}&time={_time}&rand2={_rand2}&vip={_baiduAccount.Vip}&logid={logId}&desc=1&order=time";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", NetdiskUserAgent);
             client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
@@ -757,7 +755,7 @@ namespace Netko.NetDisk.Baidu
         /// <param name="path"></param>
         private async void downloadPreProcess(string path)
         {
-            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string logId = WebUtility.UrlEncode(_baiduAccount.LogId);
             string newLogid = WebUtility.UrlEncode($"=MTczMTQxMjU5NSw4Nw==&path{path}");
 
             path = WebUtility.UrlEncode(path);
@@ -785,11 +783,11 @@ namespace Netko.NetDisk.Baidu
         /// <returns></returns>
         private async Task<string> CMS(string path)
         {
-            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string logId = WebUtility.UrlEncode(_baiduAccount.LogId);
             string newLogid = WebUtility.UrlEncode($"=MTczMTQxMjU5NSw4Nw==&path{path}");
 
             path = WebUtility.UrlEncode(path);
-            string url = $"https://pan.baidu.com/cms/fgid?method=query&clienttype=9&version=3.0.20.63&time=1731441395&rand=6f0e1e64572533db2cd6b44a731f5ee58244ffba&devuid=BDIMXV2-O_9432D545AA3849D19EFD762333A53888-C_0-D_E823_8FA6_BF53_0001_001B_448B_4A73_734B.-M_088FC3E23825-V_3EBDE1E0&channel=0&version_app=7.46.5.113&path={path}&uk={_baiduAccount.uk}&vip=0";
+            string url = $"https://pan.baidu.com/cms/fgid?method=query&clienttype=9&version=3.0.20.63&time=1731441395&rand=6f0e1e64572533db2cd6b44a731f5ee58244ffba&devuid=BDIMXV2-O_9432D545AA3849D19EFD762333A53888-C_0-D_E823_8FA6_BF53_0001_001B_448B_4A73_734B.-M_088FC3E23825-V_3EBDE1E0&channel=0&version_app=7.46.5.113&path={path}&uk={_baiduAccount.Uk}&vip=0";
 
             //string url = $"https://pan.baidu.com/api/checkapl/download?clienttype=8&channel=00000000000000000000000040000001&version=7.46.5.113&devuid={devuid}&rand={rand}&time={time}&rand2={rand2}&vip=0&logid={new_logid}";
             using var nclient = new HttpClient();
@@ -814,7 +812,7 @@ namespace Netko.NetDisk.Baidu
         /// <param name="path"></param>
         public async Task<List<string>> GetFileDownloadLink(string path)
         {
-            string logId = WebUtility.UrlEncode(_baiduAccount.log_id);
+            string logId = WebUtility.UrlEncode(_baiduAccount.LogId);
             string origPath = path;
             path = WebUtility.UrlEncode(path);
 
@@ -857,12 +855,12 @@ namespace Netko.NetDisk.Baidu
         {
             // PC: netdisk;P2SP;3.0.20.63;netdisk;7.46.5.113;PC;PC-Windows;10.0.22631;WindowsBaiduYunGuanJia
 
-            if (_baiduAccount.is_svip || _baiduAccount.is_vip)
+            if (_baiduAccount.IsSvip || _baiduAccount.IsVip)
             {
                 return new DownloadConfig
                 {
                     Cookie = GetAccountInfo().InitCookie,
-                    method = DownloadMethod.ParticalDownload,
+                    Method = DownloadMethod.ParticalDownload,
                     DownloadThread = 8,
                     UserAgent = "netdisk;P2SP;2.2.101.200;netdisk;12.17.2;PGEM10;android-android;9;JSbridge4.4.0;jointBridge;1.1.0;"
                 };
@@ -872,7 +870,7 @@ namespace Netko.NetDisk.Baidu
                 return new DownloadConfig
                 {
                     Cookie = GetAccountInfo().InitCookie,
-                    method = DownloadMethod.ParticalDownload,
+                    Method = DownloadMethod.ParticalDownload,
                     DownloadThread = 1,
                     UserAgent = "netdisk;P2SP;2.2.101.200;netdisk;12.17.2;PGEM10;android-android;9;JSbridge4.4.0;jointBridge;1.1.0;"
 
@@ -880,24 +878,20 @@ namespace Netko.NetDisk.Baidu
                  
             }
         }
-
-        public string MapFileList(string path)
-        {
-            
-            return string.Empty;
-        }
-        public async Task<FileList> MapFileListThread(string path, FileList fileList = new FileList())
+        
+        public async Task<FileList> MapFileList(string path, FileList fileList = new FileList())
         {
             if (fileList.Dir == null && fileList.File == null)
             {
-                
+                fileList.Dir = new List<NetDir>();
+                fileList.File = new List<NetFile>();
             }
             int page = 0;
             FileList tempFileList;
             while (true)
             {
                 page++;
-                tempFileList = await GetFileList(page, path:path);
+                tempFileList = await GetFileList(page, path:path, clearSelectList:false);
                 if (tempFileList.Dir.Count + tempFileList.File.Count < 1000)
                 {
                     break;
@@ -909,7 +903,7 @@ namespace Netko.NetDisk.Baidu
             }
             foreach (NetDir dir in tempFileList.Dir)
             {
-                fileList = await MapFileListThread(path:dir.Path, fileList:fileList);
+                fileList = await MapFileList(path:dir.Path, fileList:fileList);
                 fileList.Dir.Add(dir);
             }
             

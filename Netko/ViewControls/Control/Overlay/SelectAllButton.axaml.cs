@@ -46,11 +46,11 @@ public partial class SelectAllButton : UserControl
         {
             foreach (NetDir dir in list_.Dir)
             {
-                DirDict[dir].toogleSelect();
+                DirDict[dir].ToogleSelect();
             }
             foreach (NetFile file in list_.File)
             {
-                FileDict[file].toogleSelect();
+                FileDict[file].ToogleSelect();
             }
 
         }
@@ -60,14 +60,14 @@ public partial class SelectAllButton : UserControl
             {
                 if (!baiduFileList.DirIsSelected(dir))
                 {
-                    DirDict[dir].toogleSelect();
+                    DirDict[dir].ToogleSelect();
                 }
             }
             foreach (NetFile file in list_.File)
             {
                 if (!baiduFileList.FileIsSelected(file))
                 {
-                    FileDict[file].toogleSelect();
+                    FileDict[file].ToogleSelect();
                 }
             }
         }

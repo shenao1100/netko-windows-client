@@ -12,44 +12,44 @@ namespace Netko.NetDisk.Baidu
 
     public class Baidu(string cookie): INetdisk
     {
-        public Dictionary<string, string?> cookie = new Dictionary<string, string?>();      // contain BDUSS & STOKEN & PANPSC
-        public string init_cookie_string = cookie;
-        public bool account_error = false;  // if login error: true
-        public bool initialed = false;      // if logined: true
-        public int vip = 0;                // vip = 1; svip = 2
-        public bool is_vip = false;         // false
-        public bool is_svip = false;        // false
-        public string loginstate = "";        // 1
-        public int vip_level = 0;          // 1
-        public bool is_year_vip = false;    // false
-        public string bdstoken = "";          // 966aa9b0xx74e3785980d108f0839xxx
-        public string uk = "";                // 
-        public string sign1 = "";             // b1b24c86a6c49dfxxxfd3725c337xxx6aca88252
-        public string sign3 = "";             // d76e889b6aafdxxx3bd56f4d4053a
-        public int timestamp = 0;          // 1718809129
-        public string log_id = "";
+        public Dictionary<string, string?> Cookie = new Dictionary<string, string?>();      // contain BDUSS & STOKEN & PANPSC
+        public string InitCookieString = cookie;
+        public bool AccountError = false;  // if login error: true
+        public bool Initialed = false;      // if logined: true
+        public int Vip = 0;                // vip = 1; svip = 2
+        public bool IsVip = false;         // false
+        public bool IsSvip = false;        // false
+        public string Loginstate = "";        // 1
+        public int VipLevel = 0;          // 1
+        public bool IsYearVip = false;    // false
+        public string BdStoken = "";          // 966aa9b0xx74e3785980d108f0839xxx
+        public string Uk = "";                // 
+        public string Sign1 = "";             // b1b24c86a6c49dfxxxfd3725c337xxx6aca88252
+        public string Sign3 = "";             // d76e889b6aafdxxx3bd56f4d4053a
+        public int Timestamp = 0;          // 1718809129
+        public string LogId = "";
 
-        public string name = "";
-        public string headphoto_url = "";
-        public long storage_total = 0;
-        public long storage_used = 0;
-        public long storage_free = 0;
-        public const string app_id = "250528";
-        public const string channel = "chunlei";
-        public const string clienttype = "0";
-        public const string netdisk_user_agent = "netdisk";
-        public const string broswer_user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.52";
+        public string Name = "";
+        public string HeadphotoUrl = "";
+        public long StorageTotal = 0;
+        public long StorageUsed = 0;
+        public long StorageFree = 0;
+        public const string AppId = "250528";
+        public const string Channel = "chunlei";
+        public const string ClientType = "0";
+        public const string NetdiskUserAgent = "netdisk";
+        public const string BroswerUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.52";
 
         public string GetParticalCookie(string[] particalKeys)
         {
             string cookieVal = "";
             foreach (string key in particalKeys)
             {
-                if (cookie.ContainsKey(key))
+                if (Cookie.ContainsKey(key))
                 {
-                    if (cookie[key] != null)
+                    if (Cookie[key] != null)
                     {
-                        cookieVal = key + "=" + cookie[key] + "; ";
+                        cookieVal = key + "=" + Cookie[key] + "; ";
                     }
                     else
                     {
@@ -69,11 +69,11 @@ namespace Netko.NetDisk.Baidu
              * turn cookie dict into cookie header
              */
             string cookieVal = "";
-            foreach (var key in cookie.Keys)
+            foreach (var key in Cookie.Keys)
             {
-                if (cookie[key] != null)
+                if (Cookie[key] != null)
                 {
-                    cookieVal += key + "=" + cookie[key] + "; ";
+                    cookieVal += key + "=" + Cookie[key] + "; ";
                 }
                 else
                 {
@@ -109,7 +109,7 @@ namespace Netko.NetDisk.Baidu
                     value = null;
                 }
 
-                cookie[key] = value;
+                Cookie[key] = value;
             }
 
         }
@@ -142,38 +142,38 @@ namespace Netko.NetDisk.Baidu
 
         public void debug_info()
         {
-            Trace.WriteLine("log_id: " + log_id);
-            Trace.WriteLine("account_error: " + account_error.ToString());
-            Trace.WriteLine("initialed: " + initialed.ToString());
-            Trace.WriteLine("vip: " + vip.ToString());
+            Trace.WriteLine("log_id: " + LogId);
+            Trace.WriteLine("account_error: " + AccountError.ToString());
+            Trace.WriteLine("initialed: " + Initialed.ToString());
+            Trace.WriteLine("vip: " + Vip.ToString());
             /*Trace.WriteLine("is_vip: " + is_vip.ToString());
             Trace.WriteLine("is_svip: " + is_svip.ToString());
             Trace.WriteLine("loginstate: " + loginstate.ToString());*/
-            Trace.WriteLine("bdstoken: " + bdstoken);
-            Trace.WriteLine("uk: " + uk);
-            Trace.WriteLine("sign1: " + sign1);
-            Trace.WriteLine("sign3: " + sign3);
-            Trace.WriteLine("name: " + name);
+            Trace.WriteLine("bdstoken: " + BdStoken);
+            Trace.WriteLine("uk: " + Uk);
+            Trace.WriteLine("sign1: " + Sign1);
+            Trace.WriteLine("sign3: " + Sign3);
+            Trace.WriteLine("name: " + Name);
             Trace.WriteLine("Cookie: " + GetCookie());
-            Trace.WriteLine("time: " + timestamp.ToString());
+            Trace.WriteLine("time: " + Timestamp.ToString());
         }
         public AccountInfo GetAccountInfo()
         {
             return new AccountInfo
             {
-                InitCookie = init_cookie_string,
-                Name = name,
-                Token = bdstoken,
-                StorageUsed = storage_used,
-                StorageTotal = storage_total,
-                StorageFree = storage_free,
+                InitCookie = InitCookieString,
+                Name = Name,
+                Token = BdStoken,
+                StorageUsed = StorageUsed,
+                StorageTotal = StorageTotal,
+                StorageFree = StorageFree,
             };
         }
         public async Task<string> refresh_logid()
         {
             string url = "https://pan.baidu.com/";
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", broswer_user_agent);
+            client.DefaultRequestHeaders.Add("User-Agent", BroswerUserAgent);
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Referer", url);
             client.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
@@ -183,15 +183,15 @@ namespace Netko.NetDisk.Baidu
 
             var headers = content.Headers;
             UpdateCookie(headers);
-            log_id = cookie["BAIDUID_BFESS"] ?? string.Empty;
-            return log_id;
+            LogId = Cookie["BAIDUID_BFESS"] ?? string.Empty;
+            return LogId;
         }
         //https://passport.baidu.com/v2/api/getqrcode?lp=pc&qrloginfrom=pc&gid=D37084C-AEB7-493A-992C-9ED15CD1CEEC&callback=tangram_guid_1729166374201&apiver=v3&tt=1729166374830&tpl=netdisk&logPage=traceId%3Apc_loginv5_1729166375%2ClogPage%3Aloginv5&_=1729166374832
         private async Task<bool> GetStorageUsage()
         {
             string url = $"https://pan.baidu.com/api/quota";
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", netdisk_user_agent);
+            client.DefaultRequestHeaders.Add("User-Agent", NetdiskUserAgent);
             client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
@@ -210,12 +210,12 @@ namespace Netko.NetDisk.Baidu
                 = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
-                if (body.TryGetValue("result", out object? resultObj) && resultObj != null)
+                if (body.TryGetValue("result", out object? resultObj))
                 {
                     JObject result = JObject.Parse(resultObj.ToString() ?? "{}");
-                    storage_total = Convert.ToInt64(result["total"]);
-                    storage_used = Convert.ToInt64(result["used"]);
-                    storage_free = storage_total - storage_used;
+                    StorageTotal = Convert.ToInt64(result["total"]);
+                    StorageUsed = Convert.ToInt64(result["used"]);
+                    StorageFree = StorageTotal - StorageUsed;
                 }
                 return true;
             }
@@ -240,7 +240,7 @@ namespace Netko.NetDisk.Baidu
              */
             string url = $"https://pan.baidu.com/api/gettemplatevariable?fields=[%22is_svip%22,%22is_vip%22,%22loginstate%22,%22vip_level%22,%22username%22,%22photo%22,%22is_year_vip%22,%22bdstoken%22,%22sign1%22,%22sign3%22,%22timestamp%22]";
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", netdisk_user_agent);
+            client.DefaultRequestHeaders.Add("User-Agent", NetdiskUserAgent);
             client.DefaultRequestHeaders.Add("Referer", "https://pan.baidu.com/disk/home");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Accept-Language", "zh-cn");
@@ -259,18 +259,18 @@ namespace Netko.NetDisk.Baidu
                 = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
-                if (body.TryGetValue("result", out object? resultObj) && resultObj != null)
+                if (body.TryGetValue("result", out object? resultObj))
                 {
                     JObject result = JObject.Parse(resultObj.ToString() ?? "{}");
-                    headphoto_url = result["photo"]?.ToString() ?? "";
-                    is_svip = (int)(result["is_svip"] ?? 0) == 1 ? true : false;
-                    is_vip = (int)(result["is_vip"] ?? 0) == 1 ? true : false;
-                    loginstate = result["loginstate"]?.ToString() ?? "";
-                    vip_level = (int)(result["vip_level"] ?? 0);
-                    is_year_vip = (int)(result["is_year_vip"] ?? 0) == 1 ? true : false;
-                    sign1 = result["sign1"]?.ToString() ?? "";
-                    sign3 = result["sign3"]?.ToString() ?? "";
-                    timestamp = (int)(result["timestamp"] ?? 0);
+                    HeadphotoUrl = result["photo"]?.ToString() ?? "";
+                    IsSvip = (int)(result["is_svip"] ?? 0) == 1 ;
+                    IsVip = (int)(result["is_vip"] ?? 0) == 1;
+                    Loginstate = result["loginstate"]?.ToString() ?? "";
+                    VipLevel = (int)(result["vip_level"] ?? 0);
+                    IsYearVip = (int)(result["is_year_vip"] ?? 0) == 1;
+                    Sign1 = result["sign1"]?.ToString() ?? "";
+                    Sign3 = result["sign3"]?.ToString() ?? "";
+                    Timestamp = (int)(result["timestamp"] ?? 0);
 
                 }
                 debug_info();
@@ -290,10 +290,10 @@ namespace Netko.NetDisk.Baidu
              * - uk
              * - name
              */
-            string url = $"https://pan.baidu.com/api/loginStatus?clienttype={clienttype}&app_id={app_id}&web=1&channel=web&version=0";
+            string url = $"https://pan.baidu.com/api/loginStatus?clienttype={ClientType}&app_id={AppId}&web=1&channel=web&version=0";
             //string url = $"https://pan.baidu.com/api/loginStatus?clienttype=1&app_id=250528&web=1&channel=web&version=0";
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", broswer_user_agent);
+            client.DefaultRequestHeaders.Add("User-Agent", BroswerUserAgent);
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Referer", url);
             client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
@@ -319,12 +319,12 @@ namespace Netko.NetDisk.Baidu
             if (body != null && Convert.ToInt32(body["errno"]) == 0)
             {
                 // Trace.WriteLine("body.ContainsKey(\"login_info\")" + body.ContainsKey("login_info").ToString());
-                if (body.TryGetValue("login_info", out object? logininfoObj) && logininfoObj != null)
+                if (body.TryGetValue("login_info", out object? loginInfoObj))
                 {
-                    JObject loginInfo = JObject.Parse(logininfoObj?.ToString() ?? "{}");
-                    bdstoken = loginInfo["bdstoken"]?.ToString() ?? "";
-                    uk = loginInfo["uk"]?.ToString() ?? "";
-                    name = loginInfo["username"]?.ToString() ?? "";
+                    JObject loginInfo = JObject.Parse(loginInfoObj.ToString() ?? "{}");
+                    BdStoken = loginInfo["bdstoken"]?.ToString() ?? "";
+                    Uk = loginInfo["uk"]?.ToString() ?? "";
+                    Name = loginInfo["username"]?.ToString() ?? "";
                 }
                 debug_info();
                 return true;
@@ -337,17 +337,17 @@ namespace Netko.NetDisk.Baidu
         }
         private void GetVipNum()
         {
-            if (is_svip)
+            if (IsSvip)
             {
-                vip = 2;
+                Vip = 2;
             }
-            else if (is_vip)
+            else if (IsVip)
             {
-                vip = 1;
+                Vip = 1;
             }
             else
             {
-                vip = 0;
+                Vip = 0;
             }
         } 
         public async Task Init()
@@ -358,7 +358,7 @@ namespace Netko.NetDisk.Baidu
             {
                 throw new Exception("Refresh logid failed.");
             }
-            ProcessSubCookie(init_cookie_string);
+            ProcessSubCookie(InitCookieString);
             Trace.WriteLine("COOKIE: ------" + GetCookie());
             if (!await GetUkStoken())
             {

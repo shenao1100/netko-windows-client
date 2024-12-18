@@ -19,11 +19,11 @@ namespace Netko.Download
 
     public class MultiThreadDownloader : IDownload
     {
-        // Ëø
+        // é”
         private readonly object _lock = new object();
-        // ×èÈû
+        // é˜»å¡žä¿¡å·
         private readonly ManualResetEvent resetEvent = new ManualResetEvent(true);
-        // È¡ÏûÐÅºÅ
+        // å–æ¶ˆä¿¡å·
         private CancellationTokenSource cts = new CancellationTokenSource();
         private FileStream FileStream { get; set; }
         private int TotalThread { get; set; }
@@ -167,16 +167,16 @@ namespace Netko.Download
         {
             return new DownloadStatus
             {
-                downloadProgress = downloadProgress,
-                downloaded = downloaded,
-                totalSize = totalSize,
-                linkCount = linkCount,
-                downloadingThread = downloadingThread,
-                downloadBlockSize = downloadBlockSize,
+                DownloadProgress = downloadProgress,
+                Downloaded = downloaded,
+                TotalSize = totalSize,
+                LinkCount = linkCount,
+                DownloadingThread = downloadingThread,
+                DownloadBlockSize = downloadBlockSize,
 
-                isPaused = isPaused,
-                isDownloading = isDownloading,
-                isComplete = isComplete,
+                IsPaused = isPaused,
+                IsDownloading = isDownloading,
+                IsComplete = isComplete,
             };
         }
         public async Task DownloadThread(Range range, string url)
@@ -216,7 +216,7 @@ namespace Netko.Download
                         resetEvent.WaitOne();
                         if (cts.IsCancellationRequested)
                         {
-                            releaseFile();
+                            ReleaseFile();
                             // exit thread
                             return;
                         }
@@ -230,7 +230,7 @@ namespace Netko.Download
                                 resetEvent.WaitOne();
                                 if (cts.IsCancellationRequested)
                                 {
-                                    releaseFile();
+                                    ReleaseFile();
                                     // exit thread
                                     return;
                                 }
@@ -241,7 +241,7 @@ namespace Netko.Download
                                     CalcProgress();
                                     Dispatcher.UIThread.InvokeAsync(() =>
                                     {
-                                        CallBack?.Invoke(); // ÔÚ UI Ïß³ÌÖÐµ÷ÓÃ
+                                        CallBack?.Invoke(); // ï¿½ï¿½ UI ï¿½ß³ï¿½ï¿½Ðµï¿½ï¿½ï¿½
                                     });
                                     FileStream.Seek(pointer, SeekOrigin.Begin);
                                     FileStream.Write(buffer, 0, bytesRead);
@@ -271,7 +271,7 @@ namespace Netko.Download
                 return true;
             }
         }
-        public void releaseFile()
+        public void ReleaseFile()
         {
             lock (_lock)
             {
@@ -324,7 +324,7 @@ namespace Netko.Download
                 await Task.WhenAll(tasks);
 
             }
-            releaseFile();
+            ReleaseFile();
             CalcProgress();
             CallBack?.Invoke();
 

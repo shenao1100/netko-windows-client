@@ -26,16 +26,15 @@ public partial class TransferPage : UserControl
         }
         foreach (DownloadProgress progress in downloadTaskList)
         {
-            Trace.WriteLine(progress.DownloadInstance.Status().isDownloading.ToString());
-            if (!progress.DownloadInstance.Status().isPaused)
+            if (!progress.DownloadInstance.Status().IsPaused)
             {
-                pause_label.Content = "全部暂停";
+                pause_label.Content = "鍏ㄩ儴鏆傚仠";
                 pause_icon.Data = (StreamGeometry)this.FindResource("pause")!;
                 // all pause
                 return false;
             }
         }
-        pause_label.Content = "全部继续";
+        pause_label.Content = "鍏ㄩ儴缁х画";
         pause_icon.Data = (StreamGeometry)this.FindResource("resume")!;
 
         // all resume
@@ -90,10 +89,11 @@ public partial class TransferPage : UserControl
     public void addTask(List<string> download_url, DownloadConfig downloadConfig)
     {
         DownloadProgress download_progress = new DownloadProgress();
+        FilePathOperate.CreatePrentPath(downloadConfig.FilePath);
         downloadTaskList.Add(download_progress);
         download_progress.ControlDestory = () => { destoryTask(download_progress); };
         download_progress.StatusUpdateCallback = () => {UpdateTooglePauseButton(); };
-        download_progress.init(download_url, downloadConfig);
+        download_progress.Init(download_url, downloadConfig);
         DownloadListContiner.Children.Add(download_progress);
     }
 }

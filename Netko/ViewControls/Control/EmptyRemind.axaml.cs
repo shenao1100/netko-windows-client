@@ -21,7 +21,7 @@ public partial class EmptyRemind : UserControl
     }
     public void ShowError(string content)
     {
-        Message.Content = "´íÎó";
+        Message.Content = "é”™è¯¯";
         ContentLabel.Content = content;
         ButtonPanel.IsVisible = false;
         ContentSperator.IsVisible = false;
@@ -30,7 +30,7 @@ public partial class EmptyRemind : UserControl
     {
         DialogOverlay inputName = new DialogOverlay();
         OverlayReservedGrid.Children.Add(inputName);
-        string? filename = await inputName.ShowDialog("ÇëÊäÈëĞÂ½¨ÎÄ¼ş¼ĞµÄÃû³Æ", "´´½¨");
+        string? filename = await inputName.ShowDialog("è¯·è¾“å…¥æ–°å»ºæ–‡ä»¶å¤¹çš„åç§°", "åˆ›å»º");
         if ((await baiduFileList.CreateDir(ParentPath + "/" + filename)).Success)
         {
             Refresh();
@@ -40,7 +40,7 @@ public partial class EmptyRemind : UserControl
         {
             MessageOverlay message = new MessageOverlay();
             OverlayReservedGrid.Children.Add(message);
-            message.SetMessage("´´½¨Ê§°Ü", $"´´½¨{ParentPath + "/" + filename}Ê±Óöµ½´íÎó");
+            message.SetMessage("åˆ›å»ºå¤±è´¥", $"åˆ›å»º{ParentPath + "/" + filename}æ—¶é‡åˆ°é”™è¯¯");
             return;
         }
     }
