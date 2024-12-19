@@ -422,7 +422,6 @@ namespace Netko.NetDisk.Baidu
             _baiduAccount.UpdateCookie(content.Headers);
             var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
             taskContent.Wait();
-            Trace.WriteLine(taskContent.Result);
             Dictionary<string, object>? body
                 = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             NetdiskResult netdiskResult = new NetdiskResult();
@@ -544,7 +543,6 @@ namespace Netko.NetDisk.Baidu
             _baiduAccount.UpdateCookie(content.Headers);
             var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
             taskContent.Wait();
-            Console.WriteLine(taskContent.Result);
             Dictionary<string, object>? body
                 = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             NetdiskResult netdiskResult = new NetdiskResult();
@@ -582,7 +580,6 @@ namespace Netko.NetDisk.Baidu
             client.DefaultRequestHeaders.Add("User-Agent", "WindowsBaiduYunGuanJia");
             client.DefaultRequestHeaders.Add("Accept", "*/*");
             client.DefaultRequestHeaders.Add("Cookie", _baiduAccount.GetCookie());
-            Trace.WriteLine(fileIdList);
             var formData = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("fid_list", fileIdList),
@@ -597,7 +594,6 @@ namespace Netko.NetDisk.Baidu
             _baiduAccount.UpdateCookie(content.Headers);
             var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
             taskContent.Wait();
-            Trace.WriteLine(taskContent.Result);
             Dictionary<string, object>? body
                 = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
 
@@ -637,7 +633,6 @@ namespace Netko.NetDisk.Baidu
             _baiduAccount.UpdateCookie(content.Headers);
             var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
             taskContent.Wait();
-            Trace.WriteLine(taskContent.Result);
             Dictionary<string, object>? body
                 = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             NetdiskResult netdiskResult = new NetdiskResult();
@@ -779,7 +774,6 @@ namespace Netko.NetDisk.Baidu
             _baiduAccount.UpdateCookie(ncontent.Headers);
             var ntaskContent = Task.Run(() => ncontent.Content.ReadAsStringAsync());
             ntaskContent.Wait();
-            Trace.WriteLine(ntaskContent.Result);
         }
         /// <summary>
         /// CMS check for p2s record, has been disabled
@@ -808,7 +802,6 @@ namespace Netko.NetDisk.Baidu
             _baiduAccount.UpdateCookie(ncontent.Headers);
             var ntaskContent = Task.Run(() => ncontent.Content.ReadAsStringAsync());
             ntaskContent.Wait();
-            Trace.WriteLine(ntaskContent.Result);
             return ntaskContent.Result;
         }
         /// <summary>
@@ -865,7 +858,7 @@ namespace Netko.NetDisk.Baidu
                 return new DownloadConfig
                 {
                     Cookie = GetAccountInfo().InitCookie,
-                    Method = DownloadMethod.ParticalDownload,
+                    Method = DownloadMethod.PartialDownload,
                     DownloadThread = 8,
                     UserAgent = "netdisk;P2SP;2.2.101.200;netdisk;12.17.2;PGEM10;android-android;9;JSbridge4.4.0;jointBridge;1.1.0;"
                 };
@@ -875,7 +868,7 @@ namespace Netko.NetDisk.Baidu
                 return new DownloadConfig
                 {
                     Cookie = GetAccountInfo().InitCookie,
-                    Method = DownloadMethod.ParticalDownload,
+                    Method = DownloadMethod.PartialDownload,
                     DownloadThread = 1,
                     UserAgent = "netdisk;P2SP;2.2.101.200;netdisk;12.17.2;PGEM10;android-android;9;JSbridge4.4.0;jointBridge;1.1.0;"
 

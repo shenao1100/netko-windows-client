@@ -7,6 +7,7 @@ using Netko.Download;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Netko;
 
@@ -54,13 +55,16 @@ public partial class TransferPage : UserControl
         }
 
     }
-    public void tooglePauseAll(object sender, RoutedEventArgs e)
+    public async void tooglePauseAll(object sender, RoutedEventArgs e)
     {
         if (!UpdateTooglePauseButton())
         {
-            foreach (DownloadProgress progress in downloadTaskList)
+            //foreach (DownloadProgress progress in downloadTaskList)
+            for (int i = 0; i < downloadTaskList.Count; i++)
             {
-                progress.DownloadInstance.Pause();
+                
+                downloadTaskList[i].DownloadInstance.Pause();
+                //await Task.Delay(100);
             }
         }
         else

@@ -27,8 +27,8 @@ namespace Netko.Download
     }
     public enum DownloadMethod
     {
-        ParticalDownload,
-        MultithreadDownload
+        PartialDownload,
+        MultiThreadDownload
     }
     public class DownloadConfig
     {
@@ -62,8 +62,8 @@ namespace Netko.Download
         {
             return downloadConfig.Method switch
             {
-                DownloadMethod.ParticalDownload => new Downloader(downloadConfig),
-                DownloadMethod.MultithreadDownload => new MultiThreadDownloader(downloadConfig),
+                DownloadMethod.PartialDownload => new Downloader(downloadConfig),
+                DownloadMethod.MultiThreadDownload => new MultiThreadDownloader(downloadConfig),
                 _ => throw new ArgumentException("Method not found.", nameof(downloadConfig.Method)),
             };
         }
