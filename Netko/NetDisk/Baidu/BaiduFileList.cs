@@ -18,17 +18,17 @@ namespace Netko.NetDisk.Baidu
     /// </summary>
     public class RenameItem
     {
-        public string? Path { get; set; }
-        public string? NewName { get; set; }
+        public string? path { get; set; }
+        public string? newName { get; set; }
     }
     /// <summary>
     /// For use in serial json obj in move data
     /// </summary>
     public class MoveItem
     {
-        public string? Path { set; get; }
-        public string? Dest { set; get; }
-        public string? NewName { get; set; }
+        public string? path { set; get; }
+        public string? dest { set; get; }
+        public string? newName { get; set; }
     }
     
     public class BaiduFileList(INetdisk account): IFileList
@@ -392,7 +392,7 @@ namespace Netko.NetDisk.Baidu
             {
                 for (int i = 0; i < nameList.Length; i++)
                 {
-                    data.Add(new RenameItem { NewName = nameList[i], Path = fileList[i] });
+                    data.Add(new RenameItem { newName = nameList[i], path = fileList[i] });
                 }
             }
             else
@@ -452,7 +452,7 @@ namespace Netko.NetDisk.Baidu
             {
                 for (int i = 0; i < nameList.Length; i++)
                 {
-                    data.Add(new MoveItem { NewName = nameList[i], Path = fileList[i], Dest = targetPathList[i] });
+                    data.Add(new MoveItem { newName = nameList[i], path = fileList[i], dest = targetPathList[i] });
                 }
             }
             else
@@ -513,7 +513,7 @@ namespace Netko.NetDisk.Baidu
             {
                 for (int i = 0; i < nameList.Length; i++)
                 {
-                    data.Add(new MoveItem { NewName = nameList[i], Path = fileList[i], Dest = targetPathList[i] });
+                    data.Add(new MoveItem { newName = nameList[i], path = fileList[i], dest = targetPathList[i] });
                 }
             }
             else
@@ -544,7 +544,7 @@ namespace Netko.NetDisk.Baidu
             _baiduAccount.UpdateCookie(content.Headers);
             var taskContent = Task.Run(() => content.Content.ReadAsStringAsync());
             taskContent.Wait();
-            Trace.WriteLine(taskContent.Result);
+            Console.WriteLine(taskContent.Result);
             Dictionary<string, object>? body
                 = JsonConvert.DeserializeObject<Dictionary<string, object>>(taskContent.Result);
             NetdiskResult netdiskResult = new NetdiskResult();

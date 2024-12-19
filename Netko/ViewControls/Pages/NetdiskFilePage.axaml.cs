@@ -117,10 +117,10 @@ public partial class NetdiskFilePage : UserControl
     }
     public void GetColor()
     {
-        var cbhBackgound = Application.Current!.Resources.TryGetResource("CatalogBaseHighColor", null, out var Hresource);
-        if (cbhBackgound && Hresource is Color backgound)
+        var cbhBackground = Application.Current!.Resources.TryGetResource("CatalogBaseHighColor", null, out var Hresource);
+        if (cbhBackground && Hresource is Color bg)
         {
-            _selectedColor = backgound;
+            _selectedColor = bg;
         }
         var cblBackground = Application.Current!.Resources.TryGetResource("CatalogBaseHighColor", null, out var Lresource);
         if (cblBackground && Lresource is Color background)
@@ -323,7 +323,7 @@ public partial class NetdiskFilePage : UserControl
             dirBlock.TransferPage = TransferPage!;
             dirBlock.OverlayReservedGrid = OverlayReservedGrid;
             dirBlock.OverlayNotification = OverlayNotification;
-            dirBlock.taskProber = task_prober;
+            dirBlock.TaskProber = task_prober;
             dirBlock.ParentPath = currentPath;
 
             // append to viewer
@@ -348,7 +348,7 @@ public partial class NetdiskFilePage : UserControl
             fileBlock.baiduFileList = user;
             fileBlock.OverlayReservedGrid = OverlayReservedGrid;
             fileBlock.OverlayNotification = OverlayNotification;
-            fileBlock.taskProber = task_prober;
+            fileBlock.TaskProber = task_prober;
 
             fileBlock.ParentPath = currentPath;
             // append to viewer

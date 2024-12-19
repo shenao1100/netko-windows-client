@@ -1,3 +1,4 @@
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -63,7 +64,7 @@ public partial class ItemShowLine : UserControl
     public Grid OverlayReservedGrid { get; set; }
     public StackPanel OverlayNotification { get; set; }
     public TransferPage TransferPage { get; set; }
-    public TaskProber taskProber { get; set; }
+    public TaskProber TaskProber { get; set; }
 
     public ItemShowLine()
     {
@@ -290,9 +291,7 @@ public partial class ItemShowLine : UserControl
                 }
                 catch (Exception ex)
                 {
-                    FlyNoticeOverlay err = new FlyNoticeOverlay();
-
-                    err.Run($"{SelfFile.Name}下载出错：{ex}");
+                    ShowInfo($"{SelfFile.Name}下载出错：{ex.Message}");
 
                 }*/
             }
@@ -376,7 +375,7 @@ public partial class ItemShowLine : UserControl
                         return;
                     }
 
-                    TaskView taskView = taskProber.AddTask();
+                    TaskView taskView = TaskProber.AddTask();
                     taskView.SetText("复制文件", $"复制{selfName}到{targetPath}", "请稍后\t0%");
                     try
                     {
@@ -455,7 +454,7 @@ public partial class ItemShowLine : UserControl
                         return;
                     }
 
-                    TaskView taskView = taskProber.AddTask();
+                    TaskView taskView = TaskProber.AddTask();
                     taskView.SetText("移动文件", 
                         $"移动{selfName}到{targetPath}", "请稍后\t0%");
                     try
@@ -525,7 +524,7 @@ public partial class ItemShowLine : UserControl
                     return;
                 }
 
-                TaskView taskView = taskProber.AddTask();
+                TaskView taskView = TaskProber.AddTask();
                 taskView.SetText("重命名文件", $"正在重命名{selfPath}", "请稍后\t0%");
                 try
                 {
@@ -591,7 +590,7 @@ public partial class ItemShowLine : UserControl
                     return;
                 }
 
-                TaskView taskView = taskProber.AddTask();
+                TaskView taskView = TaskProber.AddTask();
 
                 taskView.SetText("删除文件", $"正在删除{count.ToString()}个项目", "请稍后\t0%");
                 try
@@ -677,8 +676,6 @@ public partial class ItemShowLine : UserControl
             flyNoticeOverlay.Run($"{SelfFile.Name} 已添加进下载队列");
             try
             {
-                Console.WriteLine((TransferPage == null) ? "NOT EXIST":"EXIST");
-
                 List<string> urlList = await baiduFileList.GetFileDownloadLink(SelfFile.Path);
                 DownloadConfig downloadConfig = baiduFileList.ChooseDownloadMethod();
                 downloadConfig.FileName = SelfFile.Name;
@@ -692,9 +689,7 @@ public partial class ItemShowLine : UserControl
             }
             catch (Exception ex)
             {
-                FlyNoticeOverlay err = new FlyNoticeOverlay();
-
-                err.Run($"{SelfFile.Name}下载出错：{ex}");
+                ShowInfo($"{SelfFile.Name}下载出错：{ex.Message}");
             }
         }
         else
@@ -702,7 +697,7 @@ public partial class ItemShowLine : UserControl
             flyNoticeOverlay.Run($"正在解析文件夹");
             try
             {
-                TaskView taskView = taskProber.AddTask();
+                TaskView taskView = TaskProber.AddTask();
                 taskView.SetText("正在解析需要下载的文件", $"正在解析: {SelfDir.Path}", "请稍后...");   
                 FileList mappedFileList = await baiduFileList.MapFileList(SelfDir.Path);
                 taskView.SetText("正在解析需要下载的文件", $"正在解析: {SelfDir.Path}", "已获取文件数");   
@@ -729,10 +724,7 @@ public partial class ItemShowLine : UserControl
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
-                FlyNoticeOverlay err = new FlyNoticeOverlay();
-
-                err.Run($"{SelfFile.Name}下载出错：{ex}");
+                ShowInfo($"{SelfFile.Name}下载出错：{ex.Message}");
             }
         }
 
@@ -783,7 +775,7 @@ public partial class ItemShowLine : UserControl
                     return;
                 }
 
-                TaskView taskView = taskProber.AddTask();
+                TaskView taskView = TaskProber.AddTask();
                 taskView.SetText("删除文件", $"生在删除{(dirList.Count() + fileList.Count()).ToString()}个对象", "请稍后\t0%");
                 try
                 {
@@ -865,7 +857,7 @@ public partial class ItemShowLine : UserControl
                         return;
                     }
 
-                    TaskView taskView = taskProber.AddTask();
+                    TaskView taskView = TaskProber.AddTask();
                     taskView.SetText("移动文件", $"移动{targetPathList.Count.ToString()}个对象到{targetPath}", "请稍后\t0%");
                     try
                     {
@@ -955,7 +947,7 @@ public partial class ItemShowLine : UserControl
                         return;
                     }
 
-                    TaskView taskView = taskProber.AddTask();
+                    TaskView taskView = TaskProber.AddTask();
                     taskView.SetText("复制文件", $"复制{targetPathList.Count.ToString()}个对象到{targetPath}", "");
                     try
                     {
@@ -990,7 +982,7 @@ public partial class ItemShowLine : UserControl
     {
         //List<NetDir> dirList = 
         //List<NetFile> fileList = 
-        TaskView taskView = taskProber.AddTask();
+        TaskView taskView = TaskProber.AddTask();
         taskView.SetText("正在解析需要下载的文件", "正在准备", "已解析: 0");
         FileList parsedFileList = new FileList();
         parsedFileList.File = new List<NetFile>();
