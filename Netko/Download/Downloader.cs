@@ -326,6 +326,12 @@ namespace Netko.Download
                                     // exit thread
                                     return false;
                                 }
+                                
+                                lock (_lock)
+                                {
+                                    FileStream.Seek(pointer, SeekOrigin.Begin);
+                                    FileStream.Write(buffer, 0, bytesRead);
+                                }
                                 //await write 
                                 _downloaded += bytesRead;
                                 pointer += bytesRead;
@@ -335,12 +341,7 @@ namespace Netko.Download
                                     tmpRange.Range.From+= bytesRead;
                                     _ranges[blockId] = tmpRange;
                                 }
-                                lock (_lock)
-                                {
-                                    Report();
-                                    FileStream.Seek(pointer, SeekOrigin.Begin);
-                                    FileStream.Write(buffer, 0, bytesRead);
-                                }
+                                Report();
                                 
                             }
                             

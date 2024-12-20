@@ -869,7 +869,7 @@ namespace Netko.NetDisk.Baidu
                 {
                     Cookie = GetAccountInfo().InitCookie,
                     Method = DownloadMethod.PartialDownload,
-                    DownloadThread = 1,
+                    DownloadThread = 64,
                     UserAgent = "netdisk;P2SP;2.2.101.200;netdisk;12.17.2;PGEM10;android-android;9;JSbridge4.4.0;jointBridge;1.1.0;"
 
                 };
