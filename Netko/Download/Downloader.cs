@@ -1,8 +1,6 @@
 ﻿using Avalonia.Threading;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -22,7 +20,7 @@ namespace Netko.Download
         public Range Range;
         public bool IsCompleted;
         public bool IsOccupied;
-        public int errorCount;
+        public int ErrorCount;
     }
     
     /// <summary>
@@ -173,7 +171,7 @@ namespace Netko.Download
                             From = calcedSize,
                             To = _totalSize
                         },
-                        errorCount = 0
+                        ErrorCount = 0
                     };
                     break;
 
@@ -189,7 +187,7 @@ namespace Netko.Download
                             From = calcedSize,
                             To = calcedSize + _downloadBlockSize,
                         },
-                        errorCount = 0
+                        ErrorCount = 0
                     };
                 }
                 calcedSize += _downloadBlockSize + 1;
@@ -309,8 +307,6 @@ namespace Netko.Download
                         {
                             return false;
                         }
-                        //_resetEvent.WaitOne();
-                        //await _pauseSource.WaitAsync();
                         if (_isPaused) { return false; }
                         long? totalSize = response.Content.Headers.ContentLength;
                         
@@ -494,29 +490,22 @@ namespace Netko.Download
                         // 遍历线程
                         for (int i = 0; i < TotalThread; i++)
                         {
-                            if (_cts.IsCancellationRequested)
-                            {
-                                break;
-                            }
-
+                            if (_cts.IsCancellationRequested) { break; }
                             // 线程正在使用则跳过
-                            if (tasks[i] != null && !tasks[i].IsCompleted)
-                            {
-                                continue;
-                            }
+                            if (tasks[i] != null && !tasks[i].IsCompleted) { continue; }
                             //_resetEvent.WaitOne();
                             
                             int threadId = i;
                             int blockId = j;
                             
                             // 剔除下载失败的Url
-                            if (_ranges[blockId].errorCount > 10)
+                            if (_ranges[blockId].ErrorCount > 10)
                             {
                                 _linkList.Remove(_linkList[threadId % _linkList.Count]);
                                 lock (_keyLock)
                                 {
                                     ProgressDistribute tmpRange = _ranges[blockId];
-                                    tmpRange.errorCount = 0;
+                                    tmpRange.ErrorCount = 0;
                                     _ranges[blockId] = tmpRange;
                                 }
                                 if (_linkList.Count == 0)
@@ -528,7 +517,7 @@ namespace Netko.Download
                             int arrangeLinkId = threadId % _linkList.Count;
                             string url = _linkList[arrangeLinkId];
                             
-                            Console.WriteLine($"Download established: Total: {_totalSize} From: {_ranges[blockId].Range.From} To: {_ranges[blockId].Range.To} ErrCount: {_ranges[blockId].errorCount} LinkId: {arrangeLinkId}");
+                            //Console.WriteLine($"Download established: Total: {_totalSize} From: {_ranges[blockId].Range.From} To: {_ranges[blockId].Range.To} ErrCount: {_ranges[blockId].ErrorCount} LinkId: {arrangeLinkId}");
                             tasks[threadId] = Task.Run(async () =>
                             {
                                 try
@@ -548,7 +537,7 @@ namespace Netko.Download
                                         tmpRange.IsCompleted = isSuccess;
                                         if (!isSuccess && !_isPaused)
                                         {
-                                            tmpRange.errorCount++;
+                                            tmpRange.ErrorCount++;
                                         }
                                         _ranges[blockId] = tmpRange;
                                     }

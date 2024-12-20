@@ -21,124 +21,151 @@ namespace Netko.Download
     {
         // 锁
         private readonly object _lock = new object();
-        // 阻塞信号
-        private readonly ManualResetEvent resetEvent = new ManualResetEvent(true);
+        // 用于保证key一致性的锁
+        private readonly object _keyLock = new object();
+        // 阻塞
+        //private readonly ManualResetEvent _resetEvent = new ManualResetEvent(true);
+        // 异步等待
+        private readonly ResetableTaskCompleteSource _pauseSource = new ResetableTaskCompleteSource();
         // 取消信号
-        private CancellationTokenSource cts = new CancellationTokenSource();
+        private CancellationTokenSource _cts = new CancellationTokenSource();
         private FileStream FileStream { get; set; }
         private int TotalThread { get; set; }
         private int CurrentThread { get; set; }
-        private string Url { get; set; }
+        private string? Url { get; set; }
         private string UserAgent { get; set; }
-        private string filePath { get; set; }
+        private string FilePath { get; set; }
 
         public Action? CallBack { get; set; }
 
-        private Dictionary<int, string> linkList = new Dictionary<int, string>();
+        private List<string> _linkList = new List<string>();
+        private Dictionary<int, ProgressDistribute> _ranges = new Dictionary<int, ProgressDistribute>();
+        
+        private float _downloadProgress = 0;
+        private long _downloaded = 0;
+        private long _totalSize = 0;
+        private int _linkCount = 0;
+        private int _downloadingThread = 0;
+        private int _notCompletedBlock = 0;
 
-        public float downloadProgress = 0;
-        public long downloaded = 0;
-        public long totalSize = 0;
-        public int linkCount = 0;
-        public int downloadingThread = 0;
-        public long downloadBlockSize = 500087;
-        public int BufferSize = 1000;
+        private long _downloadBlockSize = 500087;
+        private int _bufferSize = 1000;
+        //public long downloadBlockSize = 32767;
 
-        public bool isPaused = false;
-        public bool isDownloading = true;
-        public bool isComplete = false;
-        private string? Cookie = null;
-
-
+        private bool _isPaused = false;
+        private bool _isDownloading = true;
+        private bool _isComplete = false;
+        private string? _cookie = null;
+        private bool _runed = false;
+        private bool _isParsing = false;
+        private Func<Task<List<string>>>? getUrlFunc;
+        private long lastReportTime = DateTimeOffset.Now.ToUnixTimeSeconds();
         public MultiThreadDownloader(DownloadConfig config)
         {
             TotalThread = config.DownloadThread;
             CurrentThread = 0;
-            downloadBlockSize = config.BlockSize;
-            BufferSize = config.BufferSize;
+            _downloadBlockSize = config.BlockSize;
+            _bufferSize = config.BufferSize;
             Url = config.Url;
-            linkList.Add(linkCount, config.Url);
-            linkCount++;
-
+            if (config.Url != null)
+            {
+                _linkList.Add(config.Url);
+            }
+            _linkCount++;
+            getUrlFunc = config.GetUrlFunc;
             UserAgent = config.UserAgent;
-            totalSize = config.FileSize;
-            filePath = config.FilePath;
-            Cookie = config.Cookie;
+            _totalSize = config.FileSize;
+            FilePath = config.FilePath;
+            _cookie = config.Cookie;    
 
-            FileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            FileStream.SetLength(totalSize);
+            FileStream = new FileStream(FilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            FileStream.SetLength(_totalSize);
         }
         public void AddUrl(string url)
         {
-            linkList.Add(linkCount, url);
-            linkCount++;
-
+            _linkList.Add(url);
+            _linkCount++;
         }
         public void SetCallBack(Action callBack)
         {
             CallBack = callBack;
         }
+
         private void CalcProgress()
         {
-            if (downloaded > 0)
+            if (_downloaded > 0)
             {
-                downloadProgress = (float)downloaded / totalSize;
+                _downloadProgress = (float)_downloaded / _totalSize;
             }
-            if (downloadingThread == 0)
+
+            if (_downloadingThread == 0)
             {
-                isDownloading = false;
+                _isDownloading = false;
             }
             else
             {
-                isDownloading = true;
-            }
-            if (downloaded == totalSize)
-            {
-                isDownloading = false;
-                isComplete = true;
+                _isDownloading = true;
             }
 
-            Console.WriteLine(downloadProgress.ToString() + "\r");
-        }
-        private List<Range> CalcRange()
-        {
-            var range = new List<Range>();
-            long start = 0;
-            if (totalSize > 0)
+            if (_downloaded == _totalSize)
             {
-                long average_size = totalSize / TotalThread;
+                _isDownloading = false;
+                _isComplete = true;
+            }
+        }
+        private Dictionary<int, ProgressDistribute> CalcRange()
+        {
+            //var range = new List<Range>();
+            Dictionary<int, ProgressDistribute> ranges = new Dictionary<int, ProgressDistribute>();
+
+            long start = 0;
+            if (_totalSize > 0)
+            {
+                long average_size = _totalSize / TotalThread;
                 for (int i = 0; i < TotalThread; i++)
                 {
                     if (i == TotalThread - 1)
                     {
-                        range.Add(new Range
-                        {
-                            From = start,
-                            To = totalSize
-                        });
+                        ranges[i] = new ProgressDistribute{
+                            IsCompleted = false,
+                            IsOccupied = false,
+                            Range = new Range
+                            {
+                                From = start,
+                                To = _totalSize
+                            },
+                            ErrorCount = 0
+                        };
                     }
                     else
                     {
-                        range.Add(new Range
+                        ranges[i] = new ProgressDistribute
                         {
-                            From = start,
-                            To = start + average_size
-                        });
-                        start += average_size;
+                            IsCompleted = false,
+                            IsOccupied = false,
+                            Range = new Range
+                            {
+                                From = start,
+                                To = start + average_size
+                            },
+                            ErrorCount = 0
+                        };
                     }
                 }
             }
-            return range;
+            return ranges;
         }
-        /// <summary>
+       /// <summary>
         /// block thread to pause
         /// </summary>
         public void Pause()
         {
-            resetEvent.Reset();
-            isPaused = true;
+            //_resetEvent.Reset();
+            _pauseSource.Reset();
+            _isPaused = true;
             CalcProgress();
             CallBack?.Invoke();
+              
 
         }
 
@@ -147,41 +174,65 @@ namespace Netko.Download
         /// </summary>
         public void Continue()
         {
-            resetEvent.Set();
-            isPaused = false;
+            //_resetEvent.Set();
+            _pauseSource.Set();
+            _isPaused = false;
             CalcProgress();
             CallBack?.Invoke();
+            if (!_runed)
+            {
+                Task.Run(() => { Run(); } );
+            }
 
         }
         public void Cancel()
         {
-            resetEvent.Set();
-            isPaused = false;
-            cts.Cancel();
-            isComplete = true;
+            //_resetEvent.Set();
+            _pauseSource.Set();
+
+            _isPaused = false;
+            _cts.Cancel();
+            _isComplete = true;
             CalcProgress();
             CallBack?.Invoke();
+            ReleaseFile();
+
 
         }
         public DownloadStatus Status()
         {
             return new DownloadStatus
             {
-                DownloadProgress = downloadProgress,
-                Downloaded = downloaded,
-                TotalSize = totalSize,
-                LinkCount = linkCount,
-                DownloadingThread = downloadingThread,
-                DownloadBlockSize = downloadBlockSize,
+                DownloadProgress = _downloadProgress,
+                Downloaded = _downloaded,
+                TotalSize = _totalSize,
+                LinkCount = _linkCount,
+                DownloadingThread = _downloadingThread,
+                DownloadBlockSize = _downloadBlockSize,
 
-                IsPaused = isPaused,
-                IsDownloading = isDownloading,
-                IsComplete = isComplete,
+                IsParsing = _isParsing,
+                IsPaused = _isPaused,
+                IsDownloading = _isDownloading,
+                IsComplete = _isComplete,
             };
         }
-        public async Task DownloadThread(Range range, string url)
-        {
 
+        private void Report(bool forceReport = false)
+        {
+            CalcProgress();
+
+            if (DateTimeOffset.Now.ToUnixTimeSeconds() - lastReportTime > 1 || forceReport)
+            {
+
+                Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    CallBack?.Invoke(); // 在 UI 线程中调用
+                });
+                lastReportTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+            }
+        }
+        public async Task<bool> DownloadThread(Range range, string url, int blockId)
+        {
             long pointer = range.From;
             try
             {
@@ -192,76 +243,91 @@ namespace Netko.Download
                     client.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Language", "zh-CN");
                     client.DefaultRequestHeaders.TryAddWithoutValidation("Connection", "Keep-Alive");
                     client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Length", "0");
-                    if (Cookie != null)
+                    if (_cookie != null)
                     {
-                        client.DefaultRequestHeaders.TryAddWithoutValidation("Cookie", Cookie);
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("Cookie", _cookie);
                     }
                     client.DefaultRequestHeaders.Add("Range", $"bytes={range.From}-{range.To}");
                     client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
 
-                    client.Timeout = TimeSpan.FromSeconds(10);
+                    //client.Timeout = TimeSpan.FromSeconds(10);
                     using (HttpResponseMessage response = await client.GetAsync(url))
                     {
-                        try
-                        {
-                            response.EnsureSuccessStatusCode();
-
-                        }
-                        catch (Exception ex)
-                        {
-                            Trace.WriteLine(response.StatusCode);
-                            throw ex;
-                        }
-
-                        resetEvent.WaitOne();
-                        if (cts.IsCancellationRequested)
+                        if (_cts.IsCancellationRequested)
                         {
                             ReleaseFile();
                             // exit thread
-                            return;
+                            return false;
                         }
+                        try
+                        {
+                            response.EnsureSuccessStatusCode();
+                        }
+                        catch (Exception ex)
+                        {
+                            return false;
+                        }
+                        if (_isPaused) { return false; }
                         long? totalSize = response.Content.Headers.ContentLength;
+                        
                         using (Stream contentStream = await response.Content.ReadAsStreamAsync())
                         {
-                            byte[] buffer = new byte[BufferSize];
+                            byte[] buffer = new byte[_bufferSize];
                             int bytesRead;
+                            
                             while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                             {
-                                resetEvent.WaitOne();
-                                if (cts.IsCancellationRequested)
+                                if (_cts.IsCancellationRequested || _isPaused)
                                 {
-                                    ReleaseFile();
+                                    if (_cts.IsCancellationRequested)
+                                    {
+                                        ReleaseFile();
+                                    }
                                     // exit thread
-                                    return;
+                                    return false;
                                 }
                                 //await write 
-                                downloaded += bytesRead;
+                                _downloaded += bytesRead;
+                                pointer += bytesRead;
+                                lock ( _keyLock)
+                                {
+                                    ProgressDistribute tmpRange = _ranges[blockId];
+                                    tmpRange.Range.From+= bytesRead;
+                                    _ranges[blockId] = tmpRange;
+                                }
                                 lock (_lock)
                                 {
-                                    CalcProgress();
-                                    Dispatcher.UIThread.InvokeAsync(() =>
-                                    {
-                                        CallBack?.Invoke(); // �� UI �߳��е���
-                                    });
+                                    Report();
                                     FileStream.Seek(pointer, SeekOrigin.Begin);
                                     FileStream.Write(buffer, 0, bytesRead);
                                 }
-                                pointer += bytesRead;
-
+                                
                             }
+                            
                         }
                     }
+                    // 下载正常完毕
+                    _notCompletedBlock--;
+                    lock (_keyLock)
+                    {
+                        ProgressDistribute tmpRange = _ranges[blockId];
+                        tmpRange.IsCompleted = true;
+                        _ranges[blockId] = tmpRange;
+                    }
+                    return true;
                 }
             }
             catch (Exception ex)
             {
-                Trace.WriteLine(ex.ToString());
-                await DownloadThread(range, url);
+                
+                return false;
+                //await Task.Delay(500);
+                //Trace.WriteLine(ex.ToString());
+                //await DownloadThread(range, url);
             }
 
         }
-        private bool isFileReleased()
-        {
+        private bool IsFileReleased() {
             try
             {
                 return FileStream.SafeFileHandle.IsClosed;
@@ -275,58 +341,199 @@ namespace Netko.Download
         {
             lock (_lock)
             {
-                if (!isFileReleased())
+                if (!IsFileReleased())
                 {
                     FileStream.Close();
 
                 }
             }
-            if (cts.IsCancellationRequested)
+            if (_cts.IsCancellationRequested)
             {
-                if (File.Exists(filePath))
+                if (File.Exists(FilePath))
                 {
-                    File.Delete(filePath);
+                    File.Delete(FilePath);
                 }
             }
-            isDownloading = false;
+            _isDownloading = false;
+        }
+
+        public bool UpdateDownloadUrl()
+        {
+            
+            try
+            {
+                return UpdateDownloadUrlAsync().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+        public async Task<bool> UpdateDownloadUrlAsync()
+        {
+            Console.WriteLine("Updating download url");
+            if (getUrlFunc != null)
+            {
+                //_linkList.Clear();
+                _linkCount = 0;
+                foreach (string url in await getUrlFunc())
+                {
+                    _linkList.Add(url);
+                    _linkCount++;
+                }
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         public async void Run()
         {
-            List<Range> rangeLsit = CalcRange();
+            int clearCounter = 0;
+            int clearCounterMaxValue = 30;
+            _runed = true;
+            _isParsing = true;
+            //await UpdateDownloadUrl();
+            _isParsing = false;
+            _ranges = CalcRange();
+            _notCompletedBlock = _ranges.Count;
+            _pauseSource.Set();
+            // 信号量
             SemaphoreSlim semaphore = new SemaphoreSlim(TotalThread);
-            Console.WriteLine(rangeLsit.Count.ToString());
-            Task[] tasks = new Task[rangeLsit.Count];
-            for (int i = 0; i < rangeLsit.Count; i++)
+            // 异步信号协调
+            // ResetableTaskCompleteSource tcs = new ResetableTaskCompleteSource();
+            Task[] tasks = new Task[TotalThread];
+            while (!_isComplete)
             {
-                if (cts.IsCancellationRequested)
+                //Console.WriteLine("LOOP" + DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
+                if (_cts.IsCancellationRequested || _isComplete)
                 {
                     break;
                 }
-                await semaphore.WaitAsync();
-                int threadId = i;
-                int arrangeLinkId = threadId % linkList.Count;
-                tasks[threadId] = Task.Run(async () =>
+
+                clearCounter++;
+                if (clearCounter >= clearCounterMaxValue)
                 {
-                    try
+                    lock (_keyLock)
                     {
-                        downloadingThread++;
-                        await DownloadThread(rangeLsit[threadId], linkList[arrangeLinkId]);
-                        downloadingThread--;
+                        List<int> rangeKeyList = _ranges.Keys.ToList();
+                        foreach (int blockId in rangeKeyList)
+                        {
+                            if (_ranges[blockId].IsCompleted)
+                            {
+                                _ranges.Remove(blockId);
+                            }
+                        }
+                        clearCounter = 0;
                     }
-                    finally
+                    // 剔除已经下载完成的块
+                    
+                }
+                //等待线程空余
+                await semaphore.WaitAsync();
+                await _pauseSource.WaitAsync();
+                lock (_keyLock)
+                {
+                    //_resetEvent.WaitOne();
+
+                    // 遍历块
+                    foreach (int j in _ranges.Keys.ToList())
                     {
-                        semaphore.Release();
+                        // 若此块正在被下载或已经完成，则跳过
+                        if (_ranges[j].IsCompleted || _ranges[j].IsOccupied){continue;}
+                        //if (_ranges[j].IsOccupied || ) { continue; }
+
+                        if (_cts.IsCancellationRequested || _isComplete) { break; }
+
+                        // 遍历线程
+                        for (int i = 0; i < TotalThread; i++)
+                        {
+                            if (_cts.IsCancellationRequested) { break; }
+                            // 线程正在使用则跳过
+                            if (tasks[i] != null && !tasks[i].IsCompleted) { continue; }
+                            //_resetEvent.WaitOne();
+                            
+                            int threadId = i;
+                            int blockId = j;
+                            
+                            // 剔除下载失败的Url
+                            if (_ranges[blockId].ErrorCount > 10)
+                            {
+                                _linkList.Remove(_linkList[threadId % _linkList.Count]);
+                                lock (_keyLock)
+                                {
+                                    ProgressDistribute tmpRange = _ranges[blockId];
+                                    tmpRange.ErrorCount = 0;
+                                    _ranges[blockId] = tmpRange;
+                                }
+                                if (_linkList.Count == 0)
+                                {
+                                    // 同步更新
+                                    UpdateDownloadUrl();
+                                }
+                            }
+                            int arrangeLinkId = threadId % _linkList.Count;
+                            string url = _linkList[arrangeLinkId];
+                            
+                            //Console.WriteLine($"Download established: Total: {_totalSize} From: {_ranges[blockId].Range.From} To: {_ranges[blockId].Range.To} ErrCount: {_ranges[blockId].ErrorCount} LinkId: {arrangeLinkId}");
+                            tasks[threadId] = Task.Run(async () =>
+                            {
+                                try
+                                {
+                                    _downloadingThread++;
+                                    lock (_keyLock)
+                                    {
+                                        ProgressDistribute tmpRange = _ranges[blockId];
+                                        tmpRange.IsOccupied = true;
+                                        _ranges[blockId] = tmpRange;
+                                    }
+                                    bool isSuccess = await DownloadThread(_ranges[blockId].Range, url, blockId);
+                                    
+                                    lock (_keyLock)
+                                    {
+                                        ProgressDistribute tmpRange = _ranges[blockId];
+                                        tmpRange.IsCompleted = isSuccess;
+                                        if (!isSuccess && !_isPaused)
+                                        {
+                                            tmpRange.ErrorCount++;
+                                        }
+                                        _ranges[blockId] = tmpRange;
+                                    }
+                                }
+                                finally
+                                {
+                                    _downloadingThread--;
+                                    lock (_keyLock)
+                                    {
+                                        ProgressDistribute tmpRange = _ranges[blockId];
+                                        tmpRange.IsOccupied = false;
+                                        _ranges[blockId] = tmpRange;
+                                    }
+                                    semaphore.Release();
+                                }
+                            });
+                            break;
+                            //await Task.Delay(300);
+                        }
+
                     }
-                });
-            }
-            if (!tasks.Contains(null))
-            {
-                await Task.WhenAll(tasks);
+                }
+                
+                // 剩余块数小于线程数
+
+                /*if (!tasks.Contains(null) && _notCompletedBlock < TotalThread)
+                {
+                    await Task.WhenAll(tasks);
+                }*/
+                await Task.Delay(100);
 
             }
+            //Console.WriteLine("Download Completed");
             ReleaseFile();
             CalcProgress();
-            CallBack?.Invoke();
+            CallBack?.Invoke(); 
 
         }
 
