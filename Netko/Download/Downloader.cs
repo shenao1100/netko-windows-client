@@ -22,6 +22,7 @@ namespace Netko.Download
         public Range Range;
         public bool IsCompleted;
         public bool IsOccupied;
+        public int errorCount;
     }
     
     /// <summary>
@@ -29,17 +30,31 @@ namespace Netko.Download
     /// </summary>
     public class ResetableTaskCompleteSource
     {
-        private TaskCompletionSource<bool> _tcs = new TaskCompletionSource<bool>();
-        public Task WaitAsync => _tcs.Task;
+        private TaskCompletionSource<bool> _tcs = new TaskCompletionSource<bool>(false);
 
-        public void SetCompleted()
+        public Task WaitAsync()
         {
-            _tcs.TrySetResult(true);
+            return _tcs.Task;
+        }
+
+
+        public void Set()
+        {
+            var tcs = _tcs;
+            if (!tcs.Task.IsCompleted)
+            {
+                _tcs.TrySetResult(true);
+                
+            }
         }
 
         public void Reset()
         {
-            _tcs = new TaskCompletionSource<bool>();
+            if (_tcs.Task.IsCompleted)
+            {
+                _tcs = new TaskCompletionSource<bool>(false);
+                
+            }
         }
     }
     
@@ -50,7 +65,9 @@ namespace Netko.Download
         // 用于保证key一致性的锁
         private readonly object _keyLock = new object();
         // 阻塞
-        private readonly ManualResetEvent _resetEvent = new ManualResetEvent(true);
+        //private readonly ManualResetEvent _resetEvent = new ManualResetEvent(true);
+        // 异步等待
+        private readonly ResetableTaskCompleteSource _pauseSource = new ResetableTaskCompleteSource();
         // 取消信号
         private CancellationTokenSource _cts = new CancellationTokenSource();
         private FileStream FileStream { get; set; }
@@ -62,7 +79,7 @@ namespace Netko.Download
 
         public Action? CallBack { get; set; }
 
-        private Dictionary<int, string> _linkList = new Dictionary<int, string>();
+        private List<string> _linkList = new List<string>();
         private Dictionary<int, ProgressDistribute> _ranges = new Dictionary<int, ProgressDistribute>();
         
         private float _downloadProgress = 0;
@@ -93,7 +110,7 @@ namespace Netko.Download
             Url = config.Url;
             if (config.Url != null)
             {
-                _linkList.Add(_linkCount, config.Url);
+                _linkList.Add(config.Url);
             }
             _linkCount++;
             getUrlFunc = config.GetUrlFunc;
@@ -107,7 +124,7 @@ namespace Netko.Download
         }
         public void AddUrl(string url)
         {
-            _linkList.Add(_linkCount, url);
+            _linkList.Add(url);
             _linkCount++;
         }
         public void SetCallBack(Action callBack)
@@ -155,7 +172,8 @@ namespace Netko.Download
                         {
                             From = calcedSize,
                             To = _totalSize
-                        }
+                        },
+                        errorCount = 0
                     };
                     break;
 
@@ -170,7 +188,8 @@ namespace Netko.Download
                         {
                             From = calcedSize,
                             To = calcedSize + _downloadBlockSize,
-                        }
+                        },
+                        errorCount = 0
                     };
                 }
                 calcedSize += _downloadBlockSize + 1;
@@ -183,7 +202,8 @@ namespace Netko.Download
         /// </summary>
         public void Pause()
         {
-            _resetEvent.Reset();
+            //_resetEvent.Reset();
+            _pauseSource.Reset();
             _isPaused = true;
             CalcProgress();
             CallBack?.Invoke();
@@ -196,7 +216,8 @@ namespace Netko.Download
         /// </summary>
         public void Continue()
         {
-            _resetEvent.Set();
+            //_resetEvent.Set();
+            _pauseSource.Set();
             _isPaused = false;
             CalcProgress();
             CallBack?.Invoke();
@@ -208,7 +229,9 @@ namespace Netko.Download
         }
         public void Cancel()
         {
-            _resetEvent.Set();
+            //_resetEvent.Set();
+            _pauseSource.Set();
+
             _isPaused = false;
             _cts.Cancel();
             _isComplete = true;
@@ -239,8 +262,10 @@ namespace Netko.Download
         private void Report(bool forceReport = false)
         {
             CalcProgress();
+
             if (DateTimeOffset.Now.ToUnixTimeSeconds() - lastReportTime > 1 || forceReport)
             {
+
                 Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     CallBack?.Invoke(); // 在 UI 线程中调用
@@ -248,13 +273,9 @@ namespace Netko.Download
                 lastReportTime = DateTimeOffset.Now.ToUnixTimeSeconds();
             }
         }
-        public async Task DownloadThread(Range range, string url, int blockId)
+        public async Task<bool> DownloadThread(Range range, string url, int blockId)
         {
-            bool isCounted = false;
             long pointer = range.From;
-            ProgressDistribute tmpRange = _ranges[blockId];
-            tmpRange.IsOccupied = true;
-            _ranges[blockId] = tmpRange;
             try
             {
                 using (HttpClient client = new HttpClient())
@@ -272,15 +293,13 @@ namespace Netko.Download
                     client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
 
                     //client.Timeout = TimeSpan.FromSeconds(10);
-                    _downloadingThread++;
-                    isCounted = true;
                     using (HttpResponseMessage response = await client.GetAsync(url))
                     {
                         if (_cts.IsCancellationRequested)
                         {
                             ReleaseFile();
                             // exit thread
-                            return;
+                            return false;
                         }
                         try
                         {
@@ -288,20 +307,11 @@ namespace Netko.Download
                         }
                         catch (Exception ex)
                         {
-                            tmpRange = _ranges[blockId];
-                            tmpRange.IsOccupied = false;
-                            _ranges[blockId] = tmpRange;
-                            return;
-                            
+                            return false;
                         }
-                        _resetEvent.WaitOne();
-                        /*if (_isPaused)
-                        {
-                            tmpRange = _ranges[blockId];
-                            tmpRange.IsOccupied = false;
-                            _ranges[blockId] = tmpRange;
-                            return;
-                        }*/
+                        //_resetEvent.WaitOne();
+                        //await _pauseSource.WaitAsync();
+                        if (_isPaused) { return false; }
                         long? totalSize = response.Content.Headers.ContentLength;
                         
                         using (Stream contentStream = await response.Content.ReadAsStreamAsync())
@@ -311,61 +321,50 @@ namespace Netko.Download
                             
                             while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                             {
-                                _resetEvent.WaitOne();
-                                /*if (_isPaused)
+                                if (_cts.IsCancellationRequested || _isPaused)
                                 {
-                                    tmpRange = _ranges[blockId];
-                                    tmpRange.IsOccupied = false;
-                                    _ranges[blockId] = tmpRange;
-                                    return;
-                                }*/
-                                if (_cts.IsCancellationRequested)
-                                {
-                                    tmpRange = _ranges[blockId];
-                                    tmpRange.IsOccupied = false;
-                                    _ranges[blockId] = tmpRange;
-                                    ReleaseFile();
+                                    if (_cts.IsCancellationRequested)
+                                    {
+                                        ReleaseFile();
+                                    }
                                     // exit thread
-                                    return;
+                                    return false;
                                 }
                                 //await write 
                                 _downloaded += bytesRead;
+                                pointer += bytesRead;
+                                lock ( _keyLock)
+                                {
+                                    ProgressDistribute tmpRange = _ranges[blockId];
+                                    tmpRange.Range.From+= bytesRead;
+                                    _ranges[blockId] = tmpRange;
+                                }
                                 lock (_lock)
                                 {
                                     Report();
                                     FileStream.Seek(pointer, SeekOrigin.Begin);
                                     FileStream.Write(buffer, 0, bytesRead);
                                 }
-                                pointer += bytesRead;
-                                _ranges[blockId].Range.From += bytesRead;
+                                
                             }
                             
                         }
                     }
-                    if (isCounted)
-                    {
-                        _downloadingThread--;
-                        isCounted = false;
-                    }
                     // 下载正常完毕
                     _notCompletedBlock--;
-                    tmpRange = _ranges[blockId];
-                    tmpRange.IsOccupied = false;
-                    tmpRange.IsCompleted = true;
-                    _ranges[blockId] = tmpRange;
-                    return;
+                    lock (_keyLock)
+                    {
+                        ProgressDistribute tmpRange = _ranges[blockId];
+                        tmpRange.IsCompleted = true;
+                        _ranges[blockId] = tmpRange;
+                    }
+                    return true;
                 }
             }
             catch (Exception ex)
             {
-                if (isCounted)
-                {
-                    _downloadingThread--;
-                }
-                tmpRange = _ranges[blockId];
-                tmpRange.IsOccupied = false;
-                _ranges[blockId] = tmpRange;
-                return;
+                
+                return false;
                 //await Task.Delay(500);
                 //Trace.WriteLine(ex.ToString());
                 //await DownloadThread(range, url);
@@ -402,15 +401,28 @@ namespace Netko.Download
             _isDownloading = false;
         }
 
-        public async Task<bool> UpdateDownloadUrl()
+        public bool UpdateDownloadUrl()
         {
+            
+            try
+            {
+                return UpdateDownloadUrlAsync().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+        public async Task<bool> UpdateDownloadUrlAsync()
+        {
+            Console.WriteLine("Updating download url");
             if (getUrlFunc != null)
             {
-                _linkList.Clear();
+                //_linkList.Clear();
                 _linkCount = 0;
                 foreach (string url in await getUrlFunc())
                 {
-                    _linkList.Add(_linkCount, url);
+                    _linkList.Add(url);
                     _linkCount++;
                 }
 
@@ -431,6 +443,7 @@ namespace Netko.Download
             _isParsing = false;
             _ranges = CalcRange();
             _notCompletedBlock = _ranges.Count;
+            _pauseSource.Set();
             // 信号量
             SemaphoreSlim semaphore = new SemaphoreSlim(TotalThread);
             // 异步信号协调
@@ -464,10 +477,10 @@ namespace Netko.Download
                 }
                 //等待线程空余
                 await semaphore.WaitAsync();
-
+                await _pauseSource.WaitAsync();
                 lock (_keyLock)
                 {
-                    _resetEvent.WaitOne();
+                    //_resetEvent.WaitOne();
 
                     // 遍历块
                     foreach (int j in _ranges.Keys.ToList())
@@ -491,19 +504,64 @@ namespace Netko.Download
                             {
                                 continue;
                             }
-                            _resetEvent.WaitOne();
-
+                            //_resetEvent.WaitOne();
+                            
                             int threadId = i;
                             int blockId = j;
+                            
+                            // 剔除下载失败的Url
+                            if (_ranges[blockId].errorCount > 10)
+                            {
+                                _linkList.Remove(_linkList[threadId % _linkList.Count]);
+                                lock (_keyLock)
+                                {
+                                    ProgressDistribute tmpRange = _ranges[blockId];
+                                    tmpRange.errorCount = 0;
+                                    _ranges[blockId] = tmpRange;
+                                }
+                                if (_linkList.Count == 0)
+                                {
+                                    // 同步更新
+                                    UpdateDownloadUrl();
+                                }
+                            }
                             int arrangeLinkId = threadId % _linkList.Count;
+                            string url = _linkList[arrangeLinkId];
+                            
+                            Console.WriteLine($"Download established: Total: {_totalSize} From: {_ranges[blockId].Range.From} To: {_ranges[blockId].Range.To} ErrCount: {_ranges[blockId].errorCount} LinkId: {arrangeLinkId}");
                             tasks[threadId] = Task.Run(async () =>
                             {
                                 try
                                 {
-                                    await DownloadThread(_ranges[blockId].Range, _linkList[arrangeLinkId], blockId);
+                                    _downloadingThread++;
+                                    lock (_keyLock)
+                                    {
+                                        ProgressDistribute tmpRange = _ranges[blockId];
+                                        tmpRange.IsOccupied = true;
+                                        _ranges[blockId] = tmpRange;
+                                    }
+                                    bool isSuccess = await DownloadThread(_ranges[blockId].Range, url, blockId);
+                                    
+                                    lock (_keyLock)
+                                    {
+                                        ProgressDistribute tmpRange = _ranges[blockId];
+                                        tmpRange.IsCompleted = isSuccess;
+                                        if (!isSuccess && !_isPaused)
+                                        {
+                                            tmpRange.errorCount++;
+                                        }
+                                        _ranges[blockId] = tmpRange;
+                                    }
                                 }
                                 finally
                                 {
+                                    _downloadingThread--;
+                                    lock (_keyLock)
+                                    {
+                                        ProgressDistribute tmpRange = _ranges[blockId];
+                                        tmpRange.IsOccupied = false;
+                                        _ranges[blockId] = tmpRange;
+                                    }
                                     semaphore.Release();
                                 }
                             });
@@ -516,10 +574,11 @@ namespace Netko.Download
                 
                 // 剩余块数小于线程数
 
-                if (!tasks.Contains(null) && _notCompletedBlock < TotalThread)
+                /*if (!tasks.Contains(null) && _notCompletedBlock < TotalThread)
                 {
                     await Task.WhenAll(tasks);
-                }
+                }*/
+                await Task.Delay(100);
 
             }
             //Console.WriteLine("Download Completed");
